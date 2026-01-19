@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gabriel & Jessica - Nosso Casamento</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header/Hero -->
+    <header class="hero">
+        <nav class="navbar">
+            <div class="nav-container">
+                <a href="#" class="logo">G & J</a>
+                <ul class="nav-links">
+                    <li><a href="#nossa-historia">Nossa Historia</a></li>
+                    <li><a href="#cerimonia">Cerimonia</a></li>
+                    <li><a href="#presentes">Presentes</a></li>
+                    <li><a href="#confirmar">Confirmar Presenca</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+        <div class="hero-content">
+            <p class="hero-subtitle">Vamos nos casar!</p>
+            <h1 class="hero-title">Gabriel & Jessica</h1>
+            <p class="hero-date">15 de Marco de 2025</p>
+            <div class="countdown" id="countdown">
+                <div class="countdown-item">
+                    <span class="countdown-number" id="days">00</span>
+                    <span class="countdown-label">Dias</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="hours">00</span>
+                    <span class="countdown-label">Horas</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="minutes">00</span>
+                    <span class="countdown-label">Minutos</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-number" id="seconds">00</span>
+                    <span class="countdown-label">Segundos</span>
+                </div>
+            </div>
+            <a href="#confirmar" class="btn-primary">Confirmar Presenca</a>
+        </div>
+        <div class="scroll-indicator">
+            <span></span>
+        </div>
+    </header>
+
+    <!-- Nossa Historia -->
+    <section class="nossa-historia" id="nossa-historia">
+        <div class="container">
+            <h2 class="section-title">Nossa Historia</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">2018</div>
+                    <div class="timeline-content">
+                        <h3>O Primeiro Encontro</h3>
+                        <p>Nos conhecemos em uma tarde de verao, e desde entao nossas vidas nunca mais foram as mesmas. Foi amor a primeira vista.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2020</div>
+                    <div class="timeline-content">
+                        <h3>Primeiro Lar Juntos</h3>
+                        <p>Decidimos dar o proximo passo e comecar nossa vida juntos sob o mesmo teto. Uma nova aventura comecava.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2024</div>
+                    <div class="timeline-content">
+                        <h3>O Pedido</h3>
+                        <p>Em uma noite estrelada, a pergunta foi feita e o "sim" mais esperado foi ouvido. Estamos prontos para o proximo capitulo!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cerimonia -->
+    <section class="cerimonia" id="cerimonia">
+        <div class="container">
+            <h2 class="section-title">Cerimonia & Recepcao</h2>
+            <div class="evento-cards">
+                <div class="evento-card">
+                    <div class="evento-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                        </svg>
+                    </div>
+                    <h3>Cerimonia</h3>
+                    <p class="evento-horario">15:00</p>
+                    <p class="evento-local">Igreja Matriz de Sao Jose</p>
+                    <p class="evento-endereco">Rua das Flores, 123 - Centro</p>
+                </div>
+                <div class="evento-card">
+                    <div class="evento-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                    </div>
+                    <h3>Recepcao</h3>
+                    <p class="evento-horario">18:00</p>
+                    <p class="evento-local">Espaco Villa Verde</p>
+                    <p class="evento-endereco">Av. dos Jardins, 456 - Zona Sul</p>
+                </div>
+            </div>
+            <div class="mapa">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.1976456238127!2d-46.65390668502166!3d-23.561684284682506!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce59c8da0aa315%3A0xd59f9431f2c9776a!2sAv.%20Paulista%2C%20S%C3%A3o%20Paulo%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1620000000000!5m2!1spt-BR!2sbr" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Presentes -->
+    <section class="presentes" id="presentes">
+        <div class="container">
+            <h2 class="section-title">Lista de Presentes</h2>
+            <p class="presentes-intro">Sua presenca e o nosso maior presente! Mas se desejar nos presentear, deixamos algumas opcoes:</p>
+
+            <!-- Destaque Nubank -->
+            <div class="nubank-destaque">
+                <div class="nubank-card">
+                    <div class="nubank-logo">
+                        <svg width="120" height="40" viewBox="0 0 120 40" fill="none">
+                            <rect width="120" height="40" rx="8" fill="#820AD1"/>
+                            <text x="60" y="26" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold" font-size="16">Nubank</text>
+                        </svg>
+                    </div>
+                    <h3>Presente via Nubank</h3>
+                    <p class="nubank-desc">Envie seu presente diretamente pelo app do Nubank de forma rapida e segura</p>
+                    <div class="nubank-dados">
+                        <div class="dado-item">
+                            <span class="dado-label">Banco</span>
+                            <span class="dado-valor">Nu Pagamentos S.A. (260)</span>
+                        </div>
+                        <div class="dado-item">
+                            <span class="dado-label">Agencia</span>
+                            <span class="dado-valor">0001</span>
+                        </div>
+                        <div class="dado-item">
+                            <span class="dado-label">Conta</span>
+                            <span class="dado-valor">12345678-9</span>
+                        </div>
+                        <div class="dado-item">
+                            <span class="dado-label">Tipo</span>
+                            <span class="dado-valor">Conta Corrente PJ</span>
+                        </div>
+                        <div class="dado-item">
+                            <span class="dado-label">CNPJ</span>
+                            <span class="dado-valor">12.345.678/0001-90</span>
+                        </div>
+                        <div class="dado-item">
+                            <span class="dado-label">Razao Social</span>
+                            <span class="dado-valor">Gabriel & Jessica Casamento</span>
+                        </div>
+                    </div>
+                    <div class="nubank-pix">
+                        <p><strong>Chave PIX (CNPJ):</strong></p>
+                        <div class="pix-box">
+                            <span id="pixKey">12345678000190</span>
+                            <button class="btn-copy" onclick="copyPix()">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                Copiar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="qrcode-section">
+                        <p>Ou escaneie o QR Code:</p>
+                        <div class="qrcode-placeholder">
+                            <span>QR Code PIX</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="presentes-options">
+                <div class="presente-card">
+                    <div class="presente-icon">🏠</div>
+                    <h3>Lua de Mel</h3>
+                    <p>Contribua para realizarmos a viagem dos nossos sonhos!</p>
+                    <a href="#" class="btn-presente">Contribuir</a>
+                </div>
+                <div class="presente-card">
+                    <div class="presente-icon">💜</div>
+                    <h3>Transferencia</h3>
+                    <p>Qualquer valor e bem-vindo!</p>
+                    <button class="btn-presente" onclick="showBankDetails()">Ver Dados</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Confirmar Presenca -->
+    <section class="confirmar" id="confirmar">
+        <div class="container">
+            <h2 class="section-title">Confirme sua Presenca</h2>
+            <p class="confirmar-intro">Ficaremos muito felizes em te-lo conosco neste dia tao especial!</p>
+            <form class="rsvp-form" id="rsvpForm">
+                <div class="form-group">
+                    <input type="text" name="nome" placeholder="Seu nome completo" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Seu e-mail" required>
+                </div>
+                <div class="form-group">
+                    <input type="tel" name="telefone" placeholder="Seu telefone">
+                </div>
+                <div class="form-group">
+                    <select name="acompanhantes" required>
+                        <option value="">Numero de acompanhantes</option>
+                        <option value="0">Irei sozinho(a)</option>
+                        <option value="1">1 acompanhante</option>
+                        <option value="2">2 acompanhantes</option>
+                        <option value="3">3 acompanhantes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <textarea name="mensagem" placeholder="Deixe uma mensagem para os noivos (opcional)"></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Confirmar Presenca</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-names">Gabriel & Jessica</p>
+            <p class="footer-date">15 de Marco de 2025</p>
+            <p class="footer-hashtag">#GabrielEJessica2025</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
