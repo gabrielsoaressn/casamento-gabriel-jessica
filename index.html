@@ -17,6 +17,7 @@
                 <a href="#" class="logo">G & J</a>
                 <ul class="nav-links">
                     <li><a href="#nossa-historia">Nossa Historia</a></li>
+                    <li><a href="#galeria">Fotos</a></li>
                     <li><a href="#cerimonia">Cerimonia</a></li>
                     <li><a href="#presentes">Presentes</a></li>
                     <li><a href="#confirmar">Confirmar Presenca</a></li>
@@ -63,25 +64,68 @@
             <h2 class="section-title">Nossa Historia</h2>
             <div class="timeline">
                 <div class="timeline-item">
-                    <div class="timeline-date">2018</div>
+                    <div class="timeline-date">2019</div>
                     <div class="timeline-content">
                         <h3>O Primeiro Encontro</h3>
-                        <p>Nos conhecemos em uma tarde de verao, e desde entao nossas vidas nunca mais foram as mesmas. Foi amor a primeira vista.</p>
+                        <p>Nos conhecemos na preparacao para o Retiro de Carnaval da Paroquia Santo Antonio de 2019, onde fizemos juntos o ministerio de musica do retiro. Desde entao, continuamos tocando juntos na missa de Nossa Senhora e no oficio da Imaculada Conceicao que acontecia sempre nos sabados as 7h.</p>
                     </div>
                 </div>
                 <div class="timeline-item">
-                    <div class="timeline-date">2020</div>
+                    <div class="timeline-date">2022</div>
                     <div class="timeline-content">
-                        <h3>Primeiro Lar Juntos</h3>
-                        <p>Decidimos dar o proximo passo e comecar nossa vida juntos sob o mesmo teto. Uma nova aventura comecava.</p>
+                        <h3>Comeco do Namoro</h3>
+                        <p>Em 21 de setembro de 2022, iniciamos oficialmente nosso namoro. A partir dai, vivemos experiencias incriveis juntos.</p>
                     </div>
                 </div>
                 <div class="timeline-item">
-                    <div class="timeline-date">2024</div>
+                    <div class="timeline-date">2022-2025</div>
                     <div class="timeline-content">
-                        <h3>O Pedido</h3>
-                        <p>Em uma noite estrelada, a pergunta foi feita e o "sim" mais esperado foi ouvido. Estamos prontos para o proximo capitulo!</p>
+                        <h3>Aventuras Juntos</h3>
+                        <p>Viajamos para Recife, fomos as praias do litoral paraibano para trabalhar na pesquisa de mestrado de Jessica, e fomos juntos para Sao Cristovao com Frei Rafael para a profissao dos votos de Frei Caio. Cada momento fortaleceu nosso amor.</p>
                     </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2026</div>
+                    <div class="timeline-content">
+                        <h3>O Casamento</h3>
+                        <p>Decidimos dar um passo mais concreto e nos casar! Estamos prontos para comecar esta nova jornada juntos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Galeria de Fotos -->
+    <section class="galeria" id="galeria">
+        <div class="container">
+            <h2 class="section-title">Momentos Especiais</h2>
+            <div class="galeria-grid">
+                <div class="galeria-item">
+                    <img src="images/02f7417b-b624-49aa-804a-8712b89d246a.jpg" alt="Gabriel e Jessica">
+                </div>
+                <div class="galeria-item">
+                    <img src="images/24CB6664-E49E-41CD-80E4-DE41D59E5B97.jpg" alt="Gabriel e Jessica">
+                </div>
+                <div class="galeria-item">
+                    <img src="images/46096577-D950-482A-812B-29AA450FACC4.jpg" alt="Gabriel e Jessica">
+                </div>
+                <div class="galeria-item">
+                    <img src="images/4c6935d1-9078-4cd4-9ec4-cd1c4241595a.jpg" alt="Gabriel e Jessica">
+                </div>
+                <div class="galeria-item">
+                    <img src="images/8ae68de8-8bb0-4d00-b0ac-cb3d45e0cc2b.jpg" alt="Gabriel e Jessica">
+                </div>
+                <div class="galeria-item">
+                    <img src="images/95e0fcf8-984a-47e8-931c-56d7cecf5aa7.jpg" alt="Gabriel e Jessica">
+                </div>
+                <div class="galeria-item">
+                    <img src="images/d0115596-69c0-4a17-bda4-9f50fbb51055.jpg" alt="Gabriel e Jessica">
+                </div>
+                <div class="galeria-item">
+                    <img src="images/d086e22a-5672-4d1f-abbf-c6cd7c034458.jpg" alt="Gabriel e Jessica">
+                </div>
+                <div class="galeria-item">
+                    <img src="images/ef37d54a-8188-4961-947f-8c9662e9b6c5.jpg" alt="Gabriel e Jessica">
                 </div>
             </div>
         </div>
@@ -102,7 +146,7 @@
                     <h3>Cerimonia</h3>
                     <p class="evento-horario">09:30</p>
                     <p class="evento-local">Igreja de Nossa Senhora do Carmo</p>
-                    <p class="evento-endereco">Centro - João Pessoa, PB</p>
+                    <p class="evento-endereco">Praca Dom Adauto - Centro Historico, Joao Pessoa - PB</p>
                 </div>
                 <div class="evento-card">
                     <div class="evento-icon">
@@ -188,18 +232,48 @@
                 </div>
             </div>
 
-            <div class="presentes-options">
-                <div class="presente-card">
-                    <div class="presente-icon">🏠</div>
+            <div class="presentes-grid">
+                <div class="presente-card" data-presente="lua-mel" data-valor="50000">
+                    <div class="presente-icon">✈️</div>
                     <h3>Lua de Mel</h3>
-                    <p>Contribua para realizarmos a viagem dos nossos sonhos!</p>
-                    <a href="#" class="btn-presente">Contribuir</a>
+                    <p>Ajude a realizar a viagem dos nossos sonhos!</p>
+                    <p class="presente-valor">R$ 500,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('lua-mel', 500.00, 'Lua de Mel')">Presentear</button>
                 </div>
-                <div class="presente-card">
+                <div class="presente-card" data-presente="jogo-jantar" data-valor="30000">
+                    <div class="presente-icon">🍽️</div>
+                    <h3>Jogo de Jantar</h3>
+                    <p>Para nossas refeicoes especiais</p>
+                    <p class="presente-valor">R$ 300,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('jogo-jantar', 300.00, 'Jogo de Jantar')">Presentear</button>
+                </div>
+                <div class="presente-card" data-presente="jogo-cama" data-valor="40000">
+                    <div class="presente-icon">🛏️</div>
+                    <h3>Jogo de Cama</h3>
+                    <p>Para noites confortaveis</p>
+                    <p class="presente-valor">R$ 400,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('jogo-cama', 400.00, 'Jogo de Cama')">Presentear</button>
+                </div>
+                <div class="presente-card" data-presente="panelas" data-valor="60000">
+                    <div class="presente-icon">🍳</div>
+                    <h3>Jogo de Panelas</h3>
+                    <p>Para prepararmos deliciosas refeicoes</p>
+                    <p class="presente-valor">R$ 600,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('panelas', 600.00, 'Jogo de Panelas')">Presentear</button>
+                </div>
+                <div class="presente-card" data-presente="eletrodomesticos" data-valor="80000">
+                    <div class="presente-icon">🏠</div>
+                    <h3>Eletrodomesticos</h3>
+                    <p>Para equipar nossa casa</p>
+                    <p class="presente-valor">R$ 800,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('eletrodomesticos', 800.00, 'Eletrodomesticos')">Presentear</button>
+                </div>
+                <div class="presente-card" data-presente="personalizado" data-valor="custom">
                     <div class="presente-icon">💜</div>
-                    <h3>Transferencia</h3>
-                    <p>Qualquer valor e bem-vindo!</p>
-                    <button class="btn-presente" onclick="showBankDetails()">Ver Dados</button>
+                    <h3>Valor Personalizado</h3>
+                    <p>Escolha o valor que desejar</p>
+                    <p class="presente-valor">Qualquer valor</p>
+                    <button class="btn-presente" onclick="abrirModalValorPersonalizado()">Contribuir</button>
                 </div>
             </div>
         </div>
@@ -236,6 +310,48 @@
             </form>
         </div>
     </section>
+
+    <!-- Modal de Presente -->
+    <div id="modalPresente" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="fecharModal()">&times;</span>
+            <h2 id="modalTitulo">Confirmar Presente</h2>
+            <p id="modalDescricao"></p>
+
+            <form id="formPresente" onsubmit="gerarCobranca(event)">
+                <div class="form-group">
+                    <input type="text" id="nomeConvidado" name="nome" placeholder="Seu nome completo" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="emailConvidado" name="email" placeholder="Seu e-mail" required>
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="telefoneConvidado" name="telefone" placeholder="Seu telefone (opcional)">
+                </div>
+                <div class="form-group" id="valorPersonalizadoGroup" style="display: none;">
+                    <input type="number" id="valorPersonalizado" name="valor" placeholder="Valor (R$)" min="10" step="0.01">
+                </div>
+
+                <input type="hidden" id="presenteId" name="presenteId">
+                <input type="hidden" id="presenteValor" name="presenteValor">
+                <input type="hidden" id="presenteNome" name="presenteNome">
+
+                <button type="submit" class="btn-submit" id="btnGerarCobranca">
+                    <span id="btnTexto">Gerar Link de Pagamento</span>
+                    <span id="btnLoading" style="display: none;">Gerando...</span>
+                </button>
+            </form>
+
+            <div id="resultadoCobranca" style="display: none;">
+                <div class="sucesso-cobranca">
+                    <h3>Link de Pagamento Gerado!</h3>
+                    <p>Acesse o link abaixo para realizar o pagamento:</p>
+                    <a id="linkPagamento" href="#" target="_blank" class="btn-primary">Abrir Link de Pagamento</a>
+                    <p class="info-pagamento">Voce pode pagar com PIX, cartao de credito, debito ou NuPay</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">

@@ -170,3 +170,135 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('.timeline-item, .evento-card, .presente-card').forEach(el => {
     observer.observe(el);
 });
+
+// ========== FUNCIONALIDADE DE PRESENTES ==========
+
+// Variáveis globais para o presente selecionado
+let presenteSelecionado = {
+    id: '',
+    nome: '',
+    valor: 0
+};
+
+// Função para abrir modal com presente selecionado
+function selecionarPresente(id, valor, nome) {
+    presenteSelecionado = { id, valor, nome };
+
+    document.getElementById('modalTitulo').textContent = `Presentear: ${nome}`;
+    document.getElementById('modalDescricao').textContent = `Valor: R$ ${valor.toFixed(2).replace('.', ',')}`;
+
+    document.getElementById('presenteId').value = id;
+    document.getElementById('presenteValor').value = valor;
+    document.getElementById('presenteNome').value = nome;
+
+    document.getElementById('valorPersonalizadoGroup').style.display = 'none';
+    document.getElementById('formPresente').style.display = 'block';
+    document.getElementById('resultadoCobranca').style.display = 'none';
+
+    abrirModal();
+}
+
+// Função para abrir modal com valor personalizado
+function abrirModalValorPersonalizado() {
+    presenteSelecionado = { id: 'personalizado', nome: 'Contribuição Personalizada', valor: 0 };
+
+    document.getElementById('modalTitulo').textContent = 'Contribuição Personalizada';
+    document.getElementById('modalDescricao').textContent = 'Escolha o valor que deseja contribuir';
+
+    document.getElementById('presenteId').value = 'personalizado';
+    document.getElementById('presenteNome').value = 'Contribuição Personalizada';
+
+    document.getElementById('valorPersonalizadoGroup').style.display = 'block';
+    document.getElementById('valorPersonalizado').required = true;
+    document.getElementById('formPresente').style.display = 'block';
+    document.getElementById('resultadoCobranca').style.display = 'none';
+
+    abrirModal();
+}
+
+// Função para abrir modal
+function abrirModal() {
+    document.getElementById('modalPresente').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// Função para fechar modal
+function fecharModal() {
+    document.getElementById('modalPresente').classList.remove('active');
+    document.body.style.overflow = 'auto';
+
+    // Limpar formulário
+    document.getElementById('formPresente').reset();
+    document.getElementById('resultadoCobranca').style.display = 'none';
+    document.getElementById('formPresente').style.display = 'block';
+}
+
+// Fechar modal ao clicar fora
+document.getElementById('modalPresente').addEventListener('click', function(e) {
+    if (e.target === this) {
+        fecharModal();
+    }
+});
+
+// Função para gerar cobrança
+async function gerarCobranca(event) {
+    event.preventDefault();
+
+    const btnTexto = document.getElementById('btnTexto');
+    const btnLoading = document.getElementById('btnLoading');
+    const btnGerarCobranca = document.getElementById('btnGerarCobranca');
+
+    // Mostrar loading
+    btnTexto.style.display = 'none';
+    btnLoading.style.display = 'inline';
+    btnGerarCobranca.disabled = true;
+
+    // Obter dados do formulário
+    const formData = new FormData(event.target);
+    const dados = {
+        nome: formData.get('nome'),
+        email: formData.get('email'),
+        telefone: formData.get('telefone'),
+        presenteId: formData.get('presenteId'),
+        presenteNome: formData.get('presenteNome'),
+        valor: formData.get('presenteId') === 'personalizado'
+            ? parseFloat(formData.get('valor'))
+            : parseFloat(formData.get('presenteValor'))
+    };
+
+    try {
+        // Chamar API do backend
+        const response = await fetch('/api/criar-cobranca', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dados)
+        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao gerar cobrança');
+        }
+
+        const resultado = await response.json();
+
+        // Mostrar resultado
+        document.getElementById('linkPagamento').href = resultado.paymentUrl;
+        document.getElementById('formPresente').style.display = 'none';
+        document.getElementById('resultadoCobranca').style.display = 'block';
+
+        // Resetar botão
+        btnTexto.style.display = 'inline';
+        btnLoading.style.display = 'none';
+        btnGerarCobranca.disabled = false;
+
+    } catch (error) {
+        console.error('Erro:', error);
+        showToast('Erro ao gerar link de pagamento. Tente novamente.');
+
+        // Resetar botão
+        btnTexto.style.display = 'inline';
+        btnLoading.style.display = 'none';
+        btnGerarCobranca.disabled = false;
+    }
+}
