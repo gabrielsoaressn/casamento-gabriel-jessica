@@ -180,6 +180,64 @@ let presenteSelecionado = {
     valor: 0
 };
 
+// Variável para armazenar presentes reservados
+let presentesReservados = [];
+
+// Função para carregar presentes reservados do servidor
+async function carregarPresentesReservados() {
+    try {
+        const response = await fetch(`${API_URL}/api/presentes-reservados`);
+        const data = await response.json();
+
+        if (data.success && data.presentes) {
+            presentesReservados = data.presentes;
+            marcarPresentesIndisponiveis();
+        }
+    } catch (error) {
+        console.error('Erro ao carregar presentes reservados:', error);
+    }
+}
+
+// Função para marcar presentes como indisponíveis visualmente
+function marcarPresentesIndisponiveis() {
+    // Buscar todos os cards de presentes
+    const cards = document.querySelectorAll('.presente-card');
+
+    cards.forEach(card => {
+        const botao = card.querySelector('.btn-presente');
+        if (botao) {
+            // Extrair o presente ID do onclick do botão
+            const onclickAttr = botao.getAttribute('onclick');
+            if (onclickAttr) {
+                const match = onclickAttr.match(/selecionarPresente\('([^']+)'/);
+                if (match) {
+                    const presenteId = match[1];
+
+                    // Verificar se está reservado
+                    const reservado = presentesReservados.find(p =>
+                        p.presenteId === presenteId &&
+                        (p.status === 'pendente' || p.status === 'pago')
+                    );
+
+                    if (reservado) {
+                        card.classList.add('indisponivel');
+                        botao.disabled = true;
+                        botao.textContent = 'Indisponível';
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Carregar presentes reservados ao carregar a página
+document.addEventListener('DOMContentLoaded', () => {
+    carregarPresentesReservados();
+
+    // Recarregar a cada 30 segundos para manter atualizado
+    setInterval(carregarPresentesReservados, 30000);
+});
+
 // Função para mostrar categoria de presentes
 function mostrarCategoria(categoria) {
     // Esconder categorias principais
@@ -193,6 +251,9 @@ function mostrarCategoria(categoria) {
         document.getElementById('presentes-lua-mel').style.display = 'grid';
         document.getElementById('presentes-casa').style.display = 'none';
     }
+
+    // Remarcar presentes indisponíveis na categoria exibida
+    setTimeout(marcarPresentesIndisponiveis, 100);
 
     // Scroll suave até a seção de presentes
     document.getElementById('presentes').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -213,6 +274,17 @@ function voltarCategorias() {
 
 // Função para abrir modal com presente selecionado
 function selecionarPresente(id, valor, nome) {
+    // Verificar se o presente está disponível
+    const reservado = presentesReservados.find(p =>
+        p.presenteId === id &&
+        (p.status === 'pendente' || p.status === 'pago')
+    );
+
+    if (reservado) {
+        showToast('Este presente já foi reservado por outro convidado');
+        return;
+    }
+
     presenteSelecionado = { id, valor, nome };
 
     document.getElementById('modalTitulo').textContent = `Presentear: ${nome}`;
@@ -299,7 +371,7 @@ async function gerarCobranca(event) {
 
     try {
         // Chamar API do backend
-        const response = await fetch('/api/criar-cobranca', {
+        const response = await fetch(`${API_URL}/api/criar-cobranca`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -317,6 +389,9 @@ async function gerarCobranca(event) {
         document.getElementById('linkPagamento').href = resultado.paymentUrl;
         document.getElementById('formPresente').style.display = 'none';
         document.getElementById('resultadoCobranca').style.display = 'block';
+
+        // Recarregar lista de presentes reservados
+        carregarPresentesReservados();
 
         // Resetar botão
         btnTexto.style.display = 'inline';

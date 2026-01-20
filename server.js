@@ -3,6 +3,15 @@ const cors = require('cors');
 const axios = require('axios');
 require('dotenv').config();
 
+const {
+    initDatabase,
+    reservarPresente,
+    verificarPresenteDisponivel,
+    getPresentesReservados,
+    atualizarStatusPresente,
+    limparReservasExpiradas
+} = require('./db');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -16,6 +25,26 @@ const PICPAY_API_URL = process.env.PICPAY_API_URL || 'https://api.picpay.com';
 const PICPAY_TOKEN = process.env.PICPAY_TOKEN;
 const PICPAY_SELLER_TOKEN = process.env.PICPAY_SELLER_TOKEN;
 
+// Endpoint para consultar presentes reservados
+app.get('/api/presentes-reservados', async (req, res) => {
+    try {
+        const presentes = await getPresentesReservados();
+        res.json({
+            success: true,
+            presentes: presentes.map(p => ({
+                presenteId: p.presente_id,
+                status: p.status
+            }))
+        });
+    } catch (error) {
+        console.error('Erro ao buscar presentes reservados:', error);
+        res.status(500).json({
+            error: 'Erro ao buscar presentes reservados',
+            presentes: [] // Retornar array vazio em caso de erro
+        });
+    }
+});
+
 // Endpoint para criar cobrança
 app.post('/api/criar-cobranca', async (req, res) => {
     try {
@@ -28,6 +57,17 @@ app.post('/api/criar-cobranca', async (req, res) => {
 
         if (valor < 10) {
             return res.status(400).json({ error: 'Valor mínimo é R$ 10,00' });
+        }
+
+        // Verificar se o presente já está reservado (apenas para presentes fixos, não personalizados)
+        if (presenteId !== 'personalizado') {
+            const disponivel = await verificarPresenteDisponivel(presenteId);
+            if (!disponivel) {
+                return res.status(409).json({
+                    error: 'Este presente já foi reservado por outro convidado',
+                    message: 'Por favor, escolha outro presente da lista'
+                });
+            }
         }
 
         // Gerar ID único para a referência do pagamento
@@ -73,6 +113,25 @@ app.post('/api/criar-cobranca', async (req, res) => {
             }
         );
 
+        // Reservar presente no banco de dados após sucesso na API
+        if (presenteId !== 'personalizado') {
+            try {
+                await reservarPresente(
+                    presenteId,
+                    presenteNome,
+                    valor,
+                    nome,
+                    email,
+                    telefone,
+                    referenceId
+                );
+                console.log(`✓ Presente ${presenteId} reservado para ${nome}`);
+            } catch (dbError) {
+                console.error('Erro ao reservar presente no banco:', dbError);
+                // Não falha a transação se o banco estiver indisponível
+            }
+        }
+
         // Retornar URL de pagamento
         res.json({
             success: true,
@@ -87,10 +146,30 @@ app.post('/api/criar-cobranca', async (req, res) => {
         // Se estiver em modo de desenvolvimento sem API configurada
         if (!PICPAY_TOKEN || error.code === 'ECONNREFUSED') {
             console.warn('API do PicPay não configurada. Retornando mock para desenvolvimento.');
+
+            // Ainda assim, reservar o presente no banco
+            const mockReferenceId = 'mock-' + Date.now();
+            if (presenteId !== 'personalizado') {
+                try {
+                    await reservarPresente(
+                        presenteId,
+                        presenteNome,
+                        valor,
+                        nome,
+                        email,
+                        telefone,
+                        mockReferenceId
+                    );
+                    console.log(`✓ Presente ${presenteId} reservado (modo dev)`);
+                } catch (dbError) {
+                    console.error('Erro ao reservar presente:', dbError);
+                }
+            }
+
             return res.json({
                 success: true,
                 paymentUrl: 'https://picpay.com/mock-payment-link',
-                referenceId: 'mock-' + Date.now(),
+                referenceId: mockReferenceId,
                 qrcode: {
                     content: 'mock-qrcode',
                     base64: 'data:image/png;base64,mock'
@@ -137,7 +216,13 @@ app.post('/api/webhook/picpay', async (req, res) => {
                 switch (status) {
                     case 'paid':
                         console.log(`✓ Pagamento confirmado: ${referenceId}`);
-                        // Aqui você pode enviar email, atualizar banco de dados, etc.
+                        // Atualizar status no banco de dados
+                        try {
+                            await atualizarStatusPresente(referenceId, 'pago');
+                            console.log(`✓ Status do presente atualizado para 'pago'`);
+                        } catch (dbError) {
+                            console.error('Erro ao atualizar status:', dbError);
+                        }
                         break;
 
                     case 'analysis':
@@ -146,14 +231,29 @@ app.post('/api/webhook/picpay', async (req, res) => {
 
                     case 'expired':
                         console.log(`⏰ Pagamento expirado: ${referenceId}`);
+                        try {
+                            await atualizarStatusPresente(referenceId, 'expirado');
+                        } catch (dbError) {
+                            console.error('Erro ao atualizar status:', dbError);
+                        }
                         break;
 
                     case 'refunded':
                         console.log(`↩️ Pagamento estornado: ${referenceId}`);
+                        try {
+                            await atualizarStatusPresente(referenceId, 'cancelado');
+                        } catch (dbError) {
+                            console.error('Erro ao atualizar status:', dbError);
+                        }
                         break;
 
                     case 'chargeback':
                         console.log(`⚠️ Chargeback: ${referenceId}`);
+                        try {
+                            await atualizarStatusPresente(referenceId, 'cancelado');
+                        } catch (dbError) {
+                            console.error('Erro ao atualizar status:', dbError);
+                        }
                         break;
 
                     default:
@@ -242,9 +342,52 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
-    console.log(`\n🎉 Servidor rodando na porta ${PORT}`);
-    console.log(`📍 Acesse: http://localhost:${PORT}`);
-    console.log(`💳 API PicPay: ${PICPAY_TOKEN ? 'Configurada ✓' : 'Não configurada ⚠️'}`);
-    console.log('\n');
-});
+// Inicializar banco de dados e servidor
+async function startServer() {
+    try {
+        // Inicializar banco de dados
+        await initDatabase();
+        console.log('✓ Banco de dados inicializado');
+
+        // Limpar reservas expiradas ao iniciar
+        const expiradas = await limparReservasExpiradas();
+        if (expiradas.length > 0) {
+            console.log(`✓ ${expiradas.length} reserva(s) expirada(s) limpa(s)`);
+        }
+
+        // Agendar limpeza de reservas expiradas a cada hora
+        setInterval(async () => {
+            try {
+                const exp = await limparReservasExpiradas();
+                if (exp.length > 0) {
+                    console.log(`✓ ${exp.length} reserva(s) expirada(s) limpa(s) automaticamente`);
+                }
+            } catch (error) {
+                console.error('Erro ao limpar reservas expiradas:', error);
+            }
+        }, 60 * 60 * 1000); // 1 hora
+
+        // Iniciar servidor
+        app.listen(PORT, () => {
+            console.log(`\n🎉 Servidor rodando na porta ${PORT}`);
+            console.log(`📍 Acesse: http://localhost:${PORT}`);
+            console.log(`💳 API PicPay: ${PICPAY_TOKEN ? 'Configurada ✓' : 'Não configurada ⚠️'}`);
+            console.log(`🗄️ Banco de dados: Configurado ✓`);
+            console.log('\n');
+        });
+    } catch (error) {
+        console.error('⚠️ Erro ao inicializar servidor:', error.message);
+        console.log('⚠️ Servidor iniciando sem conexão com banco de dados...\n');
+
+        // Iniciar servidor mesmo sem banco
+        app.listen(PORT, () => {
+            console.log(`\n🎉 Servidor rodando na porta ${PORT}`);
+            console.log(`📍 Acesse: http://localhost:${PORT}`);
+            console.log(`💳 API PicPay: ${PICPAY_TOKEN ? 'Configurada ✓' : 'Não configurada ⚠️'}`);
+            console.log(`🗄️ Banco de dados: Não disponível ⚠️`);
+            console.log('\n');
+        });
+    }
+}
+
+startServer();
