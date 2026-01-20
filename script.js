@@ -180,6 +180,37 @@ let presenteSelecionado = {
     valor: 0
 };
 
+// Função para mostrar categoria de presentes
+function mostrarCategoria(categoria) {
+    // Esconder categorias principais
+    document.getElementById('categorias-presentes').style.display = 'none';
+
+    // Mostrar lista da categoria selecionada
+    if (categoria === 'casa') {
+        document.getElementById('presentes-casa').style.display = 'grid';
+        document.getElementById('presentes-lua-mel').style.display = 'none';
+    } else if (categoria === 'lua-mel') {
+        document.getElementById('presentes-lua-mel').style.display = 'grid';
+        document.getElementById('presentes-casa').style.display = 'none';
+    }
+
+    // Scroll suave até a seção de presentes
+    document.getElementById('presentes').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Função para voltar às categorias
+function voltarCategorias() {
+    // Mostrar categorias principais
+    document.getElementById('categorias-presentes').style.display = 'grid';
+
+    // Esconder listas de presentes
+    document.getElementById('presentes-casa').style.display = 'none';
+    document.getElementById('presentes-lua-mel').style.display = 'none';
+
+    // Scroll suave até a seção de presentes
+    document.getElementById('presentes').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 // Função para abrir modal com presente selecionado
 function selecionarPresente(id, valor, nome) {
     presenteSelecionado = { id, valor, nome };

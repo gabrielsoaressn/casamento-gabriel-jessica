@@ -209,47 +209,144 @@
                 </div>
             </div>
 
-            <div class="presentes-grid">
-                <div class="presente-card" data-presente="lua-mel" data-valor="50000">
-                    <div class="presente-icon">✈️</div>
+            <!-- Categorias principais -->
+            <div id="categorias-presentes" class="presentes-grid categorias-grid">
+                <div class="categoria-card" onclick="mostrarCategoria('casa')">
+                    <div class="categoria-icon">🏠</div>
+                    <h3>Nossa Casa</h3>
+                    <p>Ajude a equipar nosso novo lar</p>
+                    <button class="btn-presente">Ver Presentes</button>
+                </div>
+                <div class="categoria-card" onclick="mostrarCategoria('lua-mel')">
+                    <div class="categoria-icon">✈️</div>
                     <h3>Lua de Mel</h3>
-                    <p>Ajude a realizar a viagem dos nossos sonhos!</p>
-                    <p class="presente-valor">R$ 500,00</p>
-                    <button class="btn-presente" onclick="selecionarPresente('lua-mel', 500.00, 'Lua de Mel')">Presentear</button>
+                    <p>Praia de Carneiros e Gravatá</p>
+                    <button class="btn-presente">Ver Presentes</button>
                 </div>
-                <div class="presente-card" data-presente="jogo-jantar" data-valor="30000">
-                    <div class="presente-icon">🍽️</div>
-                    <h3>Jogo de Jantar</h3>
-                    <p>Para nossas refeicoes especiais</p>
-                    <p class="presente-valor">R$ 300,00</p>
-                    <button class="btn-presente" onclick="selecionarPresente('jogo-jantar', 300.00, 'Jogo de Jantar')">Presentear</button>
+            </div>
+
+            <!-- Lista de presentes - Casa -->
+            <div id="presentes-casa" class="presentes-grid" style="display: none;">
+                <div class="voltar-categorias">
+                    <button class="btn-voltar" onclick="voltarCategorias()">← Voltar</button>
                 </div>
-                <div class="presente-card" data-presente="jogo-cama" data-valor="40000">
+
+                <div class="presente-card">
+                    <div class="presente-icon">🤖</div>
+                    <h3>Robô de Limpeza</h3>
+                    <p>Para manter nossa casa sempre limpa</p>
+                    <p class="presente-valor">R$ 1.500,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('robo-limpeza', 1500.00, 'Robô de Limpeza')">Presentear</button>
+                </div>
+
+                <div class="presente-card">
                     <div class="presente-icon">🛏️</div>
                     <h3>Jogo de Cama</h3>
                     <p>Para noites confortaveis</p>
                     <p class="presente-valor">R$ 400,00</p>
                     <button class="btn-presente" onclick="selecionarPresente('jogo-cama', 400.00, 'Jogo de Cama')">Presentear</button>
                 </div>
-                <div class="presente-card" data-presente="panelas" data-valor="60000">
-                    <div class="presente-icon">🍳</div>
-                    <h3>Jogo de Panelas</h3>
-                    <p>Para prepararmos deliciosas refeicoes</p>
-                    <p class="presente-valor">R$ 600,00</p>
-                    <button class="btn-presente" onclick="selecionarPresente('panelas', 600.00, 'Jogo de Panelas')">Presentear</button>
+
+                <div class="presente-card">
+                    <div class="presente-icon">🛁</div>
+                    <h3>Jogo de Banho</h3>
+                    <p>Toalhas macias para nosso banheiro</p>
+                    <p class="presente-valor">R$ 300,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('jogo-banho', 300.00, 'Jogo de Banho')">Presentear</button>
                 </div>
-                <div class="presente-card" data-presente="eletrodomesticos" data-valor="80000">
-                    <div class="presente-icon">🏠</div>
-                    <h3>Eletrodomesticos</h3>
-                    <p>Para equipar nossa casa</p>
-                    <p class="presente-valor">R$ 800,00</p>
-                    <button class="btn-presente" onclick="selecionarPresente('eletrodomesticos', 800.00, 'Eletrodomesticos')">Presentear</button>
+
+                <div class="presente-card">
+                    <div class="presente-icon">🛋️</div>
+                    <h3>Sofá</h3>
+                    <p>Para momentos de descanso juntos</p>
+                    <p class="presente-valor">R$ 2.500,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('sofa', 2500.00, 'Sofá')">Presentear</button>
                 </div>
-                <div class="presente-card" data-presente="personalizado" data-valor="custom">
+
+                <div class="presente-card">
+                    <div class="presente-icon">❄️</div>
+                    <h3>Ar Condicionado</h3>
+                    <p>Para dias quentes em João Pessoa</p>
+                    <p class="presente-valor">R$ 2.000,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('ar-condicionado', 2000.00, 'Ar Condicionado')">Presentear</button>
+                </div>
+
+                <div class="presente-card">
+                    <div class="presente-icon">📽️</div>
+                    <h3>Projetor</h3>
+                    <p>Para nossas noites de cinema em casa</p>
+                    <p class="presente-valor">R$ 1.800,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('projetor', 1800.00, 'Projetor')">Presentear</button>
+                </div>
+
+                <div class="presente-card">
                     <div class="presente-icon">💜</div>
-                    <h3>Valor Personalizado</h3>
-                    <p>Escolha o valor que desejar</p>
-                    <p class="presente-valor">Qualquer valor</p>
+                    <h3>Outro Item</h3>
+                    <p>Contribua com o valor que desejar</p>
+                    <p class="presente-valor">Valor livre</p>
+                    <button class="btn-presente" onclick="abrirModalValorPersonalizado()">Contribuir</button>
+                </div>
+            </div>
+
+            <!-- Lista de presentes - Lua de Mel -->
+            <div id="presentes-lua-mel" class="presentes-grid" style="display: none;">
+                <div class="voltar-categorias">
+                    <button class="btn-voltar" onclick="voltarCategorias()">← Voltar</button>
+                </div>
+
+                <div class="presente-card">
+                    <div class="presente-icon">🍽️</div>
+                    <h3>Jantar Romântico</h3>
+                    <p>Um jantar especial a beira-mar</p>
+                    <p class="presente-valor">R$ 400,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('jantar', 400.00, 'Jantar Romântico - Lua de Mel')">Presentear</button>
+                </div>
+
+                <div class="presente-card">
+                    <div class="presente-icon">🍴</div>
+                    <h3>Almoço Especial</h3>
+                    <p>Almoço em restaurante local</p>
+                    <p class="presente-valor">R$ 250,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('almoco', 250.00, 'Almoço Especial - Lua de Mel')">Presentear</button>
+                </div>
+
+                <div class="presente-card">
+                    <div class="presente-icon">🏨</div>
+                    <h3>Hospedagem</h3>
+                    <p>Uma noite em resort na Praia de Carneiros</p>
+                    <p class="presente-valor">R$ 800,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('hospedagem', 800.00, 'Hospedagem - Lua de Mel')">Presentear</button>
+                </div>
+
+                <div class="presente-card">
+                    <div class="presente-icon">🚗</div>
+                    <h3>Locação de Carro</h3>
+                    <p>Transporte para explorar a região</p>
+                    <p class="presente-valor">R$ 500,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('locacao', 500.00, 'Locação de Carro - Lua de Mel')">Presentear</button>
+                </div>
+
+                <div class="presente-card">
+                    <div class="presente-icon">🏖️</div>
+                    <h3>Passeio de Catamarã</h3>
+                    <p>Conhecer as piscinas naturais</p>
+                    <p class="presente-valor">R$ 350,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('passeio-catamara', 350.00, 'Passeio de Catamarã - Lua de Mel')">Presentear</button>
+                </div>
+
+                <div class="presente-card">
+                    <div class="presente-icon">🎭</div>
+                    <h3>Passeio em Gravatá</h3>
+                    <p>Conhecer o clima serrano de Pernambuco</p>
+                    <p class="presente-valor">R$ 300,00</p>
+                    <button class="btn-presente" onclick="selecionarPresente('passeio-gravata', 300.00, 'Passeio em Gravatá - Lua de Mel')">Presentear</button>
+                </div>
+
+                <div class="presente-card">
+                    <div class="presente-icon">💜</div>
+                    <h3>Outra Experiência</h3>
+                    <p>Contribua com o valor que desejar</p>
+                    <p class="presente-valor">Valor livre</p>
                     <button class="btn-presente" onclick="abrirModalValorPersonalizado()">Contribuir</button>
                 </div>
             </div>

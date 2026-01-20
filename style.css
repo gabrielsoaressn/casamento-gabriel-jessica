@@ -469,6 +469,55 @@ body {
     margin: 0 auto;
 }
 
+.categorias-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 800px;
+}
+
+.categoria-card {
+    background: #fff;
+    padding: 60px 40px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.categoria-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.categoria-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.voltar-categorias {
+    grid-column: 1 / -1;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.btn-voltar {
+    padding: 12px 30px;
+    background: #666;
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.btn-voltar:hover {
+    background: #555;
+    transform: translateX(-5px);
+}
+
 .presente-card {
     background: #fff;
     padding: 40px 30px;
@@ -909,6 +958,14 @@ body {
 
     .presentes-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .categorias-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .categoria-card {
+        padding: 40px 30px;
     }
 
     .modal-content {
