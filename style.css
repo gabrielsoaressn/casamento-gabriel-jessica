@@ -104,8 +104,8 @@ body {
 /* ========== HERO ========== */
 .hero {
     min-height: 100vh;
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-                url('images/46096577-D950-482A-812B-29AA450FACC4.jpg') center/cover no-repeat;
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+                url('images/ef37d54a-8188-4961-947f-8c9662e9b6c5.jpg') center/cover no-repeat;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -248,56 +248,6 @@ body {
 .nossa-historia {
     padding: 120px 0;
     background: #faf9f7;
-    position: relative;
-    overflow: hidden;
-}
-
-/* Fotos decorativas */
-.fotos-decorativas {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    opacity: 0.15;
-}
-
-.foto-deco {
-    position: absolute;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-}
-
-.foto-deco img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.foto-deco-1 {
-    width: 200px;
-    height: 250px;
-    top: 10%;
-    left: 5%;
-    transform: rotate(-8deg);
-}
-
-.foto-deco-2 {
-    width: 180px;
-    height: 220px;
-    bottom: 15%;
-    right: 8%;
-    transform: rotate(10deg);
-}
-
-.foto-deco-3 {
-    width: 150px;
-    height: 200px;
-    top: 50%;
-    left: 10%;
-    transform: rotate(-15deg);
 }
 
 .timeline {
@@ -978,10 +928,6 @@ body {
 
     .pix-box {
         flex-direction: column;
-    }
-
-    .fotos-decorativas {
-        display: none;
     }
 }
 
