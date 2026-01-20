@@ -150,65 +150,6 @@
             <h2 class="section-title">Lista de Presentes</h2>
             <p class="presentes-intro">Sua presenca e o nosso maior presente! Mas se desejar nos presentear, deixamos algumas opcoes:</p>
 
-            <!-- Destaque Nubank -->
-            <div class="nubank-destaque">
-                <div class="nubank-card">
-                    <div class="nubank-logo">
-                        <svg width="120" height="40" viewBox="0 0 120 40" fill="none">
-                            <rect width="120" height="40" rx="8" fill="#820AD1"/>
-                            <text x="60" y="26" text-anchor="middle" fill="white" font-family="Arial" font-weight="bold" font-size="16">Nubank</text>
-                        </svg>
-                    </div>
-                    <h3>Presente via Nubank</h3>
-                    <p class="nubank-desc">Envie seu presente diretamente pelo app do Nubank de forma rapida e segura</p>
-                    <div class="nubank-dados">
-                        <div class="dado-item">
-                            <span class="dado-label">Banco</span>
-                            <span class="dado-valor">Nu Pagamentos S.A. (260)</span>
-                        </div>
-                        <div class="dado-item">
-                            <span class="dado-label">Agencia</span>
-                            <span class="dado-valor">0001</span>
-                        </div>
-                        <div class="dado-item">
-                            <span class="dado-label">Conta</span>
-                            <span class="dado-valor">12345678-9</span>
-                        </div>
-                        <div class="dado-item">
-                            <span class="dado-label">Tipo</span>
-                            <span class="dado-valor">Conta Corrente PJ</span>
-                        </div>
-                        <div class="dado-item">
-                            <span class="dado-label">CNPJ</span>
-                            <span class="dado-valor">12.345.678/0001-90</span>
-                        </div>
-                        <div class="dado-item">
-                            <span class="dado-label">Razao Social</span>
-                            <span class="dado-valor">Gabriel & Jessica Casamento</span>
-                        </div>
-                    </div>
-                    <div class="nubank-pix">
-                        <p><strong>Chave PIX (CNPJ):</strong></p>
-                        <div class="pix-box">
-                            <span id="pixKey">12345678000190</span>
-                            <button class="btn-copy" onclick="copyPix()">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                </svg>
-                                Copiar
-                            </button>
-                        </div>
-                    </div>
-                    <div class="qrcode-section">
-                        <p>Ou escaneie o QR Code:</p>
-                        <div class="qrcode-placeholder">
-                            <span>QR Code PIX</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Categorias principais -->
             <div id="categorias-presentes" class="presentes-grid categorias-grid">
                 <div class="categoria-card" onclick="mostrarCategoria('casa')">
@@ -421,7 +362,7 @@
                     <h3>Link de Pagamento Gerado!</h3>
                     <p>Acesse o link abaixo para realizar o pagamento:</p>
                     <a id="linkPagamento" href="#" target="_blank" class="btn-primary">Abrir Link de Pagamento</a>
-                    <p class="info-pagamento">Voce pode pagar com PIX, cartao de credito, debito ou NuPay</p>
+                    <p class="info-pagamento">Voce pode pagar com PIX, cartao de credito ou saldo PicPay</p>
                 </div>
             </div>
         </div>

@@ -11,10 +11,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('.'));
 
-// Configuração da API do Nubank
-const NUBANK_API_URL = process.env.NUBANK_API_URL || 'https://api.nupaybusiness.com.br';
-const NUBANK_API_KEY = process.env.NUBANK_API_KEY;
-const NUBANK_MERCHANT_ID = process.env.NUBANK_MERCHANT_ID;
+// Configuração da API do PicPay
+const PICPAY_API_URL = process.env.PICPAY_API_URL || 'https://api.picpay.com';
+const PICPAY_TOKEN = process.env.PICPAY_TOKEN;
+const PICPAY_SELLER_TOKEN = process.env.PICPAY_SELLER_TOKEN;
 
 // Endpoint para criar cobrança
 app.post('/api/criar-cobranca', async (req, res) => {
@@ -30,41 +30,45 @@ app.post('/api/criar-cobranca', async (req, res) => {
             return res.status(400).json({ error: 'Valor mínimo é R$ 10,00' });
         }
 
-        // Converter valor para centavos
-        const valorEmCentavos = Math.round(valor * 100);
+        // Gerar ID único para a referência do pagamento
+        const referenceId = `presente-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-        // Preparar dados para a API do Nubank
+        // Preparar dados para a API do PicPay
         const paymentData = {
-            amount: valorEmCentavos,
-            description: `Presente de Casamento - ${presenteNome}`,
-            customer: {
-                name: nome,
+            referenceId: referenceId,
+            callbackUrl: `${process.env.SITE_URL || 'http://localhost:3000'}/api/webhook/picpay`,
+            returnUrl: `${process.env.SITE_URL || 'http://localhost:3000'}/obrigado`,
+            value: valor,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24 horas
+            buyer: {
+                firstName: nome.split(' ')[0],
+                lastName: nome.split(' ').slice(1).join(' ') || nome.split(' ')[0],
+                document: '00000000000', // CPF não obrigatório para link de pagamento
                 email: email,
-                phone: telefone || ''
+                phone: telefone || '+5500000000000'
             },
-            metadata: {
-                presenteId: presenteId,
-                presenteNome: presenteNome,
-                tipo: 'presente_casamento'
-            },
-            // Habilitar múltiplos métodos de pagamento
-            payment_methods: ['pix', 'credit_card', 'debit_card', 'nupay'],
-            // URL de retorno após pagamento
-            success_url: `${process.env.SITE_URL || 'http://localhost:3000'}/obrigado`,
-            cancel_url: `${process.env.SITE_URL || 'http://localhost:3000'}#presentes`
+            additionalInfo: [
+                {
+                    key: 'presenteId',
+                    value: presenteId
+                },
+                {
+                    key: 'presenteNome',
+                    value: presenteNome
+                }
+            ]
         };
 
-        console.log('Criando cobrança no Nubank:', paymentData);
+        console.log('Criando cobrança no PicPay:', paymentData);
 
-        // Chamar API do Nubank
+        // Chamar API do PicPay
         const response = await axios.post(
-            `${NUBANK_API_URL}/v1/payments`,
+            `${PICPAY_API_URL}/ecommerce/public/payments`,
             paymentData,
             {
                 headers: {
-                    'Authorization': `Bearer ${NUBANK_API_KEY}`,
                     'Content-Type': 'application/json',
-                    'X-Merchant-Id': NUBANK_MERCHANT_ID
+                    'x-picpay-token': PICPAY_TOKEN
                 }
             }
         );
@@ -72,22 +76,25 @@ app.post('/api/criar-cobranca', async (req, res) => {
         // Retornar URL de pagamento
         res.json({
             success: true,
-            paymentUrl: response.data.payment_url || response.data.url,
-            paymentId: response.data.id,
-            chargeId: response.data.charge_id
+            paymentUrl: response.data.paymentUrl,
+            referenceId: response.data.referenceId,
+            qrcode: response.data.qrcode
         });
 
     } catch (error) {
         console.error('Erro ao criar cobrança:', error.response?.data || error.message);
 
         // Se estiver em modo de desenvolvimento sem API configurada
-        if (!NUBANK_API_KEY || error.code === 'ECONNREFUSED') {
-            console.warn('API do Nubank não configurada. Retornando mock para desenvolvimento.');
+        if (!PICPAY_TOKEN || error.code === 'ECONNREFUSED') {
+            console.warn('API do PicPay não configurada. Retornando mock para desenvolvimento.');
             return res.json({
                 success: true,
-                paymentUrl: 'https://nubank.com.br/mock-payment-link',
-                paymentId: 'mock-' + Date.now(),
-                chargeId: 'mock-charge-' + Date.now(),
+                paymentUrl: 'https://picpay.com/mock-payment-link',
+                referenceId: 'mock-' + Date.now(),
+                qrcode: {
+                    content: 'mock-qrcode',
+                    base64: 'data:image/png;base64,mock'
+                },
                 isDevelopment: true
             });
         }
@@ -99,33 +106,62 @@ app.post('/api/criar-cobranca', async (req, res) => {
     }
 });
 
-// Endpoint para webhook do Nubank (notificações de pagamento)
-app.post('/api/webhook/nubank', async (req, res) => {
+// Endpoint para webhook do PicPay (notificações de pagamento)
+app.post('/api/webhook/picpay', async (req, res) => {
     try {
         const { event, data } = req.body;
 
         console.log('Webhook recebido:', event, data);
 
-        // Processar diferentes tipos de eventos
-        switch (event) {
-            case 'payment.succeeded':
-                // Pagamento confirmado
-                console.log(`Pagamento confirmado: ${data.id}`);
-                // Aqui você pode enviar email, atualizar banco de dados, etc.
-                break;
+        // O PicPay envia a referenceId quando há atualização de status
+        const { referenceId, authorizationId } = req.body;
 
-            case 'payment.failed':
-                // Pagamento falhou
-                console.log(`Pagamento falhou: ${data.id}`);
-                break;
+        if (referenceId) {
+            console.log(`Notificação de pagamento recebida para: ${referenceId}`);
 
-            case 'payment.pending':
-                // Pagamento pendente
-                console.log(`Pagamento pendente: ${data.id}`);
-                break;
+            // Consultar status do pagamento na API do PicPay
+            try {
+                const statusResponse = await axios.get(
+                    `${PICPAY_API_URL}/ecommerce/public/payments/${referenceId}/status`,
+                    {
+                        headers: {
+                            'x-picpay-token': PICPAY_TOKEN
+                        }
+                    }
+                );
 
-            default:
-                console.log(`Evento desconhecido: ${event}`);
+                const status = statusResponse.data.status;
+                console.log(`Status do pagamento ${referenceId}: ${status}`);
+
+                // Processar de acordo com o status
+                switch (status) {
+                    case 'paid':
+                        console.log(`✓ Pagamento confirmado: ${referenceId}`);
+                        // Aqui você pode enviar email, atualizar banco de dados, etc.
+                        break;
+
+                    case 'analysis':
+                        console.log(`⏳ Pagamento em análise: ${referenceId}`);
+                        break;
+
+                    case 'expired':
+                        console.log(`⏰ Pagamento expirado: ${referenceId}`);
+                        break;
+
+                    case 'refunded':
+                        console.log(`↩️ Pagamento estornado: ${referenceId}`);
+                        break;
+
+                    case 'chargeback':
+                        console.log(`⚠️ Chargeback: ${referenceId}`);
+                        break;
+
+                    default:
+                        console.log(`Status desconhecido: ${status}`);
+                }
+            } catch (error) {
+                console.error('Erro ao consultar status:', error.message);
+            }
         }
 
         // Sempre retornar 200 para o webhook
@@ -202,13 +238,13 @@ app.get('/api/health', (req, res) => {
     res.json({
         status: 'ok',
         timestamp: new Date().toISOString(),
-        nubankConfigured: !!NUBANK_API_KEY
+        picpayConfigured: !!PICPAY_TOKEN
     });
 });
 
 app.listen(PORT, () => {
     console.log(`\n🎉 Servidor rodando na porta ${PORT}`);
     console.log(`📍 Acesse: http://localhost:${PORT}`);
-    console.log(`💳 API Nubank: ${NUBANK_API_KEY ? 'Configurada ✓' : 'Não configurada ⚠️'}`);
+    console.log(`💳 API PicPay: ${PICPAY_TOKEN ? 'Configurada ✓' : 'Não configurada ⚠️'}`);
     console.log('\n');
 });
