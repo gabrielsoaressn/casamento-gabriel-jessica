@@ -5,6 +5,29 @@
 - **IP**: 38.52.130.145
 - **Porta da API**: 3000
 - **Banco de Dados**: PostgreSQL (mesmo servidor)
+- **URL do Frontend**: https://gabrielsoaressn.github.io/casamento-gabriel-jessica
+
+## ⚡ Resumo Executivo
+
+**Configurações necessárias no servidor:**
+
+1. **PostgreSQL** - Criar database `casamento` e configurar acesso
+2. **PM2** - Instalar e configurar processo Node.js
+3. **Firewall** - Abrir porta 3000
+4. **Arquivo .env** - Configurar variáveis de ambiente com token do PicPay
+5. **CORS** - Já configurado para aceitar requisições do GitHub Pages
+
+---
+
+## 🌐 Passo 0: Ativar GitHub Pages no Repositório
+
+**IMPORTANTE:** Antes de configurar o servidor, ative o GitHub Pages:
+
+1. Acesse: https://github.com/gabrielsoaressn/casamento-gabriel-jessica/settings/pages
+2. Em **Source**, selecione **GitHub Actions**
+3. O workflow já está configurado em `.github/workflows/deploy.yml`
+4. A cada push na branch `master`, o site será automaticamente atualizado
+5. O site ficará disponível em: https://gabrielsoaressn.github.io/casamento-gabriel-jessica
 
 ---
 
