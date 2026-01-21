@@ -53,10 +53,23 @@ body {
     color: #fff;
     text-decoration: none;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.logo-img {
+    height: 50px;
+    width: auto;
+    filter: brightness(0) invert(1);
+    transition: all 0.3s ease;
 }
 
 .navbar.scrolled .logo {
     color: #c9a86c;
+}
+
+.navbar.scrolled .logo-img {
+    filter: none;
 }
 
 .nav-links {
@@ -133,6 +146,12 @@ body {
     font-weight: 400;
     margin-bottom: 20px;
     letter-spacing: 2px;
+}
+
+.hero-monogram {
+    height: 200px;
+    width: auto;
+    filter: brightness(0) invert(1);
 }
 
 .hero-date {
@@ -874,6 +893,13 @@ body {
     margin-bottom: 10px;
 }
 
+.footer-monogram {
+    height: 80px;
+    width: auto;
+    margin-bottom: 15px;
+    filter: brightness(0) invert(1);
+}
+
 .footer-date {
     opacity: 0.7;
     margin-bottom: 20px;
@@ -913,6 +939,10 @@ body {
 
     .hero-title {
         font-size: 3rem;
+    }
+
+    .hero-monogram {
+        height: 120px;
     }
 
     .countdown {
