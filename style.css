@@ -885,6 +885,30 @@ body {
     background: #333;
     color: #fff;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Marca d'água do emblema do Carmo */
+.carmo-watermark {
+    position: absolute;
+    right: -50px;
+    bottom: -50px;
+    width: 300px;
+    height: auto;
+    opacity: 0.05;
+    filter: brightness(0) invert(1);
+    pointer-events: none;
+}
+
+/* Emblema discreto ao lado da hashtag */
+.carmo-emblema {
+    height: 20px;
+    width: auto;
+    margin-left: 8px;
+    vertical-align: middle;
+    opacity: 0.6;
+    filter: brightness(0) invert(1);
 }
 
 .footer-names {
