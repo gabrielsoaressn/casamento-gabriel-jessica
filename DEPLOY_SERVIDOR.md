@@ -3,7 +3,7 @@
 ## 📋 Informações do Servidor
 
 - **IP**: 38.52.130.145
-- **Porta da API**: 3000
+- **Porta da API**: 3001
 - **Banco de Dados**: PostgreSQL (mesmo servidor)
 - **URL do Frontend**: https://gabrielsoaressn.github.io/casamento-gabriel-jessica
 
@@ -13,9 +13,11 @@
 
 1. **PostgreSQL** - Criar database `casamento` e configurar acesso
 2. **PM2** - Instalar e configurar processo Node.js
-3. **Firewall** - Abrir porta 3000
+3. **Firewall** - Abrir porta 3001
 4. **Arquivo .env** - Configurar variáveis de ambiente com token do PicPay
 5. **CORS** - Já configurado para aceitar requisições do GitHub Pages
+
+> **Nota:** A porta foi alterada para **3001** porque a porta 3000 já estava em uso pelo imobai-frontend.
 
 ---
 
@@ -134,7 +136,7 @@ nano .env
 Cole o seguinte conteúdo:
 
 ```env
-PORT=3000
+PORT=3001
 SITE_URL=https://gabrielsoaressn.github.io/casamento-gabriel-jessica
 
 # API do PicPay
@@ -146,7 +148,7 @@ PICPAY_SELLER_TOKEN=seu_seller_token_aqui
 # DB_HOST=38.52.130.145
 # DB_PORT=5432
 # DB_NAME=casamento
-# DB_USER=metricsdb
+# DB_USER=metricsuser
 # DB_PASSWORD=metricspass
 ```
 
@@ -204,10 +206,10 @@ Deve retornar:
 
 ## 🔥 Passo 5: Configurar Firewall
 
-### 5.1. Abrir porta 3000
+### 5.1. Abrir porta 3001
 
 ```bash
-sudo ufw allow 3000/tcp
+sudo ufw allow 3001/tcp
 sudo ufw status
 ```
 
@@ -216,7 +218,7 @@ sudo ufw status
 Do seu computador local:
 
 ```bash
-curl http://38.52.130.145:3000/api/health
+curl http://38.52.130.145:3001/api/health
 ```
 
 ---
@@ -321,11 +323,11 @@ PGPASSWORD=metricspass psql -h localhost -U metricsdb -d casamento -c "SELECT 1;
 
 Verifique se o CORS está configurado corretamente no server.js e reinicie o PM2.
 
-### Erro: Port 3000 already in use
+### Erro: Port 3001 already in use
 
 ```bash
 # Ver o que está usando a porta
-sudo lsof -i :3000
+sudo lsof -i :3001
 
 # Matar o processo
 sudo kill -9 [PID]
@@ -338,7 +340,7 @@ sudo kill -9 [PID]
 sudo ufw status
 
 # Verificar se o servidor está escutando em todas as interfaces
-netstat -tuln | grep 3000
+netstat -tuln | grep 3001
 ```
 
 ---
@@ -346,25 +348,25 @@ netstat -tuln | grep 3000
 ## 🎯 URLs Finais
 
 - **Frontend (GitHub Pages)**: https://gabrielsoaressn.github.io/casamento-gabriel-jessica
-- **Backend API**: http://38.52.130.145:3000
-- **Health Check**: http://38.52.130.145:3000/api/health
-- **Presentes Reservados**: http://38.52.130.145:3000/api/presentes-reservados
+- **Backend API**: http://38.52.130.145:3001
+- **Health Check**: http://38.52.130.145:3001/api/health
+- **Presentes Reservados**: http://38.52.130.145:3001/api/presentes-reservados
 
 ---
 
 ## ✅ Checklist Final
 
-- [ ] PostgreSQL configurado e rodando
-- [ ] Database "casamento" criado
-- [ ] Tabelas criadas (presentes_reservados)
-- [ ] Código clonado no servidor
-- [ ] Dependências instaladas (npm install)
-- [ ] Arquivo .env configurado
-- [ ] Servidor iniciado com PM2
-- [ ] Porta 3000 aberta no firewall
-- [ ] CORS configurado
-- [ ] API respondendo em http://38.52.130.145:3000/api/health
-- [ ] GitHub Pages ativo e funcionando
+- [x] PostgreSQL configurado e rodando
+- [x] Database "casamento" criado
+- [x] Tabelas criadas (presentes_reservados)
+- [x] Código clonado no servidor
+- [x] Dependências instaladas (npm install)
+- [x] Arquivo .env configurado
+- [x] Servidor iniciado com PM2
+- [x] Porta 3001 aberta no firewall
+- [x] CORS configurado
+- [x] API respondendo em http://38.52.130.145:3001/api/health
+- [x] GitHub Pages ativo e funcionando
 - [ ] Teste de reserva de presente funcionando
 
 ---
