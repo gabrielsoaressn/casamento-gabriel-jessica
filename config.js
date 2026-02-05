@@ -1,10 +1,10 @@
 // Configuração da API
 const API_CONFIG = {
     // Para produção (GitHub Pages)
-    production: 'http://38.52.130.145:3001',
+    production: 'http://38.52.130.145:3847',
 
     // Para desenvolvimento local
-    development: 'http://localhost:3001'
+    development: 'http://localhost:3847'
 };
 
 // Detectar ambiente
