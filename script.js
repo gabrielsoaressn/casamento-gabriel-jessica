@@ -236,7 +236,99 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Recarregar a cada 30 segundos para manter atualizado
     setInterval(carregarPresentesReservados, 30000);
+
+    // Verificar se voltou do pagamento PicPay
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('pagamento') === 'sucesso') {
+        mostrarModalObrigado();
+        // Limpar o parâmetro da URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
 });
+
+// Modal de agradecimento após pagamento
+function mostrarModalObrigado() {
+    const modal = document.createElement('div');
+    modal.className = 'modal-obrigado';
+    modal.innerHTML = `
+        <div class="modal-obrigado-content">
+            <h2>Muito Obrigado!</h2>
+            <p>Seu presente significa muito para nós.</p>
+            <p>Mal podemos esperar para compartilhar este dia especial com você!</p>
+            <p class="email-info">Você receberá uma confirmação do pagamento por e-mail em breve.</p>
+            <button onclick="fecharModalObrigado()" class="btn-fechar-obrigado">Fechar</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+
+    // Adicionar estilos do modal
+    const style = document.createElement('style');
+    style.textContent = `
+        .modal-obrigado {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+        }
+        .modal-obrigado-content {
+            background: linear-gradient(135deg, #c9a86c 0%, #b8975b 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            margin: 20px;
+            animation: modalIn 0.3s ease;
+        }
+        .modal-obrigado-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .modal-obrigado-content p {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        .modal-obrigado-content .email-info {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .btn-fechar-obrigado {
+            margin-top: 20px;
+            padding: 15px 40px;
+            background: white;
+            color: #c9a86c;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .btn-fechar-obrigado:hover {
+            transform: scale(1.05);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+function fecharModalObrigado() {
+    const modal = document.querySelector('.modal-obrigado');
+    if (modal) {
+        modal.remove();
+        document.body.style.overflow = 'auto';
+    }
+}
 
 // Função para mostrar categoria de presentes
 function mostrarCategoria(categoria) {
