@@ -27,4 +27,19 @@ export class PresentesController {
       );
     }
   }
+
+  // Alias usado pelo frontend e pelo prompt como /api/presentes
+  @Get('presentes')
+  async listarSimplificado() {
+    try {
+      const presentes = await this.presentesService.listarReservados();
+      return presentes.map((p) => ({
+        presente_id: p.presenteId,
+        status: p.status,
+      }));
+    } catch (error) {
+      console.error('Erro ao buscar presentes:', error);
+      return [];
+    }
+  }
 }

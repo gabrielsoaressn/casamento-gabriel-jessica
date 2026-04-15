@@ -477,18 +477,15 @@ async function gerarCobranca(event) {
 
         const resultado = await response.json();
 
-        // Mostrar resultado
-        document.getElementById('linkPagamento').href = resultado.paymentUrl;
-        document.getElementById('formPresente').style.display = 'none';
-        document.getElementById('resultadoCobranca').style.display = 'block';
-
         // Recarregar lista de presentes reservados
         carregarPresentesReservados();
 
-        // Resetar botão
-        btnTexto.style.display = 'inline';
-        btnLoading.style.display = 'none';
-        btnGerarCobranca.disabled = false;
+        // Redirecionar para o PicPay
+        if (resultado.paymentUrl) {
+            window.location.href = resultado.paymentUrl;
+        } else {
+            throw new Error('URL de pagamento não retornada pelo servidor');
+        }
 
     } catch (error) {
         console.error('Erro:', error);

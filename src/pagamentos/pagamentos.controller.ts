@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Body,
+  Headers,
   HttpException,
   HttpStatus,
   Logger,
@@ -18,11 +19,46 @@ interface CriarCobrancaBody {
   valor: number;
 }
 
-interface WebhookBody {
+// Webhook do Checkout Padrão (checkout-api.picpay.com)
+interface WebhookCheckout {
+  type?: 'PAYMENT' | 'REFUND';
+  eventDate?: string;
+  merchantDocument?: string;
+  id?: string;
+  merchantCode?: string;
+  data?: {
+    // Novo formato: Checkout Padrão
+    status?: 'AUTHORIZED' | 'PAID' | 'REFUNDED' | 'EXPIRED' | 'CANCELLED';
+    amount?: number;
+    originalAmount?: number;
+    refundedAmount?: number;
+    merchantChargeId?: string;
+    smartCheckoutId?: string;
+    paymentSource?: string;
+    customer?: {
+      document?: string;
+      documentType?: string;
+      email?: string;
+      name?: string;
+    };
+    transactions?: unknown[];
+    // Formato legado: Link de Pagamento
+    transaction?: {
+      status?: 'PAYED' | 'REFUNDED' | 'PARTREFUNDED';
+      id?: string;
+      amount?: number;
+      paymentType?: string;
+    };
+    charge?: {
+      paymentLinkId?: string;
+      qrCode?: string;
+      expiresAt?: string;
+      amount?: number;
+    };
+  };
+  // Formato legado direto
   event?: string;
-  data?: any;
   referenceId?: string;
-  authorizationId?: string;
 }
 
 @Controller('api')
@@ -84,7 +120,7 @@ export class PagamentosController {
             telefone,
             result.referenceId,
           );
-          this.logger.log(`✓ Presente ${presenteId} reservado para ${nome}`);
+          this.logger.log(`Presente ${presenteId} reservado para ${nome}`);
         } catch (dbError) {
           this.logger.error('Erro ao reservar presente no banco:', dbError);
         }
@@ -101,9 +137,7 @@ export class PagamentosController {
         !this.pagamentosService.isPicpayConfigured() ||
         error.code === 'ECONNREFUSED'
       ) {
-        this.logger.warn(
-          'API do PicPay não configurada. Retornando mock para desenvolvimento.',
-        );
+        this.logger.warn('API PicPay indisponível. Retornando mock.');
 
         const mockReferenceId = this.pagamentosService.generateMockReferenceId();
 
@@ -118,9 +152,8 @@ export class PagamentosController {
               telefone,
               mockReferenceId,
             );
-            this.logger.log(`✓ Presente ${presenteId} reservado (modo dev)`);
           } catch (dbError) {
-            this.logger.error('Erro ao reservar presente:', dbError);
+            this.logger.error('Erro ao reservar presente (mock):', dbError);
           }
         }
 
@@ -128,10 +161,6 @@ export class PagamentosController {
           success: true,
           paymentUrl: 'https://picpay.com/mock-payment-link',
           referenceId: mockReferenceId,
-          qrcode: {
-            content: 'mock-qrcode',
-            base64: 'data:image/png;base64,mock',
-          },
           isDevelopment: true,
         };
       }
@@ -147,78 +176,119 @@ export class PagamentosController {
   }
 
   @Post('webhook/picpay')
-  async webhook(@Body() body: WebhookBody) {
-    const { event, data, referenceId, authorizationId } = body;
+  async webhook(
+    @Body() body: WebhookCheckout,
+    @Headers('authorization') authHeader?: string,
+    @Headers('event-type') eventType?: string,
+  ) {
+    this.logger.log('=== Webhook PicPay Recebido ===');
+    this.logger.log(`Event-Type: ${eventType} | Type: ${body.type}`);
+    this.logger.log(`Body: ${JSON.stringify(body, null, 2)}`);
 
-    this.logger.log(`Webhook recebido: ${event} ${JSON.stringify(data)}`);
+    // --- Formato 1: Checkout Padrão (data.merchantChargeId + data.status) ---
+    if (body.data?.merchantChargeId && body.data?.status) {
+      const { merchantChargeId, status } = body.data;
 
-    if (referenceId) {
-      this.logger.log(`Notificação de pagamento recebida para: ${referenceId}`);
+      this.logger.log(
+        `[Checkout] merchantChargeId: ${merchantChargeId} | status: ${status}`,
+      );
 
       try {
-        const status =
-          await this.pagamentosService.consultarStatus(referenceId);
-        this.logger.log(`Status do pagamento ${referenceId}: ${status}`);
-
         switch (status) {
-          case 'paid':
-            this.logger.log(`✓ Pagamento confirmado: ${referenceId}`);
-            try {
-              await this.presentesService.atualizarStatus(referenceId, 'pago');
-              this.logger.log(`✓ Status do presente atualizado para 'pago'`);
-            } catch (dbError) {
-              this.logger.error('Erro ao atualizar status:', dbError);
-            }
+          case 'AUTHORIZED':
+          case 'PAID':
+            await this.presentesService.atualizarStatus(merchantChargeId, 'pago');
+            this.logger.log(`Presente marcado como pago: ${merchantChargeId}`);
             break;
-
-          case 'analysis':
-            this.logger.log(`⏳ Pagamento em análise: ${referenceId}`);
+          case 'REFUNDED':
+            await this.presentesService.atualizarStatus(merchantChargeId, 'cancelado');
+            this.logger.log(`Presente cancelado: ${merchantChargeId}`);
             break;
-
-          case 'expired':
-            this.logger.log(`⏰ Pagamento expirado: ${referenceId}`);
-            try {
-              await this.presentesService.atualizarStatus(
-                referenceId,
-                'expirado',
-              );
-            } catch (dbError) {
-              this.logger.error('Erro ao atualizar status:', dbError);
-            }
+          case 'EXPIRED':
+          case 'CANCELLED':
+            await this.presentesService.atualizarStatus(merchantChargeId, 'expirado');
+            this.logger.log(`Presente expirado: ${merchantChargeId}`);
             break;
-
-          case 'refunded':
-            this.logger.log(`↩️ Pagamento estornado: ${referenceId}`);
-            try {
-              await this.presentesService.atualizarStatus(
-                referenceId,
-                'cancelado',
-              );
-            } catch (dbError) {
-              this.logger.error('Erro ao atualizar status:', dbError);
-            }
-            break;
-
-          case 'chargeback':
-            this.logger.log(`⚠️ Chargeback: ${referenceId}`);
-            try {
-              await this.presentesService.atualizarStatus(
-                referenceId,
-                'cancelado',
-              );
-            } catch (dbError) {
-              this.logger.error('Erro ao atualizar status:', dbError);
-            }
-            break;
-
           default:
-            this.logger.log(`Status desconhecido: ${status}`);
+            this.logger.log(`Status não tratado: ${status}`);
         }
-      } catch (error) {
-        this.logger.error(`Erro ao consultar status: ${error.message}`);
+      } catch (dbError) {
+        this.logger.error('Erro ao atualizar status:', dbError);
       }
+
+      return { received: true };
     }
 
+    // --- Formato 2: Link de Pagamento (data.transaction + data.charge) ---
+    if (body.data?.transaction && body.data?.charge) {
+      const { transaction, charge } = body.data;
+      const paymentLinkId = charge.paymentLinkId;
+      const transactionStatus = transaction.status;
+
+      this.logger.log(
+        `[Link Pag] paymentLinkId: ${paymentLinkId} | status: ${transactionStatus}`,
+      );
+
+      if (paymentLinkId) {
+        try {
+          switch (transactionStatus) {
+            case 'PAYED':
+              await this.presentesService.atualizarStatus(paymentLinkId, 'pago');
+              this.logger.log(`Presente marcado como pago: ${paymentLinkId}`);
+              break;
+            case 'REFUNDED':
+              await this.presentesService.atualizarStatus(paymentLinkId, 'cancelado');
+              this.logger.log(`Presente cancelado: ${paymentLinkId}`);
+              break;
+            case 'PARTREFUNDED':
+              this.logger.log(`Estorno parcial registrado: ${paymentLinkId}`);
+              break;
+            default:
+              this.logger.log(`Status não tratado: ${transactionStatus}`);
+          }
+        } catch (dbError) {
+          this.logger.error('Erro ao atualizar status:', dbError);
+        }
+      }
+
+      return { received: true };
+    }
+
+    // --- Formato 3: Legado (referenceId + event) ---
+    if (body.referenceId) {
+      this.logger.log(
+        `[Legado] referenceId: ${body.referenceId} | event: ${body.event}`,
+      );
+
+      try {
+        const status = await this.pagamentosService.consultarStatus(
+          body.referenceId,
+        );
+        this.logger.log(`Status consultado: ${status}`);
+
+        switch (status?.toLowerCase()) {
+          case 'paid':
+          case 'payed':
+            await this.presentesService.atualizarStatus(body.referenceId, 'pago');
+            break;
+          case 'expired':
+            await this.presentesService.atualizarStatus(body.referenceId, 'expirado');
+            break;
+          case 'refunded':
+          case 'chargeback':
+            await this.presentesService.atualizarStatus(body.referenceId, 'cancelado');
+            break;
+          default:
+            this.logger.log(`Status não mapeado: ${status}`);
+        }
+      } catch (error) {
+        this.logger.error(`Erro ao processar webhook legado: ${error.message}`);
+      }
+
+      return { received: true };
+    }
+
+    this.logger.warn('Webhook recebido em formato desconhecido');
     return { received: true };
   }
 }

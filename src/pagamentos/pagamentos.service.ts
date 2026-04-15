@@ -1,15 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
+import { randomUUID } from 'crypto';
 
 export interface PaymentResponse {
   success: boolean;
   paymentUrl?: string;
   referenceId?: string;
-  qrcode?: {
-    content: string;
-    base64: string;
-  };
+  paymentLinkId?: string;
   isDevelopment?: boolean;
   error?: string;
 }
@@ -18,6 +16,7 @@ export interface PaymentResponse {
 export class PagamentosService {
   private readonly logger = new Logger(PagamentosService.name);
   private readonly picpayApiUrl: string;
+  private readonly checkoutApiUrl = 'https://checkout-api.picpay.com';
   private readonly clientId: string;
   private readonly clientSecret: string;
   private readonly siteUrl: string;
@@ -38,42 +37,35 @@ export class PagamentosService {
   }
 
   private async getAccessToken(): Promise<string> {
-    // Retorna token em cache se ainda válido (com 5 min de margem)
-    if (this.accessToken && Date.now() < this.tokenExpiresAt - 300000) {
+    // Return cached token if still valid (with 60s margin for 5-min token)
+    if (this.accessToken && Date.now() < this.tokenExpiresAt - 60000) {
       return this.accessToken;
     }
 
     this.logger.log('Obtendo novo access token do PicPay...');
 
-    try {
-      const response = await axios.post(
-        `${this.picpayApiUrl}/oauth2/token`,
-        new URLSearchParams({
-          grant_type: 'client_credentials',
-          client_id: this.clientId,
-          client_secret: this.clientSecret,
-        }),
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
+    const response = await axios.post(
+      `${this.checkoutApiUrl}/oauth2/token`,
+      {
+        grant_type: 'client_credentials',
+        client_id: this.clientId,
+        client_secret: this.clientSecret,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
-      );
+      },
+    );
 
-      this.accessToken = response.data.access_token;
-      // Token geralmente expira em 1 hora (3600 segundos)
-      const expiresIn = response.data.expires_in || 3600;
-      this.tokenExpiresAt = Date.now() + expiresIn * 1000;
+    this.logger.log(`Token response: ${JSON.stringify(response.data)}`);
+    this.accessToken = response.data.access_token;
+    const expiresIn = response.data.expires_in || 300;
+    this.tokenExpiresAt = Date.now() + expiresIn * 1000;
 
-      this.logger.log('Access token obtido com sucesso');
-      return this.accessToken;
-    } catch (error) {
-      this.logger.error(
-        'Erro ao obter access token:',
-        error.response?.data || error.message,
-      );
-      throw error;
-    }
+    this.logger.log(`Access token obtido (expira em ${expiresIn}s)`);
+    return this.accessToken;
   }
 
   async criarCobranca(
@@ -84,82 +76,154 @@ export class PagamentosService {
     presenteNome: string,
     valor: number,
   ): Promise<PaymentResponse> {
-    const referenceId = `presente-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-    // Verificar se as credenciais estão configuradas
     if (!this.clientId || !this.clientSecret) {
-      this.logger.warn(
-        'Credenciais do PicPay não configuradas. Retornando mock para desenvolvimento.',
-      );
+      this.logger.warn('Credenciais PicPay não configuradas. Usando mock.');
       return this.getMockResponse();
     }
 
-    const paymentData = {
-      referenceId,
-      callbackUrl: `${this.siteUrl}/api/webhook/picpay`,
-      returnUrl: `${this.frontendUrl}?pagamento=sucesso`,
-      value: valor,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      buyer: {
-        firstName: nome.split(' ')[0],
-        lastName: nome.split(' ').slice(1).join(' ') || nome.split(' ')[0],
-        document: '00000000000',
-        email,
-        phone: telefone || '+5500000000000',
-      },
-      additionalInfo: [
-        { key: 'presenteId', value: presenteId },
-        { key: 'presenteNome', value: presenteNome },
-      ],
-    };
+    const valorCentavos = Math.round(valor * 100);
+    const merchantChargeId = `presente-${presenteId}-${randomUUID().split('-')[0]}`;
 
-    this.logger.log(`Criando cobrança no PicPay para: ${nome} - R$ ${valor}`);
+    this.logger.log(
+      `Criando cobrança: ${nome} | R$${valor} (${valorCentavos}¢) | merchantChargeId: ${merchantChargeId}`,
+    );
 
+    let accessToken: string;
     try {
-      const accessToken = await this.getAccessToken();
+      accessToken = await this.getAccessToken();
+    } catch (tokenError) {
+      this.logger.error(
+        'Erro ao obter token:',
+        tokenError.response?.data || tokenError.message,
+      );
+      throw tokenError;
+    }
+
+    // --- Tentativa 1: Checkout Padrão (checkout-api.picpay.com/api/v1/checkout) ---
+    try {
+      const checkoutBody: Record<string, unknown> = {
+        amount: valorCentavos,
+        merchantChargeId,
+        payer: {
+          name: nome,
+          email,
+          ...(telefone ? { phone: telefone } : {}),
+        },
+        redirectUrl: `${this.frontendUrl}?pagamento=sucesso`,
+        notificationUrl: `${this.siteUrl}/api/webhook/picpay`,
+        items: [
+          {
+            description: `Presente de Casamento - ${presenteNome}`,
+            quantity: 1,
+            amount: valorCentavos,
+          },
+        ],
+      };
+
+      this.logger.log(
+        `[Checkout API] POST ${this.checkoutApiUrl}/api/v1/checkout`,
+      );
+      this.logger.log(`[Checkout API] Payload: ${JSON.stringify(checkoutBody)}`);
 
       const response = await axios.post(
-        `${this.picpayApiUrl}/ecommerce/public/payments`,
-        paymentData,
+        `${this.checkoutApiUrl}/api/v1/checkout`,
+        checkoutBody,
         {
           headers: {
             'Content-Type': 'application/json',
+            Accept: 'application/json',
             Authorization: `Bearer ${accessToken}`,
           },
         },
       );
 
-      this.logger.log(`Cobrança criada com sucesso: ${response.data.referenceId}`);
+      this.logger.log(
+        `[Checkout API] Resposta (${response.status}): ${JSON.stringify(response.data)}`,
+      );
+
+      const paymentUrl =
+        response.data.checkoutUrl ||
+        response.data.checkout_url ||
+        response.data.paymentUrl ||
+        response.data.payment_url ||
+        response.data.link;
 
       return {
         success: true,
-        paymentUrl: response.data.paymentUrl,
-        referenceId: response.data.referenceId,
-        qrcode: response.data.qrcode,
+        paymentUrl,
+        referenceId: merchantChargeId,
       };
-    } catch (error) {
-      this.logger.error(
-        'Erro ao criar cobrança:',
-        error.response?.data || error.message,
+    } catch (checkoutError) {
+      this.logger.warn(
+        `[Checkout API] Falhou (${checkoutError.response?.status}): ${JSON.stringify(checkoutError.response?.data || checkoutError.message)}`,
       );
-
-      if (error.code === 'ECONNREFUSED') {
-        return this.getMockResponse();
-      }
-
-      throw error;
+      this.logger.log('[Checkout API] Tentando Link de Pagamento como fallback...');
     }
+
+    // --- Tentativa 2: Link de Pagamento (api.picpay.com/paymentlink/create) ---
+    const expirationDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const paymentLinkBody = {
+      name: presenteNome,
+      description: `Presente de casamento: ${presenteNome} - De: ${nome}`,
+      amount: valorCentavos,
+      payment_methods: ['PIX', 'CREDIT_CARD', 'WALLET'],
+      expiration_date: expirationDate.toISOString(),
+      redirect_url: `${this.frontendUrl}?pagamento=sucesso`,
+      order_number: merchantChargeId,
+      details: {
+        product_amount: valorCentavos,
+        delivery_amount: 0,
+      },
+    };
+
+    this.logger.log(
+      `[Link Pagamento] POST ${this.picpayApiUrl}/paymentlink/create`,
+    );
+    this.logger.log(`[Link Pagamento] Payload: ${JSON.stringify(paymentLinkBody)}`);
+
+    const linkResponse = await axios.post(
+      `${this.picpayApiUrl}/paymentlink/create`,
+      paymentLinkBody,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    this.logger.log(
+      `[Link Pagamento] Resposta (${linkResponse.status}): ${JSON.stringify(linkResponse.data)}`,
+    );
+
+    const paymentLinkId =
+      linkResponse.data.paymentLinkId ||
+      linkResponse.data.payment_link_id ||
+      linkResponse.data.id;
+    const paymentUrl =
+      linkResponse.data.link ||
+      linkResponse.data.checkoutLink ||
+      linkResponse.data.checkout_link;
+
+    // paymentLinkId is PicPay's ID — used to match webhook data.charge.paymentLinkId
+    return {
+      success: true,
+      paymentUrl,
+      referenceId: paymentLinkId || merchantChargeId,
+      paymentLinkId,
+    };
   }
 
   async consultarStatus(referenceId: string): Promise<string> {
     try {
       const accessToken = await this.getAccessToken();
-
       const response = await axios.get(
-        `${this.picpayApiUrl}/ecommerce/public/payments/${referenceId}/status`,
+        `${this.picpayApiUrl}/paymentlink/${referenceId}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
+            Accept: 'application/json',
           },
         },
       );
@@ -174,10 +238,6 @@ export class PagamentosService {
     return !!(this.clientId && this.clientSecret);
   }
 
-  generateReferenceId(): string {
-    return `presente-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  }
-
   generateMockReferenceId(): string {
     return `mock-${Date.now()}`;
   }
@@ -187,10 +247,6 @@ export class PagamentosService {
       success: true,
       paymentUrl: 'https://picpay.com/mock-payment-link',
       referenceId: `mock-${Date.now()}`,
-      qrcode: {
-        content: 'mock-qrcode',
-        base64: 'data:image/png;base64,mock',
-      },
       isDevelopment: true,
     };
   }
