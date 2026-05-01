@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Recarregar a cada 30 segundos para manter atualizado
     setInterval(carregarPresentesReservados, 30000);
 
-    // Verificar se voltou do pagamento PicPay
+    // Verificar se voltou do checkout do Mercado Pago
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('pagamento') === 'sucesso') {
         mostrarModalObrigado();
@@ -480,7 +480,7 @@ async function gerarCobranca(event) {
         // Recarregar lista de presentes reservados
         carregarPresentesReservados();
 
-        // Redirecionar para o PicPay
+        // Redirecionar para o checkout do Mercado Pago
         if (resultado.paymentUrl) {
             window.location.href = resultado.paymentUrl;
         } else {

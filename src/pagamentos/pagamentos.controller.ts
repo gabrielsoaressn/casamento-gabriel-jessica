@@ -3,12 +3,28 @@ import {
   Post,
   Body,
   Headers,
+  HttpCode,
   HttpException,
   HttpStatus,
   Logger,
 } from '@nestjs/common';
 import { PagamentosService } from './pagamentos.service';
 import { PresentesService } from '../presentes/presentes.service';
+
+// Webhook do Mercado Pago (notification v1)
+// Docs: https://www.mercadopago.com.br/developers/pt/docs/your-integrations/notifications/webhooks
+interface WebhookMercadoPago {
+  id?: number | string;
+  live_mode?: boolean;
+  type?: string; // 'payment' | 'subscription_preapproval' | 'merchant_order' | ...
+  date_created?: string;
+  application_id?: number | string;
+  user_id?: number | string;
+  version?: number;
+  api_version?: string;
+  action?: string; // ex: 'payment.created', 'payment.updated'
+  data?: { id?: string | number };
+}
 
 interface CriarCobrancaBody {
   nome: string;
@@ -100,7 +116,10 @@ export class PagamentosController {
     }
 
     try {
-      const result = await this.pagamentosService.criarCobranca(
+      // Mercado Pago é o gateway oficial. PicPay foi descontinuado mas o
+      // método antigo (criarCobranca) e o webhook /api/webhook/picpay
+      // ficaram preservados no service caso seja necessário reativar.
+      const result = await this.pagamentosService.criarPreferenciaMercadoPago(
         nome,
         email,
         telefone,
@@ -129,41 +148,9 @@ export class PagamentosController {
       return result;
     } catch (error) {
       this.logger.error(
-        'Erro ao criar cobrança:',
+        'Erro ao criar cobrança Mercado Pago:',
         error.response?.data || error.message,
       );
-
-      if (
-        !this.pagamentosService.isPicpayConfigured() ||
-        error.code === 'ECONNREFUSED'
-      ) {
-        this.logger.warn('API PicPay indisponível. Retornando mock.');
-
-        const mockReferenceId = this.pagamentosService.generateMockReferenceId();
-
-        if (presenteId !== 'personalizado') {
-          try {
-            await this.presentesService.reservar(
-              presenteId,
-              presenteNome,
-              valor,
-              nome,
-              email,
-              telefone,
-              mockReferenceId,
-            );
-          } catch (dbError) {
-            this.logger.error('Erro ao reservar presente (mock):', dbError);
-          }
-        }
-
-        return {
-          success: true,
-          paymentUrl: 'https://picpay.com/mock-payment-link',
-          referenceId: mockReferenceId,
-          isDevelopment: true,
-        };
-      }
 
       throw new HttpException(
         {
@@ -290,5 +277,123 @@ export class PagamentosController {
 
     this.logger.warn('Webhook recebido em formato desconhecido');
     return { received: true };
+  }
+
+  /**
+   * Webhook do Mercado Pago.
+   * Rota completa: POST /api/webhook/mercadopago
+   *
+   * Estratégia:
+   *  1. Responder 200 OK imediatamente (MP exige resposta < 22s, senão re-tenta).
+   *  2. Disparar o processamento em "fire-and-forget" — não usamos await na
+   *     promessa para não bloquear a resposta.
+   *  3. No processamento, consultamos a API oficial do MP usando nosso
+   *     Access Token para confirmar o status real do pagamento (a notificação
+   *     em si só carrega o id; a fonte da verdade é a consulta autenticada).
+   */
+  @Post('webhook/mercadopago')
+  @HttpCode(HttpStatus.OK)
+  async webhookMercadoPago(
+    @Body() body: WebhookMercadoPago,
+    @Headers('x-request-id') xRequestId?: string,
+  ) {
+    this.logger.log('=== Webhook Mercado Pago Recebido ===');
+    this.logger.log(
+      `x-request-id: ${xRequestId} | type: ${body?.type} | action: ${body?.action} | data.id: ${body?.data?.id}`,
+    );
+
+    const paymentId = body?.data?.id ? String(body.data.id) : null;
+    const type = body?.type;
+
+    // Só fazemos a consulta segura para eventos de pagamento.
+    // Outros tópicos (merchant_order, subscription_preapproval, etc.) são
+    // apenas registrados no log; o MP continua recebendo 200 OK.
+    if (type === 'payment' && paymentId) {
+      // fire-and-forget: já vamos retornar 200 logo abaixo.
+      this.processarPagamentoMercadoPago(paymentId).catch((err) => {
+        this.logger.error(
+          `[MP Webhook] falha ao processar payment ${paymentId}: ${err.message}`,
+        );
+      });
+    } else {
+      this.logger.log(
+        `[MP Webhook] evento não-payment ignorado para processamento: type=${type}`,
+      );
+    }
+
+    return { received: true };
+  }
+
+  /**
+   * Validação anti-fraude do webhook do Mercado Pago.
+   * Consulta a API real do MP com nosso Access Token e, se o pagamento estiver
+   * realmente "approved", aciona a atualização do presente/cota no banco.
+   */
+  private async processarPagamentoMercadoPago(paymentId: string): Promise<void> {
+    const payment =
+      await this.pagamentosService.consultarPagamentoMercadoPago(paymentId);
+
+    const status = payment?.status;
+    const externalReference = payment?.external_reference;
+
+    this.logger.log(
+      `[MP Webhook] payment ${paymentId} → status=${status} | external_reference=${externalReference}`,
+    );
+
+    if (status === 'approved') {
+      // ================================================================
+      // ATUALIZAÇÃO DO PRESENTE/COTA NO BANCO
+      // ----------------------------------------------------------------
+      // Convenção do projeto (mesma usada pelo webhook PicPay logo acima):
+      //   await this.presentesService.atualizarStatus(referenceId, 'pago')
+      //
+      // O `referenceId` vem do campo `external_reference` que precisa ser
+      // enviado quando criamos a Preference do MP — usar o MESMO valor que
+      // gravamos em `presentes_reservados.referenceId` ao reservar o presente
+      // (veja PagamentosController.criarCobranca → presentesService.reservar).
+      //
+      // Ex.: ao criar a preference no MP, mandar:
+      //   { external_reference: orderNumber, ... }
+      // onde `orderNumber` é o referenceId persistido no banco.
+      // ================================================================
+      if (!externalReference) {
+        this.logger.warn(
+          `[MP Webhook] payment ${paymentId} approved sem external_reference — ` +
+            `verifique se a Preference está sendo criada com external_reference = referenceId.`,
+        );
+        return;
+      }
+
+      try {
+        const atualizado = await this.presentesService.atualizarStatus(
+          externalReference,
+          'pago',
+        );
+        if (atualizado) {
+          this.logger.log(
+            `[MP Webhook] presente marcado como pago: ${externalReference}`,
+          );
+        } else {
+          this.logger.warn(
+            `[MP Webhook] external_reference ${externalReference} não encontrado em presentes_reservados`,
+          );
+        }
+      } catch (dbError) {
+        this.logger.error(
+          `[MP Webhook] erro ao atualizar status no banco: ${dbError.message}`,
+        );
+      }
+      return;
+    }
+
+    // Outros status finais que podem demandar tratamento futuro:
+    //   - 'refunded' / 'charged_back': estornar/cancelar a reserva.
+    //       await this.presentesService.atualizarStatus(externalReference, 'cancelado');
+    //   - 'cancelled' / 'rejected': liberar o presente para outro convidado.
+    //       await this.presentesService.atualizarStatus(externalReference, 'expirado');
+    // Por ora apenas registramos no log para evitar mudanças destrutivas em produção.
+    this.logger.log(
+      `[MP Webhook] status "${status}" não acionou update no banco (somente 'approved' faz update hoje)`,
+    );
   }
 }

@@ -1,9 +1,9 @@
 // Configuração da API
 const API_CONFIG = {
-    // Para produção (GitHub Pages)
-    production: 'http://38.52.130.145:3847',
+    // Produção: HTTPS via Nginx reverse proxy (sslip.io + Let's Encrypt → Nest na 3847)
+    production: 'https://38-52-130-145.sslip.io',
 
-    // Para desenvolvimento local
+    // Desenvolvimento local
     development: 'http://localhost:3847'
 };
 
