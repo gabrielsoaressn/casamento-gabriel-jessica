@@ -85,6 +85,14 @@ export class PresentesService {
     return this.presenteRepository.save(presente);
   }
 
+  async buscarStatusPorReferenceId(referenceId: string): Promise<string | null> {
+    const presente = await this.presenteRepository.findOne({
+      where: { referenceId },
+      select: ['status'],
+    });
+    return presente?.status ?? null;
+  }
+
   @Cron(CronExpression.EVERY_HOUR, { name: 'limpar-reservas-expiradas' })
   async limparExpiradas(): Promise<PresenteReservado[]> {
     const dataLimite = new Date(Date.now() - 24 * 60 * 60 * 1000);

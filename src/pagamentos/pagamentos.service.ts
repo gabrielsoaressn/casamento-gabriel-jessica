@@ -273,7 +273,7 @@ export class PagamentosService {
         pending: `${this.frontendUrl}/?pagamento=pendente`,
         failure: `${this.frontendUrl}/?pagamento=falha`,
       },
-      auto_return: 'approved',
+      auto_return: 'all',
       external_reference: referenceId,
       notification_url: `${this.siteUrl}/api/webhook/mercadopago`,
       statement_descriptor: 'Casamento Gabriel & Jessica',

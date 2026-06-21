@@ -50,28 +50,6 @@ document.querySelectorAll('.nav-links a').forEach(link => {
     });
 });
 
-// Copy PIX key
-function copyPix() {
-    const pixKey = '12345678000190';
-    navigator.clipboard.writeText(pixKey).then(() => {
-        showToast('Chave PIX copiada!');
-    }).catch(err => {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = pixKey;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        showToast('Chave PIX copiada!');
-    });
-}
-
-// Show bank details modal
-function showBankDetails() {
-    alert('Dados Bancarios - Nubank Empresas\n\nBanco: Nu Pagamentos S.A. (260)\nAgencia: 0001\nConta: 12345678-9\nTipo: Conta Corrente PJ\nCNPJ: 12.345.678/0001-90\nRazao Social: Gabriel & Jessica Casamento\n\nChave PIX: 12345678000190');
-}
-
 // Toast notification
 function showToast(message) {
     // Remove existing toast
@@ -239,9 +217,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Verificar se voltou do checkout do Mercado Pago
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('pagamento') === 'sucesso') {
+    const statusPagamento = urlParams.get('pagamento');
+
+    if (statusPagamento === 'sucesso') {
         mostrarModalObrigado();
-        // Limpar o parâmetro da URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (statusPagamento === 'pendente') {
+        // Pix: status inicial é in_process — MP redireciona para back_urls.pending.
+        // O external_reference que enviamos na preference vem de volta na URL.
+        const referenceId = urlParams.get('external_reference');
+        mostrarModalPixAguardando(referenceId);
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 });
@@ -327,6 +312,107 @@ function fecharModalObrigado() {
     if (modal) {
         modal.remove();
         document.body.style.overflow = 'auto';
+    }
+}
+
+// ──────────────────────────────────────────────────────────────────
+// PIX — modal de aguardando confirmação + polling de status
+// ──────────────────────────────────────────────────────────────────
+
+let _pixPollingTimer = null;
+
+function mostrarModalPixAguardando(referenceId) {
+    const modal = document.createElement('div');
+    modal.id = 'modal-pix-aguardando';
+    modal.className = 'modal-obrigado'; // reutiliza overlay do modal de obrigado
+    modal.innerHTML = `
+        <div class="modal-obrigado-content modal-pix-content">
+            <div class="pix-spinner-ring"></div>
+            <h2>Aguardando confirmação</h2>
+            <p>Seu pagamento Pix está sendo processado pelo Mercado Pago.</p>
+            <p>O presente ficará reservado automaticamente assim que confirmado.</p>
+            <p class="email-info">Isso costuma levar alguns segundos.</p>
+            <button onclick="fecharModalPixAguardando()" class="btn-fechar-obrigado btn-fechar-pix">Fechar</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+
+    const style = document.createElement('style');
+    style.id = 'pix-modal-styles';
+    style.textContent = `
+        .modal-pix-content {
+            background: linear-gradient(135deg, #8b6e3e 0%, #c9a86c 100%) !important;
+        }
+        .pix-spinner-ring {
+            width: 52px;
+            height: 52px;
+            border: 4px solid rgba(255,255,255,0.35);
+            border-top-color: #fff;
+            border-radius: 50%;
+            margin: 0 auto 22px;
+            animation: pixSpin 0.9s linear infinite;
+        }
+        @keyframes pixSpin { to { transform: rotate(360deg); } }
+        .btn-fechar-pix { opacity: 0.85; }
+        .btn-fechar-pix:hover { opacity: 1; }
+    `;
+    document.head.appendChild(style);
+
+    if (referenceId) {
+        _iniciarPollingPix(referenceId);
+    }
+}
+
+function fecharModalPixAguardando() {
+    _pararPollingPix();
+    const modal = document.getElementById('modal-pix-aguardando');
+    if (modal) modal.remove();
+    const style = document.getElementById('pix-modal-styles');
+    if (style) style.remove();
+    document.body.style.overflow = 'auto';
+}
+
+async function _iniciarPollingPix(referenceId) {
+    const INTERVALO_MS = 4000;
+    const MAX_TENTATIVAS = 150; // ~10 minutos
+    let tentativas = 0;
+
+    _pixPollingTimer = setInterval(async () => {
+        tentativas++;
+        if (tentativas >= MAX_TENTATIVAS) {
+            _pararPollingPix();
+            return;
+        }
+
+        try {
+            const resp = await fetch(
+                `${API_URL}/api/status-pagamento?referenceId=${encodeURIComponent(referenceId)}`
+            );
+            if (!resp.ok) return;
+            const { status } = await resp.json();
+
+            if (status === 'pago') {
+                _pararPollingPix();
+                fecharModalPixAguardando();
+                await carregarPresentesReservados();
+                mostrarModalObrigado();
+            } else if (status === 'expirado' || status === 'cancelado') {
+                _pararPollingPix();
+                fecharModalPixAguardando();
+                showToast('Pagamento não confirmado. Tente novamente se desejar.');
+            }
+            // 'pendente' → continua polling
+        } catch (_) {
+            // ignora erros de rede silenciosamente; próxima iteração tenta de novo
+        }
+    }, INTERVALO_MS);
+}
+
+function _pararPollingPix() {
+    if (_pixPollingTimer) {
+        clearInterval(_pixPollingTimer);
+        _pixPollingTimer = null;
     }
 }
 
