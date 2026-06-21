@@ -1,8 +1,15 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, Param, Redirect, Res } from '@nestjs/common';
 import { Response } from 'express';
 
 @Controller()
 export class AppController {
+  /** Rota amigável para convites digitais: /confirmar/CODIGO → /confirmar.html?c=CODIGO */
+  @Get('confirmar/:codigo')
+  @Redirect()
+  redirecionarConfirmar(@Param('codigo') codigo: string) {
+    return { url: `/confirmar.html?c=${encodeURIComponent(codigo)}` };
+  }
+
   @Get('obrigado')
   obrigado(@Res() res: Response) {
     res.send(`

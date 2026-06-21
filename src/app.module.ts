@@ -10,6 +10,7 @@ import { AppController } from './app.controller';
 import { PresentesModule } from './presentes/presentes.module';
 import { PagamentosModule } from './pagamentos/pagamentos.module';
 import { HealthModule } from './health/health.module';
+import { RsvpModule } from './rsvp/rsvp.module';
 
 @Module({
   imports: [
@@ -19,12 +20,13 @@ import { HealthModule } from './health/health.module';
     TypeOrmModule.forRoot(databaseConfig()),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..'),
-      exclude: ['/api*', '/obrigado'],
+      exclude: ['/api*', '/obrigado', '/confirmar/*'],
     }),
     ScheduleModule.forRoot(),
     PresentesModule,
     PagamentosModule,
     HealthModule,
+    RsvpModule,
   ],
   controllers: [AppController],
 })

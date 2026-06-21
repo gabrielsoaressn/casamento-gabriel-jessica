@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin RSVP — Gabriel & Jéssica</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold:   #c9a86c;
+      --gold-dk:#b8975b;
+      --cream:  #faf9f7;
+      --surface:#f0ede5;
+      --border: #ddd8ce;
+      --text:   #1c1a17;
+      --muted:  #7a7268;
+    }
+    body { font-family: 'Montserrat', sans-serif; background: var(--cream); color: var(--text); }
+
+    /* ── Auth overlay ── */
+    #auth-overlay {
+      position: fixed; inset: 0;
+      background: var(--cream);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    #auth-overlay.hidden { display: none; }
+    .auth-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 100%; max-width: 380px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .auth-card .monogram {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px; color: var(--gold); font-style: italic; letter-spacing: 3px;
+      display: block; margin-bottom: 6px;
+    }
+    .auth-card h1 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .auth-card p  { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+    .auth-card input {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 14px 16px; font-size: 15px; font-family: 'Montserrat', sans-serif;
+      outline: none; transition: border-color 0.2s; margin-bottom: 12px;
+    }
+    .auth-card input:focus { border-color: var(--gold); }
+    .auth-card .err { font-size: 12px; color: #c53030; margin-bottom: 12px; display: none; }
+    .auth-card .err.show { display: block; }
+    .btn {
+      display: inline-block; padding: 14px 28px;
+      background: var(--gold); color: #fff; border: none;
+      border-radius: 50px; font-family: 'Montserrat', sans-serif;
+      font-size: 12px; font-weight: 600; letter-spacing: 2px;
+      text-transform: uppercase; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn:hover { background: var(--gold-dk); transform: translateY(-1px); }
+    .btn.outline {
+      background: transparent; color: var(--gold);
+      border: 1.5px solid var(--gold);
+    }
+    .btn.outline:hover { background: rgba(201,168,108,0.08); }
+    .btn.sm { padding: 8px 16px; font-size: 10px; }
+
+    /* ── App ── */
+    #app { display: none; }
+    #app.show { display: block; }
+
+    header {
+      background: #fff; border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .header-brand { display: flex; align-items: center; gap: 12px; }
+    .header-brand .monogram {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; color: var(--gold); font-style: italic; letter-spacing: 2px;
+    }
+    .header-brand .title { font-size: 13px; font-weight: 600; }
+    .header-brand .sub   { font-size: 11px; color: var(--muted); }
+    .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* ── Stats bar ── */
+    .stats {
+      display: flex; gap: 24px; flex-wrap: wrap;
+      padding: 16px 32px; background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .stat { font-size: 12px; }
+    .stat strong { font-size: 22px; font-weight: 700; color: var(--text); display: block; }
+    .stat span   { color: var(--muted); }
+
+    /* ── Filtros ── */
+    .filtros {
+      padding: 16px 32px; display: flex; gap: 12px; flex-wrap: wrap;
+      align-items: center; border-bottom: 1px solid var(--border);
+    }
+    .filtros input {
+      border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 8px 12px; font-size: 13px; font-family: 'Montserrat', sans-serif;
+      outline: none; transition: border-color 0.2s; min-width: 220px;
+    }
+    .filtros input:focus { border-color: var(--gold); }
+    .filtro-btn {
+      padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+      background: #fff; font-size: 12px; font-family: 'Montserrat', sans-serif;
+      cursor: pointer; transition: all 0.15s; color: var(--muted);
+    }
+    .filtro-btn.active { border-color: var(--gold); color: var(--gold-dk); font-weight: 600; }
+
+    /* ── Grid de convites ── */
+    .convites-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      padding: 24px 32px;
+    }
+
+    .convite-card {
+      background: #fff; border-radius: 12px;
+      border: 1.5px solid var(--border);
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .convite-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .convite-card.confirmado { border-color: #c6f6d5; }
+
+    .cc-header {
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+    }
+    .cc-grupo { font-size: 15px; font-weight: 600; line-height: 1.3; }
+    .cc-codigo {
+      font-family: monospace; font-size: 14px; font-weight: 700;
+      letter-spacing: 2px; color: var(--gold);
+      background: rgba(201,168,108,0.1); padding: 4px 10px; border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .cc-body { padding: 14px 18px; }
+    .cc-nomes { font-size: 13px; color: var(--muted); margin-bottom: 10px; line-height: 1.6; }
+    .cc-nomes .sim { color: #276749; font-weight: 600; }
+    .cc-nomes .nao { color: #c53030; text-decoration: line-through; opacity: 0.7; }
+    .cc-nomes .pendente { color: var(--muted); }
+
+    .cc-meta {
+      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+      margin-bottom: 10px;
+    }
+    .badge {
+      padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .badge-papel    { background: #ebf8ff; color: #2b6cb0; }
+    .badge-digital  { background: #f0fff4; color: #276749; }
+    .badge-ok       { background: #f0fff4; color: #276749; border: 1px solid #c6f6d5; }
+    .badge-pendente { background: #fffbeb; color: #b7791f; border: 1px solid #fefcbf; }
+
+    .cc-link {
+      font-size: 11px; color: var(--muted); word-break: break-all;
+      margin-bottom: 8px;
+    }
+    .cc-link a { color: var(--gold); text-decoration: none; }
+    .cc-link a:hover { text-decoration: underline; }
+
+    .cc-qr {
+      text-align: center; padding: 8px 0 4px;
+      border-top: 1px dashed var(--border);
+      margin-top: 8px;
+    }
+    .cc-qr img { width: 120px; height: 120px; border-radius: 8px; }
+
+    /* ── Print ── */
+    @media print {
+      #auth-overlay, header, .filtros, .header-actions, .stats { display: none !important; }
+      .convites-grid { grid-template-columns: repeat(2, 1fr); padding: 0; gap: 12px; }
+      .convite-card { break-inside: avoid; page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Auth Overlay -->
+<div id="auth-overlay">
+  <div class="auth-card">
+    <span class="monogram">G & J</span>
+    <h1>Área Admin</h1>
+    <p>Digite o token de administrador para acessar a lista de convites.</p>
+    <input type="password" id="token-input" placeholder="Token de administrador" autocomplete="off">
+    <div id="auth-err" class="err">Token inválido. Tente novamente.</div>
+    <button class="btn" onclick="entrar()">Entrar</button>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+  <header>
+    <div class="header-brand">
+      <span class="monogram">G & J</span>
+      <div>
+        <div class="title">Painel de Confirmações</div>
+        <div class="sub">Lista de convidados — RSVP</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn outline sm" onclick="exportarCSV()">⬇ Exportar CSV</button>
+      <button class="btn outline sm" onclick="window.print()">🖨 Imprimir QR codes</button>
+      <button class="btn sm" onclick="carregarDados(true)">↻ Atualizar</button>
+    </div>
+  </header>
+
+  <div class="stats" id="stats-bar"></div>
+
+  <div class="filtros">
+    <input type="text" id="busca" placeholder="Filtrar por grupo ou código..." oninput="filtrar()">
+    <button class="filtro-btn active" onclick="setFiltro('todos', this)">Todos</button>
+    <button class="filtro-btn" onclick="setFiltro('pendente', this)">Pendentes</button>
+    <button class="filtro-btn" onclick="setFiltro('confirmado', this)">Confirmados</button>
+    <button class="filtro-btn" onclick="setFiltro('papel', this)">Papel</button>
+    <button class="filtro-btn" onclick="setFiltro('digital', this)">Digital</button>
+  </div>
+
+  <div class="convites-grid" id="grid"></div>
+</div>
+
+<script src="config.js"></script>
+<script>
+let _token    = sessionStorage.getItem('admin_token') || '';
+let _todos    = [];
+let _filtroAtivo = 'todos';
+
+// ── Auth ─────────────────────────────────────────────────────────────────────
+async function entrar() {
+  const t = document.getElementById('token-input').value.trim();
+  if (!t) return;
+  const ok = await testarToken(t);
+  if (ok) {
+    _token = t;
+    sessionStorage.setItem('admin_token', t);
+    document.getElementById('auth-overlay').classList.add('hidden');
+    document.getElementById('app').classList.add('show');
+    carregarDados();
+  } else {
+    document.getElementById('auth-err').classList.add('show');
+  }
+}
+
+document.getElementById('token-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') entrar();
+});
+
+async function testarToken(t) {
+  try {
+    const r = await fetch(`${API_URL}/api/admin/convites`, {
+      headers: { 'Authorization': `Bearer ${t}` },
+    });
+    return r.ok;
+  } catch { return false; }
+}
+
+// ── Carregar dados ────────────────────────────────────────────────────────────
+async function carregarDados(forcar = false) {
+  try {
+    const r = await fetch(`${API_URL}/api/admin/convites`, {
+      headers: { 'Authorization': `Bearer ${_token}` },
+    });
+    if (!r.ok) {
+      if (r.status === 401) { sessionStorage.removeItem('admin_token'); location.reload(); }
+      return;
+    }
+    _todos = await r.json();
+    renderStats();
+    filtrar();
+  } catch (e) {
+    alert('Erro ao carregar dados: ' + e.message);
+  }
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
+function renderStats() {
+  const total       = _todos.length;
+  const confirmados = _todos.filter(c => c.confirmadoEm).length;
+  const pendentes   = total - confirmados;
+  const totalPessoas = _todos.reduce((s, c) => s + c.convidados.length, 0);
+  const confirmouSim = _todos.flatMap(c => c.convidados).filter(p => p.vaiComparecer === true).length;
+  const confirmouNao = _todos.flatMap(c => c.convidados).filter(p => p.vaiComparecer === false).length;
+
+  document.getElementById('stats-bar').innerHTML = `
+    <div class="stat"><strong>${total}</strong><span>convites</span></div>
+    <div class="stat"><strong style="color:#276749">${confirmados}</strong><span>confirmados</span></div>
+    <div class="stat"><strong style="color:#b7791f">${pendentes}</strong><span>pendentes</span></div>
+    <div class="stat"><strong>${totalPessoas}</strong><span>pessoas</span></div>
+    <div class="stat"><strong style="color:#276749">${confirmouSim}</strong><span>confirmadas presença</span></div>
+    <div class="stat"><strong style="color:#c53030">${confirmouNao}</strong><span>não virão</span></div>
+  `;
+}
+
+// ── Filtro ────────────────────────────────────────────────────────────────────
+function setFiltro(f, btn) {
+  _filtroAtivo = f;
+  document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtrar();
+}
+
+function filtrar() {
+  const q = document.getElementById('busca').value.toLowerCase();
+  let lista = _todos.filter(c => {
+    if (_filtroAtivo === 'confirmado' && !c.confirmadoEm) return false;
+    if (_filtroAtivo === 'pendente'   &&  c.confirmadoEm) return false;
+    if (_filtroAtivo === 'papel'   && c.entrega !== 'papel')   return false;
+    if (_filtroAtivo === 'digital' && c.entrega !== 'digital') return false;
+    if (!q) return true;
+    return c.grupo.toLowerCase().includes(q) || c.codigo.toLowerCase().includes(q);
+  });
+  renderGrid(lista);
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderGrid(lista) {
+  const grid = document.getElementById('grid');
+  if (lista.length === 0) {
+    grid.innerHTML = `<p style="padding:32px;color:var(--muted);grid-column:1/-1">Nenhum convite encontrado.</p>`;
+    return;
+  }
+
+  grid.innerHTML = lista.map(c => {
+    const nomesHtml = c.convidados.map(p => {
+      const cls = p.vaiComparecer === true ? 'sim' : p.vaiComparecer === false ? 'nao' : 'pendente';
+      const icone = p.vaiComparecer === true ? '✓ ' : p.vaiComparecer === false ? '✗ ' : '• ';
+      return `<span class="${cls}">${icone}${esc(p.nome)}</span>`;
+    }).join('<br>');
+
+    const status = c.confirmadoEm
+      ? `<span class="badge badge-ok">Confirmado</span>`
+      : `<span class="badge badge-pendente">Pendente</span>`;
+
+    const entregaBadge = c.entrega === 'papel'
+      ? `<span class="badge badge-papel">📄 Papel</span>`
+      : `<span class="badge badge-digital">💬 Digital</span>`;
+
+    const qrHtml = c.qrCode
+      ? `<div class="cc-qr"><img src="${c.qrCode}" alt="QR Code ${c.codigo}"></div>`
+      : '';
+
+    return `
+      <div class="convite-card ${c.confirmadoEm ? 'confirmado' : ''}">
+        <div class="cc-header">
+          <div class="cc-grupo">${esc(c.grupo)}</div>
+          <div class="cc-codigo">${esc(c.codigo)}</div>
+        </div>
+        <div class="cc-body">
+          <div class="cc-meta">${entregaBadge} ${status}</div>
+          <div class="cc-nomes">${nomesHtml}</div>
+          <div class="cc-link">
+            🔗 <a href="${esc(c.link)}" target="_blank">${esc(c.link)}</a>
+            <button class="btn outline sm" style="margin-left:8px" onclick="copiar('${esc(c.link)}')">Copiar</button>
+          </div>
+          ${qrHtml}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function copiar(texto) {
+  navigator.clipboard.writeText(texto).then(() => {
+    const t = document.createElement('div');
+    t.textContent = 'Link copiado!';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1c1a17;color:#fff;padding:10px 24px;border-radius:50px;font-size:13px;z-index:9999';
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2000);
+  });
+}
+
+// ── Exportar CSV ──────────────────────────────────────────────────────────────
+function exportarCSV() {
+  const linhas = [
+    ['Grupo', 'Código', 'Entrega', 'Convidado', 'Vai Comparecer', 'Confirmado Em', 'Link'],
+  ];
+
+  _todos.forEach(c => {
+    c.convidados.forEach(p => {
+      linhas.push([
+        c.grupo,
+        c.codigo,
+        c.entrega,
+        p.nome,
+        p.vaiComparecer === true ? 'Sim' : p.vaiComparecer === false ? 'Não' : 'Pendente',
+        c.confirmadoEm ? new Date(c.confirmadoEm).toLocaleString('pt-BR') : '',
+        c.link,
+      ]);
+    });
+  });
+
+  const csv = linhas.map(l => l.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'rsvp-casamento.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+if (_token) {
+  testarToken(_token).then(ok => {
+    if (ok) {
+      document.getElementById('auth-overlay').classList.add('hidden');
+      document.getElementById('app').classList.add('show');
+      carregarDados();
+    } else {
+      sessionStorage.removeItem('admin_token');
+      _token = '';
+    }
+  });
+}
+</script>
+</body>
+</html>
