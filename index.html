@@ -18,8 +18,8 @@
                 <ul class="nav-links">
                     <li><a href="#nossa-historia">Nossa História</a></li>
                     <li><a href="#cerimonia">Cerimônia</a></li>
-                    <li><a href="#presentes">Presentes</a></li>
-                    <li><a href="#confirmar">Confirmar Presença</a></li>
+                    <li><a href="presentes/">Presentes</a></li>
+                    <li><a href="confirmar/">Confirmar Presença</a></li>
                 </ul>
                 <div class="hamburger">
                     <span></span>
@@ -50,7 +50,7 @@
                     <span class="countdown-label">Segundos</span>
                 </div>
             </div>
-            <a href="#confirmar" class="btn-primary">Confirmar Presença</a>
+            <a href="confirmar/" class="btn-primary">Confirmar Presença</a>
         </div>
         <div class="scroll-indicator">
             <span></span>
@@ -142,192 +142,39 @@
         </div>
     </section>
 
-    <!-- Presentes -->
-    <section class="presentes" id="presentes">
+    <!-- Participe: navegação para as sub-páginas -->
+    <section class="participe" id="participe">
         <div class="container">
-            <h2 class="section-title">Lista de Presentes</h2>
-            <p class="presentes-intro">Sua presença é o nosso maior presente! Mas se desejar nos presentear, deixamos algumas opções:</p>
-
-            <!-- Categorias principais -->
-            <div id="categorias-presentes" class="presentes-grid categorias-grid">
-                <div class="categoria-card" onclick="mostrarCategoria('casa')">
-                    <div class="categoria-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            <h2 class="section-title">Participe do Nosso Dia</h2>
+            <div class="cta-cards">
+                <a class="cta-card" href="confirmar/">
+                    <div class="cta-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
                         </svg>
                     </div>
-                    <h3>Nossa Casa</h3>
-                    <p>Ajude a equipar nosso novo lar</p>
-                    <button class="btn-presente">Ver Presentes</button>
-                </div>
-            </div>
-
-            <!-- Lista de presentes - Casa -->
-            <div id="presentes-casa" class="presentes-grid" style="display: none;">
-                <div class="voltar-categorias">
-                    <button class="btn-voltar" onclick="voltarCategorias()">← Voltar</button>
-                </div>
-
-                <div class="presente-card">
-                    <img src="Lista de Presentes/roboaspirador700reais.png" alt="Robô de Limpeza" class="presente-imagem" loading="lazy">
-                    <h3>Robô de Limpeza</h3>
-                    <p>Para manter nossa casa sempre limpa</p>
-                    <p class="presente-valor">R$ 700,00</p>
-                    <button class="btn-presente" onclick="selecionarPresente('robo-limpeza', 700.00, 'Robô de Limpeza')">Presentear</button>
-                </div>
-
-                <div class="presente-card">
-                    <img src="Lista de Presentes/caixasomportatil120reais.png" alt="Caixa de Som Portátil" class="presente-imagem" loading="lazy">
-                    <h3>Caixa de Som Portátil</h3>
-                    <p>Para animar nossos momentos</p>
-                    <p class="presente-valor">R$ 120,00</p>
-                    <button class="btn-presente" onclick="selecionarPresente('caixa-som-portatil', 120.00, 'Caixa de Som Portátil')">Presentear</button>
-                </div>
-
-                <div class="presente-card">
-                    <img src="Lista de Presentes/cestoroupasuja120reais.png" alt="Cesto de Roupa Suja" class="presente-imagem" loading="lazy">
-                    <h3>Cesto de Roupa Suja</h3>
-                    <p>Para organizar nossa lavanderia</p>
-                    <p class="presente-valor">R$ 120,00</p>
-                    <button class="btn-presente" onclick="selecionarPresente('cesto-roupa-suja', 120.00, 'Cesto de Roupa Suja')">Presentear</button>
-                </div>
-
-                <div class="presente-card">
-                    <img src="Lista de Presentes/projetor4k176reais.png" alt="Projetor 4K" class="presente-imagem" loading="lazy">
-                    <h3>Projetor 4K</h3>
-                    <p>Para nossas noites de cinema em casa</p>
-                    <p class="presente-valor">R$ 176,00</p>
-                    <button class="btn-presente" onclick="selecionarPresente('projetor-4k', 176.00, 'Projetor 4K')">Presentear</button>
-                </div>
-
-                <div class="presente-card">
-                    <img src="Lista de Presentes/arcondicionado1500reais.png" alt="Ar-Condicionado" class="presente-imagem" loading="lazy">
-                    <h3>Ar-Condicionado</h3>
-                    <p>Para dias frescos em nossa casa</p>
-                    <p class="presente-valor">R$ 1.500,00</p>
-                    <button class="btn-presente" onclick="selecionarPresente('ar-condicionado', 1500.00, 'Ar-Condicionado')">Presentear</button>
-                </div>
-
-                <div class="presente-card">
-                    <img src="Lista de Presentes/sanduicheira91reais.png" alt="Sanduicheira" class="presente-imagem" loading="lazy">
-                    <h3>Sanduicheira</h3>
-                    <p>Para lanches deliciosos</p>
-                    <p class="presente-valor">R$ 91,00</p>
-                    <button class="btn-presente" onclick="selecionarPresente('sanduicheira', 91.00, 'Sanduicheira')">Presentear</button>
-                </div>
-
-                <div class="presente-card">
-                    <img src="Lista de Presentes/lavaeseca1320reais.png" alt="Lava e Seca" class="presente-imagem" loading="lazy">
-                    <h3>Lava e Seca</h3>
-                    <p>Praticidade para nosso dia a dia</p>
-                    <p class="presente-valor">R$ 1.320,00</p>
-                    <button class="btn-presente" onclick="selecionarPresente('lava-seca', 1320.00, 'Lava e Seca')">Presentear</button>
-                </div>
-
-                <div class="presente-card">
-                    <img src="Lista de Presentes/escrivaninha270.png" alt="Escrivaninha" class="presente-imagem" loading="lazy">
-                    <h3>Escrivaninha</h3>
-                    <p>Para nosso cantinho de trabalho</p>
-                    <p class="presente-valor">R$ 270,00</p>
-                    <button class="btn-presente" onclick="selecionarPresente('escrivaninha', 270.00, 'Escrivaninha')">Presentear</button>
-                </div>
-
-                <div class="presente-card">
-                    <img src="Lista de Presentes/cadeira-escritorio359reais.png" alt="Cadeira de Escritório" class="presente-imagem" loading="lazy">
-                    <h3>Cadeira de Escritório</h3>
-                    <p>Conforto para os momentos de estudo</p>
-                    <p class="presente-valor">R$ 359,00</p>
-                    <button class="btn-presente" onclick="selecionarPresente('cadeira-escritorio', 359.00, 'Cadeira de Escritório')">Presentear</button>
-                </div>
-
-                <div class="presente-card">
-                    <img src="Lista de Presentes/chaleira50reais.png" alt="Chaleira" class="presente-imagem" loading="lazy">
-                    <h3>Chaleira</h3>
-                    <p>Para nossos momentos de chá e café</p>
-                    <p class="presente-valor">R$ 50,00</p>
-                    <button class="btn-presente" onclick="selecionarPresente('chaleira', 50.00, 'Chaleira')">Presentear</button>
-                </div>
-
-                <div class="presente-card">
-                    <div class="presente-icon">
-                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    <h3>Confirmar Presença</h3>
+                    <p>Acesse com a senha que está no seu convite e diga quem vai comparecer.</p>
+                    <span class="btn-primary">Confirmar presença</span>
+                </a>
+                <a class="cta-card" href="presentes/">
+                    <div class="cta-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="20 12 20 22 4 22 4 12"></polyline>
+                            <rect x="2" y="7" width="20" height="5"></rect>
+                            <line x1="12" y1="22" x2="12" y2="7"></line>
+                            <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+                            <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
                         </svg>
                     </div>
-                    <h3>Outro Item</h3>
-                    <p>Contribua com o valor que desejar</p>
-                    <p class="presente-valor">Valor livre</p>
-                    <button class="btn-presente" onclick="abrirModalValorPersonalizado()">Contribuir</button>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- Confirmar Presenca -->
-    <section class="confirmar" id="confirmar">
-        <div class="container">
-            <h2 class="section-title">Confirme sua Presença</h2>
-            <p class="confirmar-intro">Ficaremos muito felizes em tê-lo conosco neste dia tão especial!<br>
-            Acesse com a senha que está no seu convite.</p>
-            <form class="rsvp-form" id="rsvpForm">
-                <div class="form-group">
-                    <label for="rsvp-codigo" class="visually-hidden">Senha do convite</label>
-                    <input type="text" id="rsvp-codigo" name="codigo" placeholder="Senha do convite (ex: ABC123)"
-                        autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
-                        maxlength="30" style="text-transform: uppercase; letter-spacing: 3px; text-align: center;" required>
-                </div>
-                <button type="submit" class="btn-submit">Acessar meu convite</button>
-            </form>
-        </div>
-    </section>
-
-    <!-- Modal de Presente -->
-    <div id="modalPresente" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="fecharModal()">&times;</span>
-            <h2 id="modalTitulo">Confirmar Presente</h2>
-            <p id="modalDescricao"></p>
-
-            <form id="formPresente" onsubmit="gerarCobranca(event)">
-                <div class="form-group">
-                    <label for="nomeConvidado" class="visually-hidden">Nome completo</label>
-                    <input type="text" id="nomeConvidado" name="nome" placeholder="Seu nome completo" required>
-                </div>
-                <div class="form-group">
-                    <label for="emailConvidado" class="visually-hidden">E-mail</label>
-                    <input type="email" id="emailConvidado" name="email" placeholder="Seu e-mail" required>
-                </div>
-                <div class="form-group">
-                    <label for="telefoneConvidado" class="visually-hidden">Telefone</label>
-                    <input type="tel" id="telefoneConvidado" name="telefone" placeholder="Seu telefone (opcional)">
-                </div>
-                <div class="form-group" id="valorPersonalizadoGroup" style="display: none;">
-                    <label for="valorPersonalizado" class="visually-hidden">Valor (R$)</label>
-                    <input type="number" id="valorPersonalizado" name="valor" placeholder="Valor (R$)" min="10" step="0.01">
-                </div>
-
-                <input type="hidden" id="presenteId" name="presenteId">
-                <input type="hidden" id="presenteValor" name="presenteValor">
-                <input type="hidden" id="presenteNome" name="presenteNome">
-
-                <button type="submit" class="btn-submit" id="btnGerarCobranca">
-                    <span id="btnTexto">Gerar Link de Pagamento</span>
-                    <span id="btnLoading" style="display: none;">Gerando...</span>
-                </button>
-            </form>
-
-            <div id="resultadoCobranca" style="display: none;">
-                <div class="sucesso-cobranca">
-                    <h3>Link de Pagamento Gerado!</h3>
-                    <p>Acesse o link abaixo para realizar o pagamento:</p>
-                    <a id="linkPagamento" href="#" target="_blank" class="btn-primary">Abrir Link de Pagamento</a>
-                    <p class="info-pagamento">Você pode pagar com PIX, cartão de crédito (até 12x) ou boleto</p>
-                </div>
+                    <h3>Lista de Presentes</h3>
+                    <p>Sua presença é o nosso maior presente! Mas se desejar, veja nossas sugestões.</p>
+                    <span class="btn-primary">Ver lista de presentes</span>
+                </a>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- Footer -->
     <footer class="footer">

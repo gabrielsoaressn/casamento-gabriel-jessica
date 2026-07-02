@@ -1,3 +1,6 @@
+// O script é compartilhado entre a home e as sub-páginas (/presentes, /confirmar),
+// então cada bloco só roda se os elementos da sua página existirem.
+
 // Countdown Timer
 function updateCountdown() {
     const weddingDate = new Date('2026-12-05T09:30:00').getTime();
@@ -19,36 +22,40 @@ function updateCountdown() {
     }
 }
 
-// Update countdown every second
-setInterval(updateCountdown, 1000);
-updateCountdown();
+if (document.getElementById('countdown')) {
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+}
 
-// Navbar scroll effect
-window.addEventListener('scroll', function() {
-    const navbar = document.querySelector('.navbar');
-    if (window.scrollY > 50) {
-        navbar.classList.add('scrolled');
-    } else {
-        navbar.classList.remove('scrolled');
-    }
-});
+// Navbar scroll effect — roda também no carregamento, para páginas abertas
+// já roladas (âncora/refresh) começarem com o fundo correto
+const navbar = document.querySelector('.navbar');
+if (navbar) {
+    const atualizarNavbar = () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 50);
+    };
+    window.addEventListener('scroll', atualizarNavbar);
+    atualizarNavbar();
+}
 
 // Mobile menu toggle
 const hamburger = document.querySelector('.hamburger');
 const navLinks = document.querySelector('.nav-links');
 
-hamburger.addEventListener('click', function() {
-    navLinks.classList.toggle('active');
-    hamburger.classList.toggle('active');
-});
-
-// Close mobile menu when clicking a link
-document.querySelectorAll('.nav-links a').forEach(link => {
-    link.addEventListener('click', () => {
-        navLinks.classList.remove('active');
-        hamburger.classList.remove('active');
+if (hamburger && navLinks) {
+    hamburger.addEventListener('click', function() {
+        navLinks.classList.toggle('active');
+        hamburger.classList.toggle('active');
     });
-});
+
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+            navLinks.classList.remove('active');
+            hamburger.classList.remove('active');
+        });
+    });
+}
 
 // Toast notification
 function showToast(message) {
@@ -98,14 +105,6 @@ toastStyles.textContent = `
     }
 `;
 document.head.appendChild(toastStyles);
-
-// RSVP: a senha do convite é validada apenas no servidor (confirmar.html)
-document.getElementById('rsvpForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const codigo = document.getElementById('rsvp-codigo').value.trim();
-    if (!codigo) return;
-    window.location.href = `confirmar.html?c=${encodeURIComponent(codigo.toUpperCase())}`;
-});
 
 // Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -407,38 +406,39 @@ function _pararPollingPix() {
     }
 }
 
+// Altera display só se o elemento existir (nem toda categoria tem lista própria)
+function setDisplay(id, valor) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = valor;
+}
+
 // Função para mostrar categoria de presentes
 function mostrarCategoria(categoria) {
-    // Esconder categorias principais
-    document.getElementById('categorias-presentes').style.display = 'none';
+    setDisplay('categorias-presentes', 'none');
 
-    // Mostrar lista da categoria selecionada
     if (categoria === 'casa') {
-        document.getElementById('presentes-casa').style.display = 'grid';
-        document.getElementById('presentes-lua-mel').style.display = 'none';
+        setDisplay('presentes-casa', 'grid');
+        setDisplay('presentes-lua-mel', 'none');
     } else if (categoria === 'lua-mel') {
-        document.getElementById('presentes-lua-mel').style.display = 'grid';
-        document.getElementById('presentes-casa').style.display = 'none';
+        setDisplay('presentes-lua-mel', 'grid');
+        setDisplay('presentes-casa', 'none');
     }
 
     // Remarcar presentes indisponíveis na categoria exibida
     setTimeout(marcarPresentesIndisponiveis, 100);
 
-    // Scroll suave até a seção de presentes
-    document.getElementById('presentes').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const secao = document.getElementById('presentes');
+    if (secao) secao.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Função para voltar às categorias
 function voltarCategorias() {
-    // Mostrar categorias principais
-    document.getElementById('categorias-presentes').style.display = 'grid';
+    setDisplay('categorias-presentes', 'grid');
+    setDisplay('presentes-casa', 'none');
+    setDisplay('presentes-lua-mel', 'none');
 
-    // Esconder listas de presentes
-    document.getElementById('presentes-casa').style.display = 'none';
-    document.getElementById('presentes-lua-mel').style.display = 'none';
-
-    // Scroll suave até a seção de presentes
-    document.getElementById('presentes').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const secao = document.getElementById('presentes');
+    if (secao) secao.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Função para abrir modal com presente selecionado
@@ -506,11 +506,14 @@ function fecharModal() {
 }
 
 // Fechar modal ao clicar fora
-document.getElementById('modalPresente').addEventListener('click', function(e) {
-    if (e.target === this) {
-        fecharModal();
-    }
-});
+const modalPresente = document.getElementById('modalPresente');
+if (modalPresente) {
+    modalPresente.addEventListener('click', function(e) {
+        if (e.target === this) {
+            fecharModal();
+        }
+    });
+}
 
 // Função para gerar cobrança
 async function gerarCobranca(event) {

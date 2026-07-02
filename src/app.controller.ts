@@ -1,13 +1,25 @@
-import { Controller, Get, Param, Redirect, Res } from '@nestjs/common';
+import { Controller, Get, Param, Res } from '@nestjs/common';
 import { Response } from 'express';
+import { join } from 'path';
+
+const CONFIRMAR_DIR = join(__dirname, '..', 'confirmar');
 
 @Controller()
 export class AppController {
-  /** Rota amigável para convites digitais: /confirmar/CODIGO → /confirmar.html?c=CODIGO */
+  /** Página de RSVP em URL limpa: /confirmar */
+  @Get('confirmar')
+  confirmarPage(@Res() res: Response) {
+    res.sendFile('index.html', { root: CONFIRMAR_DIR });
+  }
+
+  /** Rota amigável para convites digitais: /confirmar/CODIGO → /confirmar/?c=CODIGO */
   @Get('confirmar/:codigo')
-  @Redirect()
-  redirecionarConfirmar(@Param('codigo') codigo: string) {
-    return { url: `/confirmar.html?c=${encodeURIComponent(codigo)}` };
+  redirecionarConfirmar(@Param('codigo') codigo: string, @Res() res: Response) {
+    // O ServeStatic exclui /confirmar/*, então assets da pasta chegam aqui
+    if (codigo.includes('.')) {
+      return res.sendFile(codigo, { root: CONFIRMAR_DIR });
+    }
+    res.redirect(`/confirmar/?c=${encodeURIComponent(codigo)}`);
   }
 
   @Get('obrigado')

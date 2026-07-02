@@ -34,20 +34,34 @@ body {
 }
 
 /* ========== NAVBAR ========== */
+/* Fundo escuro translúcido por padrão: garante leitura dos links brancos
+   sobre qualquer conteúdo, mesmo antes do JS aplicar .scrolled */
 .navbar {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 1000;
-    padding: 20px 0;
+    padding: 14px 0;
+    background: rgba(28, 26, 23, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     transition: all 0.3s ease;
 }
 
-.navbar.scrolled {
-    background: rgba(255, 255, 255, 0.95);
+.navbar.scrolled,
+.navbar.navbar-solid {
+    background: rgba(255, 255, 255, 0.97);
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-    padding: 15px 0;
+}
+
+.navbar.navbar-solid .logo,
+.navbar.navbar-solid .nav-links a {
+    color: #333;
+}
+
+.navbar.navbar-solid .hamburger span {
+    background: #333;
 }
 
 .nav-container {
@@ -124,7 +138,7 @@ body {
 /* ========== HERO ========== */
 .hero {
     min-height: 100vh;
-    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.55)),
                 url('images/ef37d54a-8188-4961-947f-8c9662e9b6c5.jpg') center/cover no-repeat;
     display: flex;
     flex-direction: column;
@@ -133,6 +147,9 @@ body {
     text-align: center;
     color: #fff;
     position: relative;
+    /* Respiro para o navbar fixo (topo) e o indicador de rolagem (base):
+       o conteúdo centralizado nunca desliza para baixo deles */
+    padding: 110px 0 120px;
 }
 
 .hero-content {
@@ -140,11 +157,13 @@ body {
 }
 
 .hero-subtitle {
-    font-size: 1.2rem;
-    letter-spacing: 3px;
+    max-width: 720px;
+    margin: 0 auto 20px;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    margin-bottom: 20px;
-    opacity: 0.9;
+    opacity: 0.95;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
 }
 
 .hero-title {
@@ -165,6 +184,7 @@ body {
     font-weight: 300;
     margin-bottom: 50px;
     letter-spacing: 2px;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
 }
 
 /* Countdown */
@@ -220,6 +240,14 @@ body {
     bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
+    pointer-events: none;
+}
+
+/* Em telas baixas o indicador disputaria espaço com o botão CTA */
+@media (max-height: 700px) {
+    .scroll-indicator {
+        display: none;
+    }
 }
 
 .scroll-indicator span {
@@ -434,10 +462,90 @@ body {
     border: none;
 }
 
+/* ========== PARTICIPE (CTA cards na home) ========== */
+.participe {
+    padding: 120px 0;
+    background: #fff;
+}
+
+.cta-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.cta-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    padding: 56px 40px;
+    background: #faf9f7;
+    border: 1px solid #f0ede5;
+    border-radius: 15px;
+    text-decoration: none;
+    color: #333;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cta-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.cta-card:focus-visible {
+    outline: 3px solid #c9a86c;
+    outline-offset: 3px;
+}
+
+.cta-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 16px;
+    background: #c9a86c;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cta-icon svg {
+    width: 36px;
+    height: 36px;
+    color: #fff;
+}
+
+.cta-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 400;
+}
+
+.cta-card p {
+    color: #666;
+    font-size: 0.95rem;
+    max-width: 300px;
+    margin-bottom: 16px;
+}
+
+.cta-card .btn-primary {
+    margin-top: auto;
+}
+
 /* ========== PRESENTES ========== */
 .presentes {
     padding: 120px 0;
     background: #faf9f7;
+}
+
+/* Sub-páginas: primeira seção fica sob o navbar fixo — mais respiro no topo */
+.pagina-sub {
+    padding-top: 160px;
+    min-height: 70vh;
 }
 
 .presentes-intro {
@@ -456,8 +564,10 @@ body {
     margin: 0 auto;
 }
 
+/* auto-fit + justify-content centraliza mesmo com um único card */
 .categorias-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 380px));
+    justify-content: center;
     max-width: 800px;
 }
 
@@ -624,6 +734,17 @@ body {
 .btn-presente:hover {
     background: #b8975b;
     transform: scale(1.05);
+}
+
+.btn-presente:disabled,
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-presente {
+    min-height: 44px;
 }
 
 /* Nubank Destaque */
@@ -1013,6 +1134,15 @@ body {
         height: 120px;
     }
 
+    .hero-subtitle {
+        font-size: 0.95rem;
+        letter-spacing: 1.5px;
+    }
+
+    .hero {
+        padding: 100px 0 100px;
+    }
+
     .countdown {
         gap: 15px;
     }
@@ -1091,8 +1221,22 @@ body {
     .nossa-historia,
     .cerimonia,
     .presentes,
-    .confirmar {
+    .confirmar,
+    .participe {
         padding: 70px 0;
+    }
+
+    .pagina-sub {
+        padding-top: 120px;
+    }
+
+    .cta-cards {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .cta-card {
+        padding: 40px 24px;
     }
 
     .section-title {

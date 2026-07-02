@@ -126,7 +126,7 @@ export class RsvpService {
 
     return Promise.all(
       convites.map(async (c) => {
-        const link = `${this.frontendUrl}/confirmar.html?c=${encodeURIComponent(c.codigo)}`;
+        const link = `${this.frontendUrl}/confirmar/?c=${encodeURIComponent(c.codigo)}`;
         let qrCode: string | null = null;
 
         if (c.entrega === 'papel') {

@@ -20,7 +20,9 @@ import { RsvpModule } from './rsvp/rsvp.module';
     TypeOrmModule.forRoot(databaseConfig()),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..'),
-      exclude: ['/api*', '/obrigado', '/confirmar/*'],
+      // Sintaxe do path-to-regexp v8 (Express 5): '/api*' quebrava com
+      // PathError e derrubava qualquer requisição 404 com erro 500
+      exclude: ['/api/{*path}', '/obrigado', '/confirmar/{*path}'],
     }),
     ScheduleModule.forRoot(),
     PresentesModule,
