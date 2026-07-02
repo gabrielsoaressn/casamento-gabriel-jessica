@@ -11,8 +11,8 @@ import { ConfigService } from '@nestjs/config';
 import { Convite } from './entities/convite.entity';
 import { Convidado } from './entities/convidado.entity';
 
+// `grupo` é controle interno — nunca vai na resposta pública para o convidado
 export interface ConvitePublico {
-  grupo: string;
   confirmadoEm: Date | null;
   convidados: { id: string; nome: string; vaiComparecer: boolean | null }[];
 }
@@ -63,7 +63,6 @@ export class RsvpService {
     if (!convite) return null;
 
     return {
-      grupo: convite.grupo,
       confirmadoEm: convite.confirmadoEm,
       convidados: convite.convidados.map((c) => ({
         id: c.id,

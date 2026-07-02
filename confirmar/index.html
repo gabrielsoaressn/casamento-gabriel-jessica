@@ -348,7 +348,7 @@
     <div id="tela-convite" class="screen">
       <div class="grupo-header">
         <div class="eyebrow">Seu convite</div>
-        <div class="saudacao" id="saudacao-grupo"></div>
+        <div class="saudacao">Que bom ter você aqui!</div>
         <span id="badge-status" class="status-badge pendente"></span>
       </div>
 
@@ -484,8 +484,8 @@ async function verificarCodigo(event) {
 // Tela 2 — Renderizar convite + checkboxes
 // ──────────────────────────────────────────────────────────────────────────────
 function renderizarConvite(data) {
-  document.getElementById('saudacao-grupo').textContent = data.grupo;
-
+  // O título é fixo ("Que bom ter você aqui!") — o campo `grupo` é interno
+  // e não deve aparecer para o convidado.
   const badge = document.getElementById('badge-status');
   if (data.confirmadoEm) {
     const d = new Date(data.confirmadoEm).toLocaleDateString('pt-BR');
