@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Pool } = require('pg');
 
 // Conectar diretamente ao database casamento (assumindo que já existe)
@@ -5,8 +6,8 @@ const pool = new Pool({
     host: '38.52.130.145',
     port: 5432,
     database: 'casamento',
-    user: 'metricsdb',
-    password: 'metricspass',
+    user: process.env.DB_USER || 'metricsdb',
+    password: process.env.DB_PASSWORD,
 });
 
 async function setupTables() {

@@ -149,7 +149,7 @@ PICPAY_SELLER_TOKEN=seu_seller_token_aqui
 # DB_PORT=5432
 # DB_NAME=casamento
 # DB_USER=metricsuser
-# DB_PASSWORD=metricspass
+# DB_PASSWORD=SUA_SENHA_AQUI
 ```
 
 ### 3.4. Inicializar o banco de dados
@@ -161,7 +161,7 @@ NODE_PATH=/usr/lib/node_modules node init-db.js
 Ou se preferir criar manualmente:
 
 ```bash
-PGPASSWORD=metricspass psql -h localhost -U metricsdb -d postgres -c "CREATE DATABASE casamento;"
+PGPASSWORD=$DB_PASSWORD psql -h localhost -U metricsdb -d postgres -c "CREATE DATABASE casamento;"
 NODE_PATH=/usr/lib/node_modules node setup-tables.js
 ```
 
@@ -316,7 +316,7 @@ sudo systemctl status postgresql
 sudo tail -f /var/log/postgresql/postgresql-*-main.log
 
 # Testar conexão manual
-PGPASSWORD=metricspass psql -h localhost -U metricsdb -d casamento -c "SELECT 1;"
+PGPASSWORD=$DB_PASSWORD psql -h localhost -U metricsdb -d casamento -c "SELECT 1;"
 ```
 
 ### Erro: CORS blocked

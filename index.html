@@ -269,35 +269,16 @@
     <section class="confirmar" id="confirmar">
         <div class="container">
             <h2 class="section-title">Confirme sua Presença</h2>
-            <p class="confirmar-intro">Ficaremos muito felizes em tê-lo conosco neste dia tão especial!</p>
+            <p class="confirmar-intro">Ficaremos muito felizes em tê-lo conosco neste dia tão especial!<br>
+            Acesse com a senha que está no seu convite.</p>
             <form class="rsvp-form" id="rsvpForm">
                 <div class="form-group">
-                    <label for="rsvp-nome" class="visually-hidden">Nome completo</label>
-                    <input type="text" id="rsvp-nome" name="nome" placeholder="Seu nome completo" required>
+                    <label for="rsvp-codigo" class="visually-hidden">Senha do convite</label>
+                    <input type="text" id="rsvp-codigo" name="codigo" placeholder="Senha do convite (ex: ABC123)"
+                        autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
+                        maxlength="30" style="text-transform: uppercase; letter-spacing: 3px; text-align: center;" required>
                 </div>
-                <div class="form-group">
-                    <label for="rsvp-email" class="visually-hidden">E-mail</label>
-                    <input type="email" id="rsvp-email" name="email" placeholder="Seu e-mail" required>
-                </div>
-                <div class="form-group">
-                    <label for="rsvp-telefone" class="visually-hidden">Telefone</label>
-                    <input type="tel" id="rsvp-telefone" name="telefone" placeholder="Seu telefone">
-                </div>
-                <div class="form-group">
-                    <label for="rsvp-acompanhantes" class="visually-hidden">Número de acompanhantes</label>
-                    <select id="rsvp-acompanhantes" name="acompanhantes" required>
-                        <option value="">Número de acompanhantes</option>
-                        <option value="0">Irei sozinho(a)</option>
-                        <option value="1">1 acompanhante</option>
-                        <option value="2">2 acompanhantes</option>
-                        <option value="3">3 acompanhantes</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="rsvp-mensagem" class="visually-hidden">Mensagem para os noivos</label>
-                    <textarea id="rsvp-mensagem" name="mensagem" placeholder="Deixe uma mensagem para os noivos (opcional)"></textarea>
-                </div>
-                <button type="submit" class="btn-submit">Confirmar Presença</button>
+                <button type="submit" class="btn-submit">Acessar meu convite</button>
             </form>
         </div>
     </section>

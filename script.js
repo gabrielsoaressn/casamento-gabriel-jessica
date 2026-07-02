@@ -99,21 +99,12 @@ toastStyles.textContent = `
 `;
 document.head.appendChild(toastStyles);
 
-// Form submission
+// RSVP: a senha do convite é validada apenas no servidor (confirmar.html)
 document.getElementById('rsvpForm').addEventListener('submit', function(e) {
     e.preventDefault();
-
-    const formData = new FormData(this);
-    const data = Object.fromEntries(formData);
-
-    // Here you would typically send the data to a server
-    console.log('Form data:', data);
-
-    // Show success message
-    showToast('Presenca confirmada com sucesso!');
-
-    // Reset form
-    this.reset();
+    const codigo = document.getElementById('rsvp-codigo').value.trim();
+    if (!codigo) return;
+    window.location.href = `confirmar.html?c=${encodeURIComponent(codigo.toUpperCase())}`;
 });
 
 // Smooth scroll for anchor links

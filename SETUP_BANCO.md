@@ -5,7 +5,7 @@
 - **Host**: 38.52.130.145
 - **Porta**: 5432
 - **Usuário**: metricsdb
-- **Senha**: metricspass
+- **Senha**: SUA_SENHA_AQUI
 - **Database**: casamento
 
 ## Configuração do pg_hba.conf

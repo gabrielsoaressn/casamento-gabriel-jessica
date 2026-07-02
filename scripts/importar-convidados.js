@@ -72,12 +72,17 @@ async function main() {
     return;
   }
 
+  if (!process.env.DB_USER || !process.env.DB_PASSWORD) {
+    console.error('\n❌ Defina DB_USER e DB_PASSWORD no .env (veja .env.example)\n');
+    process.exit(1);
+  }
+
   const client = new Client({
-    host:     process.env.DB_HOST     || 'localhost',
+    host:     process.env.DB_HOST || 'localhost',
     port:     parseInt(process.env.DB_PORT || '5432'),
-    database: process.env.DB_NAME     || 'casamento',
-    user:     process.env.DB_USER     || 'metricsuser',
-    password: process.env.DB_PASSWORD || 'metricspass',
+    database: process.env.DB_NAME || 'casamento',
+    user:     process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
   });
 
   await client.connect();

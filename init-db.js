@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Pool } = require('pg');
 
 // Primeiro, conectar ao database padrão 'postgres' para criar o database 'casamento'
@@ -5,8 +6,8 @@ const adminPool = new Pool({
     host: '38.52.130.145',
     port: 5432,
     database: 'postgres',
-    user: 'metricsdb',
-    password: 'metricspass',
+    user: process.env.DB_USER || 'metricsdb',
+    password: process.env.DB_PASSWORD,
 });
 
 async function createDatabase() {

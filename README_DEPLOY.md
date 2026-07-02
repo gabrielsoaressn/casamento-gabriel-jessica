@@ -201,7 +201,7 @@ pm2 restart casamento-api
 
 ```bash
 # No servidor
-PGPASSWORD=metricspass psql -h localhost -U metricsdb -d casamento -c "SELECT presente_nome, status, nome_convidado FROM presentes_reservados;"
+PGPASSWORD=$DB_PASSWORD psql -h localhost -U metricsdb -d casamento -c "SELECT presente_nome, status, nome_convidado FROM presentes_reservados;"
 ```
 
 ---

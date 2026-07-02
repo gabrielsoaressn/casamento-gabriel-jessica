@@ -1,9 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Atrás do Nginx: sem isso, @Ip() enxerga o IP do proxy para todos os
+  // visitantes e o rate limiter do RSVP bloquearia o site inteiro de uma vez
+  app.set('trust proxy', 1);
 
   app.enableCors();
 
