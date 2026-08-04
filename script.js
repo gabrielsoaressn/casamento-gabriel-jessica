@@ -1,6 +1,15 @@
 // O script é compartilhado entre a home e as sub-páginas (/presentes, /confirmar),
 // então cada bloco só roda se os elementos da sua página existirem.
 
+// ──────────────────────────────────────────────────────────────────
+// Preferência de movimento reduzido
+// Consultada por todos os efeitos abaixo: com ela ativa, nada se move.
+// É um MediaQueryList vivo — se o visitante mudar a preferência no
+// sistema, os efeitos respondem sem precisar recarregar a página.
+// ──────────────────────────────────────────────────────────────────
+const consultaMovimento = window.matchMedia('(prefers-reduced-motion: reduce)');
+const movimentoReduzido = () => consultaMovimento.matches;
+
 // Countdown Timer
 function updateCountdown() {
     const weddingDate = new Date('2026-12-05T09:30:00').getTime();
@@ -27,33 +36,76 @@ if (document.getElementById('countdown')) {
     updateCountdown();
 }
 
-// Navbar scroll effect — roda também no carregamento, para páginas abertas
-// já roladas (âncora/refresh) começarem com o fundo correto
+// ──────────────────────────────────────────────────────────────────
+// Navbar flutuante — some ao rolar para baixo, volta ao subir.
+// Roda também no carregamento, para páginas abertas já roladas
+// (âncora/refresh) começarem com o fundo correto.
+// ──────────────────────────────────────────────────────────────────
 const navbar = document.querySelector('.navbar');
+const navLinks = document.querySelector('.nav-links');
+
 if (navbar) {
+    let ultimoY = window.scrollY;
+    let agendado = false;
+
     const atualizarNavbar = () => {
-        navbar.classList.toggle('scrolled', window.scrollY > 50);
+        const y = Math.max(0, window.scrollY);
+
+        navbar.classList.toggle('scrolled', y > 50);
+
+        // Só esconde depois do hero e nunca com o menu mobile aberto
+        const menuAberto = navLinks && navLinks.classList.contains('active');
+        const descendo = y > ultimoY + 4;
+        const subindo = y < ultimoY - 4;
+
+        if (!menuAberto && y > 320 && descendo) {
+            navbar.classList.add('navbar-hidden');
+        } else if (subindo || y <= 320) {
+            navbar.classList.remove('navbar-hidden');
+        }
+
+        ultimoY = y;
+        agendado = false;
     };
-    window.addEventListener('scroll', atualizarNavbar);
+
+    window.addEventListener('scroll', () => {
+        // rAF evita recalcular a barra em toda a torrente de eventos de scroll
+        if (!agendado) {
+            agendado = true;
+            requestAnimationFrame(atualizarNavbar);
+        }
+    }, { passive: true });
+
     atualizarNavbar();
 }
 
 // Mobile menu toggle
 const hamburger = document.querySelector('.hamburger');
-const navLinks = document.querySelector('.nav-links');
 
 if (hamburger && navLinks) {
-    hamburger.addEventListener('click', function() {
-        navLinks.classList.toggle('active');
-        hamburger.classList.toggle('active');
+    const alternarMenu = (abrir) => {
+        navLinks.classList.toggle('active', abrir);
+        hamburger.classList.toggle('active', abrir);
+        hamburger.setAttribute('aria-expanded', String(abrir));
+        hamburger.setAttribute('aria-label', abrir ? 'Fechar menu' : 'Abrir menu');
+        if (abrir && navbar) navbar.classList.remove('navbar-hidden');
+    };
+
+    hamburger.addEventListener('click', () => {
+        alternarMenu(!navLinks.classList.contains('active'));
     });
 
-    // Close mobile menu when clicking a link
+    // Fecha o menu ao clicar num link
     document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', () => {
-            navLinks.classList.remove('active');
-            hamburger.classList.remove('active');
-        });
+        link.addEventListener('click', () => alternarMenu(false));
+    });
+
+    // Esc fecha o menu e devolve o foco ao botão — navegação por teclado
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navLinks.classList.contains('active')) {
+            alternarMenu(false);
+            hamburger.focus();
+        }
     });
 }
 
@@ -109,35 +161,173 @@ document.head.appendChild(toastStyles);
 // Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
+        const href = this.getAttribute('href');
+        const comportamento = movimentoReduzido() ? 'auto' : 'smooth';
+
+        // O logo aponta para "#" — querySelector('#') lançaria erro
+        if (href === '#') {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: comportamento });
+            return;
+        }
+
+        const target = document.querySelector(href);
         if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
+            e.preventDefault();
+            target.scrollIntoView({ behavior: comportamento, block: 'start' });
+        }
+    });
+});
+
+// ──────────────────────────────────────────────────────────────────
+// Reveal ao rolar (blur-in)
+// Uma vez revelado, o elemento sai da observação: nada de trabalho
+// repetido a cada rolagem.
+// ──────────────────────────────────────────────────────────────────
+const alvosReveal = document.querySelectorAll('.reveal');
+
+if (alvosReveal.length) {
+    if (!('IntersectionObserver' in window)) {
+        // Navegador antigo: mostra tudo em vez de esconder o conteúdo
+        alvosReveal.forEach(el => el.classList.add('animate-in'));
+    } else {
+        const observador = new IntersectionObserver((entradas, obs) => {
+            entradas.forEach(entrada => {
+                if (entrada.isIntersecting) {
+                    entrada.target.classList.add('animate-in');
+                    obs.unobserve(entrada.target);
+                }
             });
+        }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+        alvosReveal.forEach(el => observador.observe(el));
+    }
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Sparkles nos nomes do casal
+// Brilhos dourados que nascem e somem em posições aleatórias sobre o
+// título. Cada um se remove do DOM ao fim da animação.
+// ──────────────────────────────────────────────────────────────────
+const alvoSparkles = document.querySelector('[data-sparkles]');
+
+if (alvoSparkles && !movimentoReduzido()) {
+    let temporizador = null;
+
+    const criarBrilho = () => {
+        const brilho = document.createElement('span');
+        const tamanho = 6 + Math.random() * 8;
+
+        brilho.className = 'sparkle';
+        brilho.setAttribute('aria-hidden', 'true');
+        brilho.style.width = `${tamanho}px`;
+        brilho.style.height = `${tamanho}px`;
+        brilho.style.left = `${Math.random() * 96}%`;
+        brilho.style.top = `${Math.random() * 88}%`;
+
+        alvoSparkles.appendChild(brilho);
+        brilho.addEventListener('animationend', () => brilho.remove());
+    };
+
+    const agendarBrilho = () => {
+        criarBrilho();
+        temporizador = setTimeout(agendarBrilho, 380 + Math.random() * 520);
+    };
+
+    agendarBrilho();
+
+    // Fora da tela não há nada a brilhar — poupa bateria no celular
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            clearTimeout(temporizador);
+        } else if (!movimentoReduzido()) {
+            agendarBrilho();
         }
     });
-});
+}
 
-// Intersection Observer for animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
+// ──────────────────────────────────────────────────────────────────
+// Galeria com parallax
+// Cada coluna sobe/desce em ritmo próprio conforme a seção cruza a
+// tela. Desligado no mobile (< 900px) e com movimento reduzido.
+// ──────────────────────────────────────────────────────────────────
+const gradeGaleria = document.getElementById('galeria-grid');
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('animate-in');
+if (gradeGaleria) {
+    const colunas = Array.from(gradeGaleria.querySelectorAll('.galeria-coluna'));
+    const telaLarga = window.matchMedia('(min-width: 900px)');
+    let pendente = false;
+
+    const aplicarParallax = () => {
+        pendente = false;
+
+        if (!telaLarga.matches || movimentoReduzido()) {
+            colunas.forEach(col => col.style.removeProperty('--deslocamento'));
+            return;
         }
-    });
-}, observerOptions);
 
-// Observe elements for animation
-document.querySelectorAll('.timeline-item, .evento-card, .presente-card').forEach(el => {
-    observer.observe(el);
-});
+        const caixa = gradeGaleria.getBoundingClientRect();
+
+        // Só calcula enquanto a galeria está visível
+        if (caixa.bottom < 0 || caixa.top > window.innerHeight) return;
+
+        // Distância entre o centro da galeria e o centro da tela
+        const centro = caixa.top + caixa.height / 2 - window.innerHeight / 2;
+
+        colunas.forEach(col => {
+            const velocidade = parseFloat(col.dataset.velocidade || '0');
+            col.style.setProperty('--deslocamento', `${(centro * velocidade).toFixed(1)}px`);
+        });
+    };
+
+    const agendarParallax = () => {
+        if (!pendente) {
+            pendente = true;
+            requestAnimationFrame(aplicarParallax);
+        }
+    };
+
+    window.addEventListener('scroll', agendarParallax, { passive: true });
+    window.addEventListener('resize', agendarParallax);
+    telaLarga.addEventListener('change', agendarParallax);
+    consultaMovimento.addEventListener('change', agendarParallax);
+    aplicarParallax();
+}
+
+// ──────────────────────────────────────────────────────────────────
+// Trilho dourado da linha do tempo
+// Preenche de cima para baixo conforme a seção é percorrida.
+// ──────────────────────────────────────────────────────────────────
+const linhaTempo = document.querySelector('.timeline');
+
+if (linhaTempo) {
+    let pendenteTrilho = false;
+
+    const atualizarTrilho = () => {
+        pendenteTrilho = false;
+
+        if (movimentoReduzido()) {
+            linhaTempo.style.setProperty('--progresso', '1');
+            return;
+        }
+
+        const caixa = linhaTempo.getBoundingClientRect();
+        const meio = window.innerHeight * 0.55;
+        const avanco = (meio - caixa.top) / caixa.height;
+
+        linhaTempo.style.setProperty('--progresso', Math.min(1, Math.max(0, avanco)).toFixed(3));
+    };
+
+    window.addEventListener('scroll', () => {
+        if (!pendenteTrilho) {
+            pendenteTrilho = true;
+            requestAnimationFrame(atualizarTrilho);
+        }
+    }, { passive: true });
+
+    window.addEventListener('resize', atualizarTrilho);
+    atualizarTrilho();
+}
 
 // ========== FUNCIONALIDADE DE PRESENTES ==========
 

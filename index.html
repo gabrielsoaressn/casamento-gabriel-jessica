@@ -1,38 +1,60 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="sem-js">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gabriel & Jéssica - Nosso Casamento</title>
+    <title>Gabriel &amp; Jéssica — Nosso Casamento</title>
+    <meta name="description" content="Gabriel e Jéssica se casam em 05 de dezembro de 2026, na Igreja de Nossa Senhora do Carmo, em João Pessoa. Confirme sua presença e veja a lista de presentes.">
+    <meta name="theme-color" content="#2B2B2B">
+
+    <!-- Remove o fallback sem-js antes da primeira pintura: evita piscar -->
+    <script>document.documentElement.classList.remove('sem-js');</script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&family=Great+Vibes&display=swap" rel="stylesheet">
+
+    <!-- A foto do hero é o elemento de LCP: buscar cedo encurta o tempo até ela pintar -->
+    <link rel="preload" as="image" href="images/8e6472ce-71ef-4ab0-af18-b8a661d7669d.jpg" fetchpriority="high">
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <a href="#nossa-historia" class="visually-hidden">Pular para o conteúdo</a>
+
     <!-- Header/Hero -->
     <header class="hero">
-        <nav class="navbar">
+        <div class="hero-foto" aria-hidden="true"></div>
+        <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+
+        <nav class="navbar" aria-label="Navegação principal">
             <div class="nav-container">
-                <a href="#" class="logo"><img src="images/monograma.png" alt="Gabriel & Jéssica" class="logo-img"></a>
+                <a href="#" class="logo" aria-label="Gabriel e Jéssica — início"><img src="images/monograma.png" alt="" class="logo-img" width="70" height="50"></a>
                 <ul class="nav-links">
                     <li><a href="#nossa-historia">Nossa História</a></li>
-                    <li><a href="#cerimonia">Cerimônia</a></li>
+                    <li><a href="#galeria">Galeria</a></li>
+                    <li><a href="#cerimonia">O Grande Dia</a></li>
                     <li><a href="presentes/">Presentes</a></li>
                     <li><a href="confirmar/">Confirmar Presença</a></li>
                 </ul>
-                <div class="hamburger">
+                <button class="hamburger" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-principal">
                     <span></span>
                     <span></span>
                     <span></span>
-                </div>
+                </button>
             </div>
         </nav>
+
         <div class="hero-content">
             <p class="hero-subtitle">"Para onde iremos, Senhor? Só tu tens palavra de Vida Eterna" (Jo 6, 68).</p>
-            <h1 class="hero-title"><img src="images/monograma.png" alt="Gabriel & Jéssica" class="hero-monogram"></h1>
+
+            <h1 class="hero-nomes" data-sparkles>Gabriel <span class="e-comercial">&amp;</span> Jéssica</h1>
+
+            <p class="hero-title"><img src="images/monograma.png" alt="Monograma de Gabriel e Jéssica" class="hero-monogram" width="147" height="104"></p>
+
             <p class="hero-date">05 de Dezembro de 2026</p>
-            <div class="countdown" id="countdown">
+
+            <div class="countdown" id="countdown" aria-label="Contagem regressiva para o casamento">
                 <div class="countdown-item">
                     <span class="countdown-number" id="days">00</span>
                     <span class="countdown-label">Dias</span>
@@ -50,9 +72,11 @@
                     <span class="countdown-label">Segundos</span>
                 </div>
             </div>
+
             <a href="confirmar/" class="btn-primary">Confirmar Presença</a>
         </div>
-        <div class="scroll-indicator">
+
+        <div class="scroll-indicator" aria-hidden="true">
             <span></span>
         </div>
     </header>
@@ -60,45 +84,46 @@
     <!-- Nossa Historia -->
     <section class="nossa-historia" id="nossa-historia">
         <div class="container">
-            <h2 class="section-title">Nossa História</h2>
+            <span class="section-eyebrow reveal">Como tudo começou</span>
+            <h2 class="section-title reveal">Nossa História</h2>
 
             <div class="timeline">
-                <div class="timeline-item">
+                <div class="timeline-item reveal">
                     <div class="timeline-date">2019</div>
                     <div class="timeline-content">
                         <h3>A admiração nutre o amor</h3>
                         <p>A admiração um para com o outro nasceu de maneira pura. Com os olhares atentos aos vários "sim" e a cada sim dado para as coisas de Deus. Nos conhecemos na preparação para o Retiro de Carnaval da Paróquia Santo Antônio de 2019, onde fizemos juntos o ministério de música do retiro. Desde então, sempre fomos amigos e próximos, cantando juntos nas missas Marianas e no ofício da Imaculada Conceição que acontecia sempre nos sábados cedinho, sempre com Nossa Senhora, São Francisco e Santa Clara nos guiando. Tudo isso nos motivou a escolher esse dia especial para celebrar o nosso para sempre sob os olhares atentos de Nossa Senhora. Um sábado de manhã!</p>
                     </div>
                 </div>
-                <div class="timeline-item">
+                <div class="timeline-item reveal">
                     <div class="timeline-date">2022</div>
                     <div class="timeline-content">
                         <h3>Sorvete do Fat Guys</h3>
                         <p>Nossa amizade começou a se estreitar. Já estávamos em escala de missas em várias paróquias, especialmente, às quintas-feiras, na Casa de Evangelização Monsenhor Catão, onde sempre aproveitávamos a proximidade com a praia para fazer uma breve caminhada e desligar-nos dos problemas semanais... Certo dia, decidimos conhecer o Fat Guys junto com Nayana (a grande culpada) que, mais uma vez "estava cansada" em cima da hora e nos deixou ir sozinhos. Uma foto de um sorvete nos storys e todo avoroço começou. Todos os nossos amigos comentavam que a gente deveria ficar junto. Aquele momento foi especial!</p>
                     </div>
                 </div>
-                <div class="timeline-item">
+                <div class="timeline-item reveal">
                     <div class="timeline-date">2022</div>
                     <div class="timeline-content">
                         <h3>Evidências</h3>
                         <p>Em 25 de setembro de 2022, iniciamos oficialmente nosso namoro ao coro do hino nacional "Evidências" entoado por todos os nossos amigos. Coagidos a iniciar nesse dia e não mais postergar o inicio da nossa história a dois, vivemos, a partir daí, experiências incríveis juntos.</p>
                     </div>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-date">2022-2025</div>
+                <div class="timeline-item reveal">
+                    <div class="timeline-date">2022&ndash;2025</div>
                     <div class="timeline-content">
                         <h3>Aventuras Juntos</h3>
                         <p>O ofício de Jéssica, na época, exigia muitas viagens por cada estuário do litoral paraibano, nos presenteando com muitas histórias e aventuras nesse tempo. Viajamos também por Recife, São Cristóvão, Aracajú, Natal, Campina Grande, Juazeirinho e pelos Carmelos. Cada momento fortaleceu nosso amor. E em cada momento, muitas pessoas estiveram conosco, saboreando essas aventuras, tornando-as mais especial!</p>
                     </div>
                 </div>
-                <div class="timeline-item">
+                <div class="timeline-item reveal">
                     <div class="timeline-date">2026</div>
                     <div class="timeline-content">
                         <h3>O dia mais esperado</h3>
                         <p>Gabriel pediu Jéssica em casamento na praia, justamente de frente ao Fat Guys - o lugar onde tudo começou a se transformar - depois de uma caminhada pela praia, como em 2022. Foi um momento inesquecível e cheio de significado para nós!</p>
                     </div>
                 </div>
-                <div class="timeline-item">
+                <div class="timeline-item reveal">
                     <div class="timeline-date">2026</div>
                     <div class="timeline-content">
                         <h3>O Casamento</h3>
@@ -109,23 +134,89 @@
         </div>
     </section>
 
-    <!-- Cerimonia -->
+    <!-- Galeria de fotos -->
+    <section class="galeria" id="galeria">
+        <div class="container">
+            <span class="section-eyebrow reveal">Nossos registros</span>
+            <h2 class="section-title reveal">Galeria</h2>
+
+            <div class="galeria-grid" id="galeria-grid">
+                <div class="galeria-coluna" data-velocidade="-0.06">
+                    <figure class="galeria-figura reveal">
+                        <img src="images/8e6472ce-71ef-4ab0-af18-b8a661d7669d.jpg" alt="Gabriel e Jéssica de testa colada, sorrindo" width="1200" height="1600" loading="lazy" decoding="async">
+                    </figure>
+                    <figure class="galeria-figura reveal">
+                        <img src="images/1767036a-477d-40d4-b2d9-96db323c341f.jpg" alt="Gabriel e Jéssica de braços dados, sorrindo para a câmera" width="900" height="1600" loading="lazy" decoding="async">
+                    </figure>
+                    <figure class="galeria-figura reveal">
+                        <img src="images/24CB6664-E49E-41CD-80E4-DE41D59E5B97.jpg" alt="Gabriel e Jéssica em uma selfie do dia a dia" width="1170" height="2080" loading="lazy" decoding="async">
+                    </figure>
+                </div>
+
+                <div class="galeria-coluna" data-velocidade="0.05">
+                    <figure class="galeria-figura reveal">
+                        <img src="images/c27f9b59-49bf-4835-9f1c-5b80c58e4a81.jpg" alt="Gabriel e Jéssica frente a frente, rindo juntos" width="1200" height="1600" loading="lazy" decoding="async">
+                    </figure>
+                    <figure class="galeria-figura reveal">
+                        <img src="images/d086e22a-5672-4d1f-abbf-c6cd7c034458.jpg" alt="Gabriel e Jéssica no salão da festa, sob as luzes" width="1200" height="1600" loading="lazy" decoding="async">
+                    </figure>
+                    <figure class="galeria-figura reveal">
+                        <img src="images/ef37d54a-8188-4961-947f-8c9662e9b6c5.jpg" alt="Gabriel e Jéssica posando lado a lado" width="900" height="1600" loading="lazy" decoding="async">
+                    </figure>
+                </div>
+
+                <div class="galeria-coluna" data-velocidade="-0.03">
+                    <figure class="galeria-figura reveal">
+                        <img src="images/02f7417b-b624-49aa-804a-8712b89d246a.jpg" alt="Gabriel beijando a testa de Jéssica" width="1200" height="1600" loading="lazy" decoding="async">
+                    </figure>
+                    <figure class="galeria-figura reveal">
+                        <img src="images/fe23410d-43df-43b5-b8a3-520489cda408.jpg" alt="Gabriel e Jéssica abraçados, ela rindo" width="1200" height="1600" loading="lazy" decoding="async">
+                    </figure>
+                    <figure class="galeria-figura reveal">
+                        <img src="images/46096577-D950-482A-812B-29AA450FACC4.jpg" alt="Gabriel e Jéssica abraçados em uma selfie" width="1170" height="2080" loading="lazy" decoding="async">
+                    </figure>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cerimonia + cronograma + mapa -->
     <section class="cerimonia" id="cerimonia">
         <div class="container">
-            <h2 class="section-title">Cerimônia & Recepção</h2>
+            <span class="section-eyebrow reveal">05 de dezembro de 2026</span>
+            <h2 class="section-title reveal">O Grande Dia</h2>
+
+            <div class="cronograma reveal">
+                <div class="cronograma-item">
+                    <div class="cronograma-hora">09:30</div>
+                    <div class="cronograma-desc">
+                        <h4>Cerimônia</h4>
+                        <p>Igreja de Nossa Senhora do Carmo &middot; Centro Histórico</p>
+                    </div>
+                </div>
+                <div class="cronograma-item">
+                    <div class="cronograma-hora">12:00</div>
+                    <div class="cronograma-desc">
+                        <h4>Recepção</h4>
+                        <p>Bless Eventos &middot; Mangabeira</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="evento-cards">
-                <div class="evento-card">
+                <div class="evento-card reveal">
                     <div class="evento-icon emblema-carmo-icon">
-                        <img src="images/emblema-ordem-do-carmo.png" alt="Nossa Senhora do Carmo">
+                        <img src="images/emblema-ordem-do-carmo.png" alt="Emblema da Ordem do Carmo" width="68" height="68" loading="lazy">
                     </div>
                     <h3>Cerimônia</h3>
                     <p class="evento-horario">09:30</p>
                     <p class="evento-local">Igreja de Nossa Senhora do Carmo</p>
                     <p class="evento-endereco">Praça Dom Adauto - Centro Histórico, João Pessoa - PB</p>
+                    <a class="evento-mapa-link" href="https://www.google.com/maps/search/?api=1&query=Igreja+de+Nossa+Senhora+do+Carmo+Jo%C3%A3o+Pessoa" target="_blank" rel="noopener">Como chegar</a>
                 </div>
-                <div class="evento-card">
+                <div class="evento-card reveal" data-atraso="1">
                     <div class="evento-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                             <circle cx="12" cy="10" r="3"></circle>
                         </svg>
@@ -134,10 +225,12 @@
                     <p class="evento-horario">12:00</p>
                     <p class="evento-local">Bless Eventos</p>
                     <p class="evento-endereco">Rua José Tadeu Cabral, 177 - Mangabeira, João Pessoa - PB</p>
+                    <a class="evento-mapa-link" href="https://www.google.com/maps/search/?api=1&query=Rua+Jos%C3%A9+Tadeu+Cabral+177+Mangabeira+Jo%C3%A3o+Pessoa" target="_blank" rel="noopener">Como chegar</a>
                 </div>
             </div>
-            <div class="mapa">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3958.7639573537773!2d-34.88481872522954!3d-7.115648492871819!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x7ace810852ae4f1%3A0xc9261b8c353e95d8!2sIgreja%20de%20Nossa%20Senhora%20do%20Carmo!5e0!3m2!1spt-BR!2sbr!4v1737418000000!5m2!1spt-BR!2sbr" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+            <div class="mapa reveal">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3958.7639573537773!2d-34.88481872522954!3d-7.115648492871819!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x7ace810852ae4f1%3A0xc9261b8c353e95d8!2sIgreja%20de%20Nossa%20Senhora%20do%20Carmo!5e0!3m2!1spt-BR!2sbr!4v1737418000000!5m2!1spt-BR!2sbr" title="Mapa da Igreja de Nossa Senhora do Carmo" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
     </section>
@@ -145,9 +238,10 @@
     <!-- Participe: navegação para as sub-páginas -->
     <section class="participe" id="participe">
         <div class="container">
-            <h2 class="section-title">Participe do Nosso Dia</h2>
+            <span class="section-eyebrow reveal">Contamos com você</span>
+            <h2 class="section-title reveal">Participe do Nosso Dia</h2>
             <div class="cta-cards">
-                <a class="cta-card" href="confirmar/">
+                <a class="cta-card reveal" href="confirmar/">
                     <div class="cta-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -158,7 +252,7 @@
                     <p>Acesse com a senha que está no seu convite e diga quem vai comparecer.</p>
                     <span class="btn-primary">Confirmar presença</span>
                 </a>
-                <a class="cta-card" href="presentes/">
+                <a class="cta-card reveal" data-atraso="1" href="presentes/">
                     <div class="cta-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <polyline points="20 12 20 22 4 22 4 12"></polyline>
@@ -178,10 +272,19 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <img src="images/emblema-ordem-do-carmo.png" alt="" class="carmo-watermark">
+        <img src="images/emblema-ordem-do-carmo.png" alt="" class="carmo-watermark" aria-hidden="true" loading="lazy">
         <div class="container">
-            <img src="images/monograma.png" alt="Gabriel & Jéssica" class="footer-monogram">
-            <p class="footer-date">05 de Dezembro de 2026</p>
+            <p class="footer-versiculo">"Para onde iremos, Senhor? Só tu tens palavra de Vida Eterna" (Jo 6, 68).</p>
+            <img src="images/monograma.png" alt="Monograma de Gabriel e Jéssica" class="footer-monogram" width="113" height="80" loading="lazy">
+            <p class="footer-date">05 de Dezembro de 2026 &middot; João Pessoa, PB</p>
+            <ul class="footer-links">
+                <li><a href="#nossa-historia">Nossa História</a></li>
+                <li><a href="#galeria">Galeria</a></li>
+                <li><a href="#cerimonia">O Grande Dia</a></li>
+                <li><a href="presentes/">Presentes</a></li>
+                <li><a href="confirmar/">Confirmar Presença</a></li>
+            </ul>
+            <p class="footer-creditos">Gabriel &amp; Jéssica</p>
         </div>
     </footer>
 
