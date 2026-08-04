@@ -208,7 +208,12 @@ body {
 }
 
 /* Com a barra clara o dourado claro perderia contraste — usa o tom de texto */
-.navbar.scrolled .nav-links a:hover {
+.navbar.scrolled .nav-links a:hover,
+.navbar.navbar-solid .nav-links a:hover {
+    color: var(--gold-texto);
+}
+
+.navbar.navbar-solid .logo {
     color: var(--gold-texto);
 }
 
@@ -1631,7 +1636,7 @@ body {
     bottom: -50px;
     width: 300px;
     height: auto;
-    opacity: 0.05;
+    opacity: 0.035;
     filter: brightness(0) invert(1);
     pointer-events: none;
 }
