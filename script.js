@@ -390,10 +390,18 @@ function marcarPresentesIndisponiveis() {
 
 // Carregar presentes reservados ao carregar a página
 document.addEventListener('DOMContentLoaded', () => {
-    carregarPresentesReservados();
+    // A home e a página de confirmação não têm lista de presentes: buscar o
+    // status ali só gastaria uma requisição e sujaria o console quando a API
+    // estivesse fora do ar.
+    const temListaDePresentes = document.getElementById('categorias-presentes')
+        || document.querySelector('.presente-card');
 
-    // Recarregar a cada 30 segundos para manter atualizado
-    setInterval(carregarPresentesReservados, 30000);
+    if (temListaDePresentes) {
+        carregarPresentesReservados();
+
+        // Recarregar a cada 30 segundos para manter atualizado
+        setInterval(carregarPresentesReservados, 30000);
+    }
 
     // Verificar se voltou do checkout do Mercado Pago
     const urlParams = new URLSearchParams(window.location.search);

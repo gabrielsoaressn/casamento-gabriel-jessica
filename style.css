@@ -255,7 +255,8 @@ body {
 
 /* ========== HERO ========== */
 .hero {
-    min-height: 100svh;
+    min-height: 100vh;   /* fallback para navegadores sem unidades svh */
+    min-height: 100svh;  /* no celular, desconta a barra do navegador */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1761,14 +1762,28 @@ body {
         grid-template-columns: 1fr;
     }
 
-    /* Galeria: 2 colunas e sem parallax (o JS zera o deslocamento) */
+    /* Galeria no mobile: sem parallax e sem colunas próprias.
+       display:contents dissolve os 3 agrupadores para que as 9 fotos
+       caiam direto na grade de 2 colunas — senão a terceira coluna
+       sobraria sozinha embaixo. */
     .galeria-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
 
     .galeria-coluna {
-        gap: 12px;
+        display: contents;
+    }
+
+    /* São 9 fotos em 2 colunas: a última fecharia a grade sozinha.
+       Ela atravessa as duas colunas, com recorte mais largo. */
+    .galeria-coluna:last-child .galeria-figura:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .galeria-coluna:last-child .galeria-figura:last-child img {
+        aspect-ratio: 4 / 3;
+        object-position: center 28%;
     }
 
     .mapa iframe {
