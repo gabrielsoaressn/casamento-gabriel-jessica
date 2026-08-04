@@ -4,22 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Confirmar Presença — Gabriel & Jéssica</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --gold:     #c9a86c;
-      --gold-dk:  #b8975b;
-      --cream:    #faf9f7;
-      --text:     #333;
-      --muted:    #888;
-      --border:   #e0dbd2;
-      --radius:   16px;
+      --gold:       #C6A664;  /* preenchimentos e filetes */
+      --gold-texto: #7E6329;  /* dourado legível sobre fundo claro (5.1:1) */
+      --gold-dk:    #B99450;  /* hover — 5.0:1 com texto grafite */
+      --cream:      #F7F3EE;
+      --text:       #2B2B2B;
+      --muted:      #6E6960;  /* 4.9:1 sobre o marfim */
+      --border:     #E7E0D5;
+      --radius:     16px;
+      --serif:      'Playfair Display', Georgia, serif;
+      --sans:       'Inter', system-ui, -apple-system, sans-serif;
+      --ease:       cubic-bezier(0.22, 0.61, 0.36, 1);
     }
 
     body {
-      font-family: 'Montserrat', sans-serif;
+      font-family: var(--sans);
       background: var(--cream);
       color: var(--text);
       min-height: 100vh;
@@ -44,9 +50,9 @@
       text-decoration: none;
     }
     .site-header .monogram {
-      font-family: 'Playfair Display', serif;
+      font-family: var(--serif);
       font-size: 22px;
-      color: var(--gold);
+      color: var(--gold-texto);
       font-style: italic;
       letter-spacing: 2px;
     }
@@ -81,7 +87,7 @@
 
     /* ── Typography ── */
     .card h1 {
-      font-family: 'Playfair Display', serif;
+      font-family: var(--serif);
       font-size: 28px;
       font-weight: 400;
       color: var(--text);
@@ -92,7 +98,7 @@
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 2.5px;
-      color: var(--gold);
+      color: var(--gold-texto);
       font-weight: 600;
       margin-bottom: 10px;
     }
@@ -120,7 +126,7 @@
       border-radius: 10px;
       padding: 14px 16px;
       font-size: 18px;
-      font-family: 'Montserrat', sans-serif;
+      font-family: var(--sans);
       font-weight: 500;
       letter-spacing: 3px;
       text-transform: uppercase;
@@ -140,10 +146,10 @@
       width: 100%;
       padding: 16px;
       background: var(--gold);
-      color: #fff;
+      color: var(--text);
       border: none;
       border-radius: 50px;
-      font-family: 'Montserrat', sans-serif;
+      font-family: var(--sans);
       font-size: 13px;
       font-weight: 600;
       letter-spacing: 2px;
@@ -157,11 +163,11 @@
     .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
     .btn.secondary {
       background: transparent;
-      color: var(--gold);
+      color: var(--gold-texto);
       border: 1.5px solid var(--gold);
       margin-top: 12px;
     }
-    .btn.secondary:hover { background: rgba(201,168,108,0.08); }
+    .btn.secondary:hover { background: rgba(198,166,100,0.12); }
 
     /* ── Error ── */
     .error-msg {
@@ -188,7 +194,7 @@
       margin-bottom: 24px;
     }
     .grupo-header .saudacao {
-      font-family: 'Playfair Display', serif;
+      font-family: var(--serif);
       font-size: 22px;
       color: var(--text);
       font-style: italic;
@@ -254,8 +260,8 @@
       content: '';
       width: 6px;
       height: 11px;
-      border-right: 2px solid #fff;
-      border-bottom: 2px solid #fff;
+      border-right: 2px solid var(--text);
+      border-bottom: 2px solid var(--text);
       transform: rotate(45deg) translate(-1px, -2px);
     }
     .convidado-nome {
@@ -273,7 +279,7 @@
     }
     .obrigado-msg {
       text-align: center;
-      font-family: 'Playfair Display', serif;
+      font-family: var(--serif);
       font-size: 24px;
       color: var(--text);
       margin-bottom: 12px;
@@ -290,14 +296,47 @@
     .spinner {
       display: inline-block;
       width: 18px; height: 18px;
-      border: 2px solid rgba(255,255,255,0.4);
-      border-top-color: #fff;
+      border: 2px solid rgba(43,43,43,0.25);
+      border-top-color: var(--text);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       vertical-align: middle;
       margin-right: 6px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Confete da confirmação ── */
+    .confete-camada {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 9999;
+    }
+    .confete {
+      position: absolute;
+      top: -14px;
+      width: 8px;
+      height: 14px;
+      border-radius: 1px;
+      opacity: 0;
+      animation: confete-cair var(--tempo, 2.6s) cubic-bezier(0.25, 0.6, 0.4, 1) var(--atraso, 0s) forwards;
+    }
+    @keyframes confete-cair {
+      0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
+      8%   { opacity: 1; }
+      80%  { opacity: 1; }
+      100% { opacity: 0; transform: translateY(105vh) rotate(var(--giro, 540deg)); }
+    }
+
+    /* Sem movimento: nada de confete caindo pela tela */
+    @media (prefers-reduced-motion: reduce) {
+      .confete-camada { display: none; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
 
     @media (max-width: 520px) {
       .card { padding: 32px 24px; }
@@ -397,7 +436,35 @@
 <script src="../config.js"></script>
 <script>
 // ──────────────────────────────────────────────────────────────────────────────
+// Confete — celebra a confirmação. Puramente decorativo: se o navegador
+// pedir movimento reduzido, não roda.
+// ──────────────────────────────────────────────────────────────────────────────
+function soltarConfete() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const cores = ['#C6A664', '#E8D6B2', '#B99450', '#FFFFFF', '#7E6329'];
+  const camada = document.createElement('div');
+  camada.className = 'confete-camada';
+  camada.setAttribute('aria-hidden', 'true');
+
+  for (let i = 0; i < 70; i++) {
+    const peca = document.createElement('span');
+    peca.className = 'confete';
+    peca.style.left = `${Math.random() * 100}%`;
+    peca.style.background = cores[i % cores.length];
+    peca.style.setProperty('--atraso', `${(Math.random() * 0.9).toFixed(2)}s`);
+    peca.style.setProperty('--tempo', `${(2.2 + Math.random() * 1.6).toFixed(2)}s`);
+    peca.style.setProperty('--giro', `${360 + Math.random() * 540}deg`);
+    camada.appendChild(peca);
+  }
+
+  document.body.appendChild(camada);
+  setTimeout(() => camada.remove(), 5200);
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 // Estado
+// ──────────────────────────────────────────────────────────────────────────────
 // ──────────────────────────────────────────────────────────────────────────────
 let _codigoAtual   = '';
 let _convidadosAtivos = []; // [{id, nome, vaiComparecer}]
@@ -561,6 +628,7 @@ async function confirmarPresenca(event) {
     }
 
     mostrarTela('tela-obrigado');
+    soltarConfete();
 
   } catch (e) {
     mostrarErro('erro-confirmacao', 'Erro de conexão. Tente novamente em instantes.');
