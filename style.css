@@ -18,10 +18,15 @@
     --brown:        #5B4127;   /* cor de TODO o texto */
     --branco:       #FFFFFF;
 
-    /* ---- Tons de apoio ---- */
-    --paper:        #FBF7EA;   /* fundo de página padrão */
-    --paper-warm:   #F7EFD4;   /* fundo de card / peça de papelaria */
-    --butter-deep:  #F4E4B0;   /* faixas e blocos em manteiga suave */
+    /* ---- Tons de apoio ----
+       Ritmo de faixas, do mais claro ao mais forte:
+       card (papel) → creme (base) → manteiga suave → manteiga cheia.
+       A base é bege quente, não branca: a manteiga é a cor principal. */
+    --card:         #FDF8EA;   /* peça de papel — sempre a camada mais clara */
+    --cream:        #FAF2DC;   /* fundo de página padrão, bege quente */
+    --paper:        #FBF7EA;
+    --paper-warm:   #F7EFD4;
+    --butter-deep:  #F4E4B0;   /* faixas em manteiga suave */
     --gold:         #C9A24A;   /* molduras e filetes — nunca em corpo de texto */
     --gold-ink:     #A8742E;   /* rótulos em caixa alta, destaque pequeno */
     --brown-soft:   #6B5238;   /* texto secundário sobre papel */
@@ -66,7 +71,7 @@
        da identidade faz todo o CSS existente herdar a direção nova sem
        precisar reescrever cada regra. Não usar em código novo.
        ====================================================================== */
-    --marfim:      var(--paper);        /* fundo de seção padrão */
+    --marfim:      var(--cream);        /* fundo de seção padrão */
     --marfim-alt:  var(--butter-deep);  /* faixa alternada em manteiga */
     --grafite:     var(--brown);
     --grafite-mid: var(--brown-soft);
@@ -97,7 +102,7 @@ body {
     font-family: var(--font-body);
     font-size: 17px;
     color: var(--brown);
-    background: var(--paper);
+    background: var(--cream);
     line-height: 1.7;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -184,7 +189,7 @@ a:hover {
 
 /* ---- Card de papel: a superfície de papelaria ---- */
 .card-papel {
-    background: var(--paper-warm);
+    background: var(--card);
     border-radius: var(--raio-papel);
     box-shadow: var(--sombra-papel);
     padding: clamp(24px, 5vw, 46px);
@@ -327,7 +332,7 @@ a:hover {
     transition: color var(--dur-rapida) var(--ease);
 }
 
-/* Filete dourado que cresce a partir do centro */
+/* Filete que cresce a partir do centro */
 .nav-links a::after {
     content: '';
     position: absolute;
@@ -338,6 +343,13 @@ a:hover {
     background: var(--gold);
     transform: scaleX(0);
     transition: transform var(--dur-rapida) var(--ease);
+}
+
+/* Com a barra clara o filete vira fúcsia — um pisca do acento na navegação */
+.navbar.scrolled .nav-links a::after,
+.navbar.navbar-solid .nav-links a::after {
+    background: var(--fuchsia);
+    height: 1.5px;
 }
 
 .nav-links a:hover::after,
@@ -840,7 +852,7 @@ a:hover {
     position: relative;
     text-align: center;
     padding: 46px 34px;
-    background: var(--paper-warm);
+    background: var(--card);
     border-radius: var(--raio-papel);
     box-shadow: var(--sombra-card);
     transition: transform var(--dur) var(--ease),
@@ -1050,7 +1062,7 @@ a:hover {
     margin: 0;
     overflow: hidden;
     border-radius: var(--raio-papel);
-    background: var(--paper-warm);
+    background: var(--card);
     box-shadow: var(--sombra-card);
 }
 
@@ -1105,9 +1117,21 @@ a:hover {
 .reveal[data-atraso="3"] { transition-delay: 0.36s; }
 
 /* ========== PARTICIPE (CTA cards na home) ========== */
+/* Faixa em manteiga cheia — o ponto mais forte da página.
+   É a chamada para ação, e a manteiga é a cor principal da identidade.
+   Texto marrom sobre #E7C45C dá 5,6:1, folgado em AA. */
 .participe {
     padding: var(--secao) 0;
-    background: var(--marfim-alt);
+    background: var(--butter);
+}
+
+/* Sobre a manteiga cheia o filete dourado do título some — vira marrom */
+.participe .section-title::after {
+    background: linear-gradient(90deg, transparent, var(--brown-label), transparent);
+}
+
+.participe .section-eyebrow {
+    color: var(--brown-label);
 }
 
 .cta-cards {
@@ -1126,7 +1150,7 @@ a:hover {
     text-align: center;
     gap: 8px;
     padding: 52px 40px;
-    background: var(--paper-warm);
+    background: var(--card);
     border-radius: var(--raio-papel);
     text-decoration: none;
     color: var(--brown);
@@ -1231,7 +1255,7 @@ a:hover {
 
 .categoria-card {
     position: relative;
-    background: var(--paper-warm);
+    background: var(--card);
     padding: 56px 40px;
     border-radius: var(--raio-papel);
     text-align: center;
@@ -1316,7 +1340,7 @@ a:hover {
 
 .presente-card {
     position: relative;
-    background: var(--paper-warm);
+    background: var(--card);
     padding: 38px 30px;
     border-radius: var(--raio-papel);
     text-align: center;
@@ -1628,7 +1652,7 @@ a:hover {
 /* ========== CONFIRMAR SECTION ========== */
 .confirmar {
     padding: 120px 0;
-    background: var(--paper-warm);
+    background: var(--butter-deep);
 }
 
 .confirmar-intro {
@@ -1749,7 +1773,7 @@ a:hover {
 }
 
 .modal-content {
-    background: var(--paper-warm);
+    background: var(--card);
     padding: 46px;
     border-radius: var(--raio-papel);
     max-width: 500px;
@@ -1844,7 +1868,7 @@ a:hover {
     overflow: hidden;
 }
 
-/* Filete dourado no topo do rodapé */
+/* Filete dourado no topo do rodapé, com o losango fúcsia ao centro */
 .footer::before {
     content: '';
     position: absolute;
@@ -1854,6 +1878,18 @@ a:hover {
     width: min(420px, 72%);
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.footer::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    width: 7px;
+    height: 7px;
+    margin-left: -3.5px;
+    background: var(--fuchsia);
+    transform: rotate(45deg);
 }
 
 .footer-versiculo {
