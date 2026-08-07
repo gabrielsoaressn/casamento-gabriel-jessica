@@ -4,19 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin RSVP — Gabriel & Jéssica</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Tokens da identidade "Clássico Romântico". Esta é a tela interna dos
+       noivos: adota a base e a tipografia da identidade, mas mantém as cores
+       semânticas de status (verde/vermelho) — ali a cor informa, não decora. */
     :root {
-      --gold:   #c9a86c;
-      --gold-dk:#b8975b;
-      --cream:  #faf9f7;
-      --surface:#f0ede5;
-      --border: #ddd8ce;
-      --text:   #1c1a17;
-      --muted:  #7a7268;
+      --gold:   #C9A24A;
+      --gold-dk:#8F5F22;
+      --cream:  #FBF7EA;
+      --surface:#F7EFD4;
+      --border: rgba(91, 65, 39, 0.14);
+      --text:   #5B4127;
+      --muted:  #7A5A39;
+      --fuchsia:#C32B6E;
+      --butter-deep:#F4E4B0;
+
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body:    'EB Garamond', Georgia, serif;
+      --font-label:   'Jost', system-ui, sans-serif;
     }
-    body { font-family: 'Montserrat', sans-serif; background: var(--cream); color: var(--text); }
+    body { font-family: var(--font-body); font-size: 16px; background: var(--cream); color: var(--text); }
 
     /* ── Auth overlay ── */
     #auth-overlay {
@@ -27,37 +36,36 @@
     }
     #auth-overlay.hidden { display: none; }
     .auth-card {
-      background: #fff;
-      border-radius: 16px;
+      background: var(--surface);
+      border-radius: 3px;
       padding: 48px 40px;
       width: 100%; max-width: 380px;
       box-shadow: 0 4px 32px rgba(0,0,0,0.1);
       text-align: center;
     }
     .auth-card .monogram {
-      font-family: 'Playfair Display', serif;
-      font-size: 28px; color: var(--gold); font-style: italic; letter-spacing: 3px;
-      display: block; margin-bottom: 6px;
+      display: block; height: 64px; width: auto;
+      margin: 0 auto 12px;
     }
     .auth-card h1 { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
     .auth-card p  { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
     .auth-card input {
       width: 100%; border: 1.5px solid var(--border); border-radius: 10px;
-      padding: 14px 16px; font-size: 15px; font-family: 'Montserrat', sans-serif;
+      padding: 14px 16px; font-size: 15px; font-family: var(--font-label);
       outline: none; transition: border-color 0.2s; margin-bottom: 12px;
     }
     .auth-card input:focus { border-color: var(--gold); }
-    .auth-card .err { font-size: 12px; color: #c53030; margin-bottom: 12px; display: none; }
+    .auth-card .err { font-size: 14px; color: var(--fuchsia); margin-bottom: 12px; display: none; }
     .auth-card .err.show { display: block; }
     .btn {
       display: inline-block; padding: 14px 28px;
-      background: var(--gold); color: #fff; border: none;
-      border-radius: 50px; font-family: 'Montserrat', sans-serif;
-      font-size: 12px; font-weight: 600; letter-spacing: 2px;
+      background: var(--fuchsia); color: var(--butter-deep); border: none;
+      border-radius: 40px; font-family: var(--font-label);
+      font-size: 12px; font-weight: 500; letter-spacing: 2px;
       text-transform: uppercase; cursor: pointer;
       transition: background 0.2s, transform 0.15s;
     }
-    .btn:hover { background: var(--gold-dk); transform: translateY(-1px); }
+    .btn:hover { background: #A82259; transform: translateY(-1px); }
     .btn.outline {
       background: transparent; color: var(--gold);
       border: 1.5px solid var(--gold);
@@ -76,10 +84,7 @@
       flex-wrap: wrap; gap: 12px;
     }
     .header-brand { display: flex; align-items: center; gap: 12px; }
-    .header-brand .monogram {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px; color: var(--gold); font-style: italic; letter-spacing: 2px;
-    }
+    .header-brand .monogram { display: block; height: 34px; width: auto; }
     .header-brand .title { font-size: 13px; font-weight: 600; }
     .header-brand .sub   { font-size: 11px; color: var(--muted); }
     .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -101,13 +106,13 @@
     }
     .filtros input {
       border: 1.5px solid var(--border); border-radius: 8px;
-      padding: 8px 12px; font-size: 13px; font-family: 'Montserrat', sans-serif;
+      padding: 8px 12px; font-size: 13px; font-family: var(--font-label);
       outline: none; transition: border-color 0.2s; min-width: 220px;
     }
     .filtros input:focus { border-color: var(--gold); }
     .filtro-btn {
       padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 8px;
-      background: #fff; font-size: 12px; font-family: 'Montserrat', sans-serif;
+      background: #fff; font-size: 12px; font-family: var(--font-label);
       cursor: pointer; transition: all 0.15s; color: var(--muted);
     }
     .filtro-btn.active { border-color: var(--gold); color: var(--gold-dk); font-weight: 600; }
@@ -188,7 +193,7 @@
 <!-- Auth Overlay -->
 <div id="auth-overlay">
   <div class="auth-card">
-    <span class="monogram">G & J</span>
+    <img src="images/identidade/monograma-gold.png" alt="Gabriel e Jéssica" class="monogram" width="64" height="64">
     <h1>Área Admin</h1>
     <p>Digite a senha de administrador para acessar a lista de convites.</p>
     <input type="password" id="token-input" placeholder="Senha" autocomplete="off">
@@ -201,7 +206,7 @@
 <div id="app">
   <header>
     <div class="header-brand">
-      <span class="monogram">G & J</span>
+      <img src="images/identidade/monograma-gold.png" alt="Gabriel e Jéssica" class="monogram" width="34" height="34">
       <div>
         <div class="title">Painel de Confirmações</div>
         <div class="sub">Lista de convidados — RSVP</div>
@@ -376,7 +381,7 @@ function copiar(texto) {
   navigator.clipboard.writeText(texto).then(() => {
     const t = document.createElement('div');
     t.textContent = 'Link copiado!';
-    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1c1a17;color:#fff;padding:10px 24px;border-radius:50px;font-size:13px;z-index:9999';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#5B4127;color:#F4E4B0;padding:10px 24px;border-radius:50px;font-size:13px;z-index:9999';
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 2000);
   });

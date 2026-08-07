@@ -6,38 +6,59 @@
   <title>Confirmar Presença — Gabriel & Jéssica</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Pinyon+Script&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* Tokens da identidade "Clássico Romântico" — espelham os de style.css.
+       Esta página é autocontida (não carrega a folha principal), então
+       repete a camada de tokens em vez de inventar cores próprias. */
     :root {
-      --gold:       #C6A664;  /* preenchimentos e filetes */
-      --gold-texto: #7E6329;  /* dourado legível sobre fundo claro (5.1:1) */
-      --gold-dk:    #B99450;  /* hover — 5.0:1 com texto grafite */
-      --cream:      #F7F3EE;
-      --text:       #2B2B2B;
-      --muted:      #6E6960;  /* 4.9:1 sobre o marfim */
-      --border:     #E7E0D5;
-      --radius:     16px;
-      --serif:      'Playfair Display', Georgia, serif;
-      --sans:       'Inter', system-ui, -apple-system, sans-serif;
-      --ease:       cubic-bezier(0.22, 0.61, 0.36, 1);
+      --butter:      #E7C45C;
+      --fuchsia:     #C32B6E;
+      --olive-deep:  #52592E;
+      --brown:       #5B4127;
+      --paper:       #FBF7EA;
+      --paper-warm:  #F7EFD4;
+      --butter-deep: #F4E4B0;
+      --gold:        #C9A24A;
+      --gold-ink:    #A8742E;
+      --brown-soft:  #6B5238;
+      --brown-label: #7A5A39;
+
+      --gold-linha:  rgba(201, 162, 74, 0.5);
+      --hairline:    rgba(91, 65, 39, 0.14);
+
+      --font-script:  'Pinyon Script', cursive;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body:    'EB Garamond', Georgia, serif;
+      --font-label:   'Jost', system-ui, sans-serif;
+
+      --raio-papel:  3px;
+      --raio-pill:   40px;
+      --sombra-papel: 0 14px 44px rgba(70, 48, 24, 0.20);
+      --sombra-selo:  0 8px 22px rgba(122, 28, 72, 0.34);
+      --ease:        cubic-bezier(0.22, 0.61, 0.36, 1);
     }
 
     body {
-      font-family: var(--sans);
-      background: var(--cream);
-      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 17px;
+      background: var(--paper);
+      color: var(--brown);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
 
+    a { color: var(--fuchsia); }
+    a:hover { color: var(--brown); text-decoration-thickness: 2px; }
+
     /* ── Header ── */
     .site-header {
-      background: #fff;
-      border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
+      background: var(--paper-warm);
+      border-bottom: 1px solid var(--gold-linha);
+      padding: 14px 24px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -46,21 +67,21 @@
     .site-header a {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       text-decoration: none;
     }
     .site-header .monogram {
-      font-family: var(--serif);
-      font-size: 22px;
-      color: var(--gold-texto);
-      font-style: italic;
-      letter-spacing: 2px;
+      display: block;
+      height: 46px;
+      width: auto;
     }
     .site-header .subtitle {
-      font-size: 11px;
+      font-family: var(--font-label);
+      font-size: 10px;
+      font-weight: 400;
       text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--muted);
+      letter-spacing: 0.28em;
+      color: var(--gold-ink);
     }
 
     /* ── Container ── */
@@ -72,14 +93,25 @@
       padding: 48px 16px 64px;
     }
 
+    /* Card de papel com moldura dourada interna */
     .card {
-      background: #fff;
-      border-radius: var(--radius);
-      box-shadow: 0 4px 32px rgba(0,0,0,0.07);
-      padding: 48px 40px;
+      position: relative;
+      background: var(--paper-warm);
+      border-radius: var(--raio-papel);
+      box-shadow: var(--sombra-papel);
+      padding: 46px 40px;
       width: 100%;
       max-width: 480px;
     }
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 12px;
+      border: 1px solid var(--gold-linha);
+      border-radius: var(--raio-papel);
+      pointer-events: none;
+    }
+    .card > * { position: relative; }
 
     /* ── Screens ── */
     .screen { display: none; }
@@ -87,97 +119,133 @@
 
     /* ── Typography ── */
     .card h1 {
-      font-family: var(--serif);
-      font-size: 28px;
-      font-weight: 400;
-      color: var(--text);
+      font-family: var(--font-display);
+      font-size: 30px;
+      font-weight: 500;
+      color: var(--brown);
       margin-bottom: 8px;
-      line-height: 1.3;
+      line-height: 1.1;
     }
     .card .eyebrow {
+      font-family: var(--font-label);
       font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 2.5px;
-      color: var(--gold-texto);
-      font-weight: 600;
+      letter-spacing: 0.28em;
+      color: var(--gold-ink);
+      font-weight: 500;
       margin-bottom: 10px;
     }
     .card p {
-      font-size: 14px;
-      color: var(--muted);
+      font-size: 16px;
+      color: var(--brown-soft);
       line-height: 1.7;
       margin-bottom: 28px;
+      text-wrap: pretty;
     }
 
-    /* ── Form elements ── */
+    /* ── Ornamento: filete dourado + losango fúcsia ── */
+    .ornamento {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      margin: 20px auto;
+    }
+    .ornamento::before, .ornamento::after {
+      content: '';
+      width: 48px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold));
+    }
+    .ornamento::after { background: linear-gradient(90deg, var(--gold), transparent); }
+    .ornamento span {
+      width: 6px; height: 6px;
+      background: var(--fuchsia);
+      transform: rotate(45deg);
+    }
+
+    /* ── Campos: linha inferior, nunca caixa fechada ── */
     label {
       display: block;
-      font-size: 11px;
-      font-weight: 600;
+      font-family: var(--font-body);
+      font-size: 13px;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--muted);
+      letter-spacing: 0.2em;
+      color: var(--brown-label);
       margin-bottom: 8px;
     }
 
     input[type="text"] {
       width: 100%;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 16px;
-      font-size: 18px;
-      font-family: var(--sans);
+      border: none;
+      border-bottom: 1px solid rgba(91, 65, 39, 0.4);
+      border-radius: 0;
+      padding: 12px 2px;
+      font-size: 20px;
+      font-family: var(--font-body);
       font-weight: 500;
-      letter-spacing: 3px;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--text);
-      background: var(--cream);
+      color: var(--brown);
+      background: transparent;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.18s var(--ease);
     }
     input[type="text"]:focus {
-      border-color: var(--gold);
-      background: #fff;
+      border-bottom-color: var(--fuchsia);
+      border-bottom-width: 2px;
     }
 
-    /* ── Button ── */
+    /* ── Botão: fúcsia com texto manteiga ── */
     .btn {
       display: block;
       width: 100%;
-      padding: 16px;
-      background: var(--gold);
-      color: var(--text);
+      padding: 15px;
+      min-height: 44px;
+      background: var(--fuchsia);
+      color: var(--butter-deep);
       border: none;
-      border-radius: 50px;
-      font-family: var(--sans);
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 2px;
+      border-radius: var(--raio-pill);
+      font-family: var(--font-label);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
       cursor: pointer;
       margin-top: 24px;
-      transition: background 0.2s, transform 0.15s;
+      transition: background 0.18s var(--ease), transform 0.18s var(--ease),
+                  box-shadow 0.18s var(--ease);
     }
-    .btn:hover { background: var(--gold-dk); transform: translateY(-1px); }
+    .btn:hover {
+      background: #A82259;
+      transform: translateY(-2px);
+      box-shadow: var(--sombra-selo);
+    }
     .btn:active { transform: translateY(0); }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+    /* Secundário: contorno dourado, texto marrom */
     .btn.secondary {
       background: transparent;
-      color: var(--gold-texto);
+      color: var(--brown);
       border: 1.5px solid var(--gold);
       margin-top: 12px;
     }
-    .btn.secondary:hover { background: rgba(198,166,100,0.12); }
+    .btn.secondary:hover {
+      background: rgba(201, 162, 74, 0.16);
+      color: var(--brown);
+      box-shadow: none;
+    }
 
-    /* ── Error ── */
+    /* ── Erro: fúcsia, como manda a identidade ── */
     .error-msg {
       margin-top: 14px;
-      padding: 12px 16px;
-      background: #fef2f2;
-      border-left: 3px solid #e53e3e;
-      border-radius: 0 8px 8px 0;
-      font-size: 13px;
-      color: #c53030;
+      padding: 12px 0 12px 14px;
+      border-left: 2px solid var(--fuchsia);
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--fuchsia);
       display: none;
     }
     .error-msg.visible { display: block; }
@@ -185,7 +253,7 @@
     /* ── Divider ── */
     .divider {
       border: none;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--hairline);
       margin: 24px 0;
     }
 
@@ -194,23 +262,27 @@
       margin-bottom: 24px;
     }
     .grupo-header .saudacao {
-      font-family: var(--serif);
-      font-size: 22px;
-      color: var(--text);
-      font-style: italic;
-      line-height: 1.4;
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--brown);
+      line-height: 1.15;
     }
     .grupo-header .status-badge {
       display: inline-block;
-      margin-top: 8px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1px;
+      margin-top: 10px;
+      padding: 4px 12px;
+      border-radius: var(--raio-pill);
+      font-family: var(--font-label);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
     }
-    .status-badge.confirmado { background: #f0fff4; color: #276749; border: 1px solid #c6f6d5; }
-    .status-badge.pendente   { background: #fffbeb; color: #b7791f; border: 1px solid #fefcbf; }
+    /* Oliva para confirmado, dourado para pendente — a fúcsia fica
+       reservada ao erro, para o convidado não confundir os estados. */
+    .status-badge.confirmado { background: rgba(110, 117, 65, 0.14); color: var(--olive-deep); border: 1px solid rgba(110, 117, 65, 0.34); }
+    .status-badge.pendente   { background: rgba(231, 196, 92, 0.20); color: var(--gold-ink);   border: 1px solid var(--gold-linha); }
 
     /* ── Checkboxes ── */
     .convidados-lista {
@@ -222,7 +294,7 @@
       align-items: center;
       gap: 16px;
       padding: 14px 0;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--hairline);
       cursor: pointer;
     }
     .convidado-item:last-child { border-bottom: none; }
@@ -244,50 +316,58 @@
     .check-box {
       width: 24px;
       height: 24px;
-      border: 2px solid var(--border);
-      border-radius: 6px;
-      background: var(--cream);
+      border: 1.5px solid var(--gold);
+      border-radius: var(--raio-papel);
+      background: var(--paper);
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.15s;
+      transition: background 0.18s var(--ease), border-color 0.18s var(--ease);
     }
+    /* Marcado = fúcsia: é o "sim" da confirmação, o acento da peça */
     .check-wrap input:checked ~ .check-box {
-      background: var(--gold);
-      border-color: var(--gold);
+      background: var(--fuchsia);
+      border-color: var(--fuchsia);
     }
     .check-wrap input:checked ~ .check-box::after {
       content: '';
       width: 6px;
       height: 11px;
-      border-right: 2px solid var(--text);
-      border-bottom: 2px solid var(--text);
+      border-right: 2px solid var(--butter-deep);
+      border-bottom: 2px solid var(--butter-deep);
       transform: rotate(45deg) translate(-1px, -2px);
     }
+    .check-wrap input:focus-visible ~ .check-box {
+      outline: 2px solid var(--gold);
+      outline-offset: 2px;
+    }
     .convidado-nome {
-      font-size: 15px;
+      font-family: var(--font-body);
+      font-size: 17px;
       font-weight: 500;
-      color: var(--text);
+      color: var(--brown);
       flex: 1;
     }
 
-    /* ── Obrigado ── */
-    .obrigado-icon {
-      font-size: 48px;
-      text-align: center;
-      margin-bottom: 16px;
+    /* ── Obrigado: monograma no lugar do emoji, como pede a identidade ── */
+    .obrigado-monograma {
+      display: block;
+      height: 72px;
+      width: auto;
+      margin: 0 auto 18px;
     }
     .obrigado-msg {
       text-align: center;
-      font-family: var(--serif);
-      font-size: 24px;
-      color: var(--text);
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 500;
+      color: var(--brown);
       margin-bottom: 12px;
     }
     .obrigado-sub {
       text-align: center;
-      color: var(--muted);
-      font-size: 14px;
+      color: var(--brown-soft);
+      font-size: 16px;
       line-height: 1.7;
       margin-bottom: 24px;
     }
@@ -295,13 +375,13 @@
     /* ── Loading spinner ── */
     .spinner {
       display: inline-block;
-      width: 18px; height: 18px;
-      border: 2px solid rgba(43,43,43,0.25);
-      border-top-color: var(--text);
+      width: 16px; height: 16px;
+      border: 2px solid rgba(244, 228, 176, 0.35);
+      border-top-color: var(--butter-deep);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       vertical-align: middle;
-      margin-right: 6px;
+      margin-right: 8px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -347,7 +427,7 @@
 
 <header class="site-header">
   <a href="../">
-    <span class="monogram">G & J</span>
+    <img src="../images/identidade/monograma-gold.png" alt="Gabriel e Jéssica" class="monogram" width="46" height="46">
     <div>
       <div class="subtitle">Confirmar Presença</div>
     </div>
@@ -361,6 +441,7 @@
     <div id="tela-codigo" class="screen active">
       <div class="eyebrow">Confirmação de Presença</div>
       <h1>Acesse com sua senha</h1>
+      <div class="ornamento" aria-hidden="true"><span></span></div>
       <p>Digite o código que está no seu convite. Ele é único para o seu grupo.</p>
 
       <form id="form-codigo" onsubmit="verificarCodigo(event)">
@@ -413,8 +494,9 @@
 
     <!-- TELA 3: Obrigado -->
     <div id="tela-obrigado" class="screen">
-      <div class="obrigado-icon">💍</div>
-      <div class="obrigado-msg">Presença confirmada!</div>
+      <img src="../images/identidade/monograma-gold.png" alt="Monograma de Gabriel e Jéssica" class="obrigado-monograma" width="72" height="72">
+      <div class="obrigado-msg">Presença confirmada</div>
+      <div class="ornamento" aria-hidden="true"><span></span></div>
       <p class="obrigado-sub">
         Obrigado por responder. Mal podemos esperar para compartilhar esse dia tão especial com você!
       </p>
@@ -442,7 +524,8 @@
 function soltarConfete() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const cores = ['#C6A664', '#E8D6B2', '#B99450', '#FFFFFF', '#7E6329'];
+  // Paleta da identidade: manteiga e dourado dominam, a fúcsia é o brilho
+  const cores = ['#E7C45C', '#F4E4B0', '#C9A24A', '#FBF7EA', '#C32B6E', '#6E7541'];
   const camada = document.createElement('div');
   camada.className = 'confete-camada';
   camada.setAttribute('aria-hidden', 'true');

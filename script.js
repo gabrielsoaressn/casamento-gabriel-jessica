@@ -205,48 +205,6 @@ if (alvosReveal.length) {
 }
 
 // ──────────────────────────────────────────────────────────────────
-// Sparkles nos nomes do casal
-// Brilhos dourados que nascem e somem em posições aleatórias sobre o
-// título. Cada um se remove do DOM ao fim da animação.
-// ──────────────────────────────────────────────────────────────────
-const alvoSparkles = document.querySelector('[data-sparkles]');
-
-if (alvoSparkles && !movimentoReduzido()) {
-    let temporizador = null;
-
-    const criarBrilho = () => {
-        const brilho = document.createElement('span');
-        const tamanho = 6 + Math.random() * 8;
-
-        brilho.className = 'sparkle';
-        brilho.setAttribute('aria-hidden', 'true');
-        brilho.style.width = `${tamanho}px`;
-        brilho.style.height = `${tamanho}px`;
-        brilho.style.left = `${Math.random() * 96}%`;
-        brilho.style.top = `${Math.random() * 88}%`;
-
-        alvoSparkles.appendChild(brilho);
-        brilho.addEventListener('animationend', () => brilho.remove());
-    };
-
-    const agendarBrilho = () => {
-        criarBrilho();
-        temporizador = setTimeout(agendarBrilho, 380 + Math.random() * 520);
-    };
-
-    agendarBrilho();
-
-    // Fora da tela não há nada a brilhar — poupa bateria no celular
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            clearTimeout(temporizador);
-        } else if (!movimentoReduzido()) {
-            agendarBrilho();
-        }
-    });
-}
-
-// ──────────────────────────────────────────────────────────────────
 // Galeria com parallax
 // Cada coluna sobe/desce em ritmo próprio conforme a seção cruza a
 // tela. Desligado no mobile (< 900px) e com movimento reduzido.

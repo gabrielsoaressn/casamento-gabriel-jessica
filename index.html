@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gabriel &amp; Jéssica — Nosso Casamento</title>
     <meta name="description" content="Gabriel e Jéssica se casam em 05 de dezembro de 2026, na Igreja de Nossa Senhora do Carmo, em João Pessoa. Confirme sua presença e veja a lista de presentes.">
-    <meta name="theme-color" content="#2B2B2B">
+    <meta name="theme-color" content="#5B4127">
 
     <!-- Remove o fallback sem-js antes da primeira pintura: evita piscar -->
     <script>document.documentElement.classList.remove('sem-js');</script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Pinyon+Script&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 
     <!-- A foto do hero é o elemento de LCP: buscar cedo encurta o tempo até ela pintar -->
     <link rel="preload" as="image" href="images/8e6472ce-71ef-4ab0-af18-b8a661d7669d.jpg" fetchpriority="high">
@@ -25,11 +25,10 @@
     <!-- Header/Hero -->
     <header class="hero">
         <div class="hero-foto" aria-hidden="true"></div>
-        <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
 
         <nav class="navbar" aria-label="Navegação principal">
             <div class="nav-container">
-                <a href="#" class="logo" aria-label="Gabriel e Jéssica — início"><img src="images/monograma.png" alt="" class="logo-img" width="70" height="50"></a>
+                <a href="#" class="logo" aria-label="Gabriel e Jéssica — início"><img src="images/identidade/monograma-gold.png" alt="" class="logo-img" width="50" height="50"></a>
                 <ul class="nav-links" id="menu-principal">
                     <li><a href="#nossa-historia">Nossa História</a></li>
                     <li><a href="#galeria">Galeria</a></li>
@@ -46,13 +45,19 @@
         </nav>
 
         <div class="hero-content">
+            <!-- Composição da identidade: rótulo → monograma → nomes → ornamento → data e local -->
+            <span class="hero-eyebrow">Vamos nos casar</span>
+
+            <p class="hero-title"><img src="images/identidade/monograma-branco.png" alt="Monograma de Gabriel e Jéssica" class="hero-monogram" width="112" height="112"></p>
+
+            <h1 class="hero-nomes">Gabriel <span class="e-comercial">&amp;</span> Jéssica</h1>
+
+            <div class="ornamento hero-ornamento" aria-hidden="true"><span></span></div>
+
             <p class="hero-subtitle">"Para onde iremos, Senhor? Só tu tens palavra de Vida Eterna" (Jo 6, 68).</p>
 
-            <h1 class="hero-nomes" data-sparkles>Gabriel <span class="e-comercial">&amp;</span> Jéssica</h1>
-
-            <p class="hero-title"><img src="images/monograma.png" alt="Monograma de Gabriel e Jéssica" class="hero-monogram" width="147" height="104"></p>
-
-            <p class="hero-date">05 de Dezembro de 2026</p>
+            <p class="hero-date">05 . 12 . 2026</p>
+            <p class="hero-local">Igreja Nossa Senhora do Carmo — João Pessoa, PB</p>
 
             <div class="countdown" id="countdown" aria-label="Contagem regressiva para o casamento">
                 <div class="countdown-item">
@@ -205,9 +210,7 @@
 
             <div class="evento-cards">
                 <div class="evento-card reveal">
-                    <div class="evento-icon emblema-carmo-icon">
-                        <img src="images/emblema-ordem-do-carmo.png" alt="Emblema da Ordem do Carmo" width="68" height="68" loading="lazy">
-                    </div>
+                    <img src="images/identidade/igreja-aquarela.jpg" alt="Aquarela da Igreja de Nossa Senhora do Carmo" class="evento-aquarela" width="76" height="76" loading="lazy">
                     <h3>Cerimônia</h3>
                     <p class="evento-horario">09:30</p>
                     <p class="evento-local">Igreja de Nossa Senhora do Carmo</p>
@@ -275,8 +278,8 @@
         <img src="images/emblema-ordem-do-carmo.png" alt="" class="carmo-watermark" aria-hidden="true" loading="lazy">
         <div class="container">
             <p class="footer-versiculo">"Para onde iremos, Senhor? Só tu tens palavra de Vida Eterna" (Jo 6, 68).</p>
-            <img src="images/monograma.png" alt="Monograma de Gabriel e Jéssica" class="footer-monogram" width="113" height="80" loading="lazy">
-            <p class="footer-date">05 de Dezembro de 2026 &middot; João Pessoa, PB</p>
+            <img src="images/identidade/monograma-gold.png" alt="Monograma de Gabriel e Jéssica" class="footer-monogram" width="84" height="84" loading="lazy">
+            <p class="footer-date">05 . 12 . 2026 &middot; João Pessoa, PB</p>
             <ul class="footer-links">
                 <li><a href="#nossa-historia">Nossa História</a></li>
                 <li><a href="#galeria">Galeria</a></li>
@@ -284,7 +287,7 @@
                 <li><a href="presentes/">Presentes</a></li>
                 <li><a href="confirmar/">Confirmar Presença</a></li>
             </ul>
-            <p class="footer-creditos">Gabriel &amp; Jéssica</p>
+            <p class="footer-creditos">Gabriel <span class="e-comercial">&amp;</span> Jéssica</p>
         </div>
     </footer>
 

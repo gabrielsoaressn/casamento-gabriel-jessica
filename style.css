@@ -1,44 +1,84 @@
 /* ==========================================================================
-   DESIGN SYSTEM — tokens
-   Paleta: 1 neutro claro (marfim) + 1 neutro escuro (grafite) + 1 acento
-   (dourado champanhe). O acento só aparece em detalhes: botões, filetes,
-   ícones e brilhos — nunca em blocos grandes.
+   IDENTIDADE VISUAL — Casamento Gabriel & Jéssica
+   Direção aprovada: "Clássico Romântico".
+
+   Regra de proporção 60-25-11-7 — ~58% manteiga + papel creme (base),
+   ~24% marrom (texto e blocos nobres), ~11% oliva (apoio), ~7% fúcsia
+   (acento). A fúcsia é o BRILHO, nunca o fundo de uma seção inteira:
+   só aparece no "&", no losango dos ornamentos, em botões e selos.
+
+   Esta é a única fonte de cor e tipografia do site — nenhum componente
+   abaixo declara hex solto.
    ========================================================================== */
 :root {
-    /* Neutros */
-    --marfim:      #F7F3EE;
-    --marfim-alt:  #FBF9F6;
-    --branco:      #FFFFFF;
-    --grafite:     #2B2B2B;   /* 12.8:1 sobre marfim */
-    --grafite-mid: #5A564F;   /*  6.6:1 sobre marfim */
-    --grafite-sub: #6E6960;   /*  4.9:1 sobre marfim */
-    --linha:       #E7E0D5;
+    /* ---- Paleta principal ---- */
+    --butter:       #E7C45C;   /* cor principal — destaques e faixas */
+    --fuchsia:      #C32B6E;   /* acento vivo — só em peças pequenas */
+    --olive:        #6E7541;   /* apoio */
+    --brown:        #5B4127;   /* cor de TODO o texto */
+    --branco:       #FFFFFF;
 
-    /* Acento
-       O dourado claro só é legível sobre fundo escuro (6.1:1 no grafite).
-       Sobre marfim ele cai para 2.1:1 — reprova em qualquer nível — então
-       texto dourado em fundo claro usa --gold-texto (5.1:1). */
-    --gold:        #C6A664;   /* preenchimentos, filetes, texto sobre escuro */
-    --gold-texto:  #7E6329;   /* texto dourado sobre fundo claro */
-    --gold-dk:     #B99450;   /* hover de botão — 5.0:1 com texto grafite */
-    --gold-soft:   rgba(198, 166, 100, 0.16);
+    /* ---- Tons de apoio ---- */
+    --paper:        #FBF7EA;   /* fundo de página padrão */
+    --paper-warm:   #F7EFD4;   /* fundo de card / peça de papelaria */
+    --butter-deep:  #F4E4B0;   /* faixas e blocos em manteiga suave */
+    --gold:         #C9A24A;   /* molduras e filetes — nunca em corpo de texto */
+    --gold-ink:     #A8742E;   /* rótulos em caixa alta, destaque pequeno */
+    --brown-soft:   #6B5238;   /* texto secundário sobre papel */
+    --brown-label:  #7A5A39;   /* rótulos sobre papel */
+    --olive-deep:   #52592E;
+    --muted:        #9B8F78;   /* legendas / terciário */
 
-    /* Tipografia */
-    --serif:  'Playfair Display', Georgia, serif;
-    --sans:   'Inter', system-ui, -apple-system, sans-serif;
-    --script: 'Great Vibes', 'Playfair Display', cursive;
+    --gold-linha:   rgba(201, 162, 74, 0.5);   /* moldura interna */
+    --hairline:     rgba(91, 65, 39, 0.14);    /* divisores */
+    --gold-soft:    rgba(201, 162, 74, 0.16);
 
-    /* Ritmo */
-    --leitura:   65ch;
-    --raio:      14px;
-    --raio-lg:   20px;
-    --secao:     clamp(88px, 12vw, 148px);
+    /* ---- Tipografia ----
+       Quatro famílias, nunca uma quinta. */
+    --font-script:  'Pinyon Script', cursive;              /* só os nomes dos noivos */
+    --font-display: 'Cormorant Garamond', Georgia, serif;  /* títulos, datas, números */
+    --font-body:    'EB Garamond', Georgia, serif;         /* texto corrido */
+    --font-label:   'Jost', system-ui, sans-serif;         /* SÓ rótulos em caixa alta */
 
-    /* Movimento — lento e suave */
+    /* ---- Raios e sombras ----
+       Papel não tem canto redondo; sombra sempre em marrom transparente. */
+    --raio-papel:  3px;
+    --raio-card:   5px;
+    --raio-pill:   40px;
+    --sombra-papel: 0 14px 44px rgba(70, 48, 24, 0.20);
+    --sombra-card:  0 8px 40px rgba(70, 48, 24, 0.12);
+    --sombra-selo:  0 8px 22px rgba(122, 28, 72, 0.34);
+
+    /* ---- Ritmo ---- */
+    --leitura:   62ch;
+    --secao:     clamp(72px, 11vw, 96px);
+    --largura:   1120px;
+
+    /* ---- Movimento — 180–240ms, nada acima de 400ms ---- */
     --ease:      cubic-bezier(0.22, 0.61, 0.36, 1);
-    --dur-rapida: 0.4s;
-    --dur:        0.8s;
-    --dur-lenta:  1.2s;
+    --dur-rapida: 0.18s;
+    --dur:        0.24s;
+    --dur-lenta:  0.4s;
+
+    /* ======================================================================
+       ALIASES DOS NOMES ANTIGOS
+       O site inteiro já consumia estes tokens. Reapontá-los para a paleta
+       da identidade faz todo o CSS existente herdar a direção nova sem
+       precisar reescrever cada regra. Não usar em código novo.
+       ====================================================================== */
+    --marfim:      var(--paper);        /* fundo de seção padrão */
+    --marfim-alt:  var(--butter-deep);  /* faixa alternada em manteiga */
+    --grafite:     var(--brown);
+    --grafite-mid: var(--brown-soft);
+    --grafite-sub: var(--brown-label);
+    --linha:       var(--hairline);
+    --gold-texto:  var(--gold-ink);
+    --gold-dk:     #8F5F22;             /* hover do dourado */
+    --serif:       var(--font-display);
+    --sans:        var(--font-body);
+    --script:      var(--font-script);
+    --raio:        var(--raio-card);
+    --raio-lg:     var(--raio-card);
 }
 
 /* Reset e Base */
@@ -54,18 +94,123 @@ html {
 }
 
 body {
-    font-family: var(--sans);
-    color: var(--grafite);
-    background: var(--marfim);
+    font-family: var(--font-body);
+    font-size: 17px;
+    color: var(--brown);
+    background: var(--paper);
     line-height: 1.7;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
 }
 
+p {
+    text-wrap: pretty;
+}
+
+/* Links — a identidade proíbe deixar o azul padrão do browser em qualquer
+   lugar. Fúcsia em repouso, marrom no hover com sublinhado mais encorpado. */
+a {
+    color: var(--fuchsia);
+}
+
+a:hover {
+    color: var(--brown);
+    text-decoration-thickness: 2px;
+}
+
 /* Largura de leitura confortável para blocos de texto corrido */
 .medida {
     max-width: var(--leitura);
+}
+
+/* ==========================================================================
+   COMPONENTES DA IDENTIDADE
+   Blocos compartilhados dos quais o resto se compõe.
+   ========================================================================== */
+
+/* ---- Ornamento: filete dourado + losango fúcsia + filete dourado ----
+   O separador que aparece em toda peça da papelaria. */
+.ornamento {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    margin: 20px auto;
+}
+
+.ornamento::before,
+.ornamento::after {
+    content: '';
+    width: clamp(40px, 12vw, 60px);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold));
+}
+
+.ornamento::after {
+    background: linear-gradient(90deg, var(--gold), transparent);
+}
+
+/* O losango é o único fúcsia da composição */
+.ornamento span {
+    width: 6px;
+    height: 6px;
+    background: var(--fuchsia);
+    transform: rotate(45deg);
+}
+
+/* ---- Moldura dourada: dupla no desktop, só a externa no mobile ---- */
+.moldura-dourada {
+    position: relative;
+}
+
+.moldura-dourada::before,
+.moldura-dourada::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    border-radius: var(--raio-papel);
+}
+
+.moldura-dourada::before {
+    inset: 18px;
+    border: 1.5px solid var(--gold);
+}
+
+.moldura-dourada::after {
+    inset: 27px;
+    border: 0.75px solid var(--gold-linha);
+}
+
+/* ---- Card de papel: a superfície de papelaria ---- */
+.card-papel {
+    background: var(--paper-warm);
+    border-radius: var(--raio-papel);
+    box-shadow: var(--sombra-papel);
+    padding: clamp(24px, 5vw, 46px);
+}
+
+/* ---- Nomes dos noivos: o "&" é SEMPRE fúcsia ---- */
+.nomes-noivos {
+    font-family: var(--font-script);
+    font-weight: 400;
+    color: var(--brown);
+    line-height: 0.9;
+}
+
+.nomes-noivos .e-comercial {
+    color: var(--fuchsia);
+    font-size: 0.5em;
+    line-height: 0.6;
+    padding: 0 0.08em;
+    vertical-align: 0.08em;
+}
+
+/* ---- Monograma ---- */
+.monograma {
+    display: block;
+    width: auto;
+    margin: 0 auto;
 }
 
 .visually-hidden {
@@ -81,7 +226,7 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: var(--largura);
     margin: 0 auto;
     padding: 0 20px;
 }
@@ -120,9 +265,9 @@ body {
 
 .navbar.scrolled,
 .navbar.navbar-solid {
-    background: rgba(251, 249, 246, 0.94);
-    border-bottom: 1px solid var(--linha);
-    box-shadow: 0 8px 32px rgba(43, 43, 43, 0.06);
+    background: rgba(251, 247, 234, 0.95);
+    border-bottom: 1px solid var(--gold-linha);
+    box-shadow: 0 8px 32px rgba(70, 48, 24, 0.08);
 }
 
 .navbar.navbar-solid .logo,
@@ -144,9 +289,9 @@ body {
 }
 
 .logo {
-    font-family: var(--serif);
+    font-family: var(--font-display);
     font-size: 2rem;
-    color: #fff;
+    color: var(--branco);
     text-decoration: none;
     font-weight: 600;
     display: flex;
@@ -171,12 +316,13 @@ body {
 
 .nav-links a {
     position: relative;
-    color: #fff;
+    color: var(--branco);
     text-decoration: none;
-    font-size: 0.78rem;
+    font-family: var(--font-label);
+    font-size: 0.68rem;
     font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 1.6px;
+    letter-spacing: 0.18em;
     padding: 6px 2px;
     transition: color var(--dur-rapida) var(--ease);
 }
@@ -243,10 +389,10 @@ body {
 }
 
 .hamburger span {
-    width: 25px;
-    height: 2px;
-    background: #fff;
-    transition: all 0.3s ease;
+    width: 24px;
+    height: 1.5px;
+    background: var(--branco);
+    transition: all var(--dur) var(--ease);
 }
 
 .navbar.scrolled .hamburger span {
@@ -262,22 +408,23 @@ body {
     justify-content: center;
     align-items: center;
     text-align: center;
-    color: #fff;
+    color: var(--branco);
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    background: #16130F;
+    background: var(--brown);
     /* Respiro para o navbar fixo (topo) e o indicador de rolagem (base):
        o conteúdo centralizado nunca desliza para baixo deles */
     padding: 110px 0 120px;
 }
 
-/* Camada 1 — a foto do casal, escurecida o bastante para o texto branco
-   passar em contraste AA */
+/* Camada 1 — a foto do casal sob o overlay marrom da identidade.
+   O degradê escurece topo e base (onde ficam navbar e indicador) e alivia
+   no centro, onde está o rosto do casal. */
 .hero-foto {
     position: absolute;
     inset: 0;
-    z-index: -3;
+    z-index: -2;
     background: url('images/8e6472ce-71ef-4ab0-af18-b8a661d7669d.jpg') center 22% / cover no-repeat;
     transform: scale(1.06);
 }
@@ -286,80 +433,22 @@ body {
     content: '';
     position: absolute;
     inset: 0;
-    background:
-        radial-gradient(ellipse at 50% 42%, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.72) 78%),
-        linear-gradient(rgba(22, 19, 15, 0.5), rgba(22, 19, 15, 0.68));
+    background: linear-gradient(180deg,
+        rgba(74, 52, 30, 0.55) 0%,
+        rgba(74, 52, 30, 0.15) 32%,
+        rgba(74, 52, 30, 0.60) 70%,
+        rgba(60, 42, 24, 0.92) 100%);
 }
 
-/* Camada 2 — AURORA: manchas de luz champanhe que respiram devagar.
-   Puro CSS: sem canvas, sem WebGL, sem custo de JS. */
-.aurora {
-    position: absolute;
-    inset: -25%;
-    z-index: -2;
-    pointer-events: none;
-    filter: blur(72px);
-    opacity: 0.55;
-    mix-blend-mode: screen;
-}
-
-.aurora span {
-    position: absolute;
-    display: block;
-    border-radius: 50%;
-    will-change: transform;
-}
-
-.aurora span:nth-child(1) {
-    width: 46vw;
-    height: 46vw;
-    top: 6%;
-    left: 4%;
-    background: radial-gradient(circle, rgba(198, 166, 100, 0.85), transparent 68%);
-    animation: aurora-a 22s var(--ease) infinite alternate;
-}
-
-.aurora span:nth-child(2) {
-    width: 40vw;
-    height: 40vw;
-    top: 34%;
-    right: 2%;
-    background: radial-gradient(circle, rgba(232, 214, 178, 0.7), transparent 68%);
-    animation: aurora-b 27s var(--ease) infinite alternate;
-}
-
-.aurora span:nth-child(3) {
-    width: 52vw;
-    height: 52vw;
-    bottom: -8%;
-    left: 28%;
-    background: radial-gradient(circle, rgba(169, 138, 75, 0.65), transparent 70%);
-    animation: aurora-c 31s var(--ease) infinite alternate;
-}
-
-@keyframes aurora-a {
-    from { transform: translate3d(0, 0, 0) scale(1); }
-    to   { transform: translate3d(14vw, 8vh, 0) scale(1.18); }
-}
-
-@keyframes aurora-b {
-    from { transform: translate3d(0, 0, 0) scale(1.1); }
-    to   { transform: translate3d(-12vw, 10vh, 0) scale(0.92); }
-}
-
-@keyframes aurora-c {
-    from { transform: translate3d(0, 0, 0) scale(0.95); }
-    to   { transform: translate3d(8vw, -12vh, 0) scale(1.22); }
-}
-
-/* Vinheta que fecha a composição e reforça o contraste no centro */
+/* Véu marrom extra atrás do bloco de texto: garante o contraste AA do
+   texto creme sem precisar escurecer a foto inteira. */
 .hero::after {
     content: '';
     position: absolute;
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 42%, rgba(22, 19, 15, 0.55) 100%);
+    background: radial-gradient(ellipse at 50% 52%, rgba(60, 42, 24, 0.42) 0%, transparent 68%);
 }
 
 .hero-content {
@@ -367,92 +456,88 @@ body {
     position: relative;
 }
 
-.hero-subtitle {
-    max-width: 620px;
-    margin: 0 auto 28px;
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: clamp(0.95rem, 2.4vw, 1.15rem);
+/* Rótulo em caixa alta que abre a composição do hero */
+.hero-eyebrow {
+    display: block;
+    margin-bottom: 22px;
+    font-family: var(--font-label);
+    font-size: clamp(0.6rem, 2vw, 0.7rem);
     font-weight: 400;
-    line-height: 1.7;
-    letter-spacing: 0.3px;
-    text-transform: none;
-    color: rgba(255, 255, 255, 0.9);
-    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.32em;
+    color: var(--butter-deep);
 }
 
-/* Nomes do casal — script fino, com brilhos discretos (sparkles) */
+.hero-subtitle {
+    max-width: 56ch;
+    margin: 0 auto 34px;
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: clamp(0.98rem, 2.4vw, 1.12rem);
+    font-weight: 400;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+/* Nomes do casal — Pinyon Script, o "&" em fúcsia */
 .hero-nomes {
     position: relative;
     display: inline-block;
-    font-family: var(--script);
-    font-size: clamp(3.4rem, 12vw, 7rem);
+    font-family: var(--font-script);
+    font-size: clamp(2.9rem, 11vw, 5rem);
     font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: 1px;
-    margin: 0 0 6px;
-    padding: 0 0.12em;
-    color: #fff;
-    text-shadow: 0 2px 30px rgba(0, 0, 0, 0.45);
+    line-height: 0.86;
+    margin: 0 0 4px;
+    padding: 0.14em 0.12em;
+    color: var(--branco);
 }
 
+/* Sobre a foto a fúcsia não sustenta contraste (o overlay é marrom escuro).
+   A regra do hero da identidade — texto em #FFF / manteiga sobre foto —
+   prevalece aqui; a fúcsia segue no losango do ornamento logo abaixo. */
 .hero-nomes .e-comercial {
-    color: var(--gold);
-    font-size: 0.72em;
-    padding: 0 0.06em;
-    vertical-align: 0.06em;
-}
-
-/* Cada brilho é um losango minúsculo posicionado pelo JS */
-.sparkle {
-    position: absolute;
-    pointer-events: none;
-    background: var(--gold);
-    clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
-    opacity: 0;
-    animation: sparkle-pop 1.6s var(--ease) forwards;
-}
-
-@keyframes sparkle-pop {
-    0%   { opacity: 0; transform: scale(0) rotate(0deg); }
-    45%  { opacity: 1; transform: scale(1) rotate(90deg); }
-    100% { opacity: 0; transform: scale(0) rotate(180deg); }
+    color: var(--butter);
+    font-size: 0.5em;
+    line-height: 0.6;
+    padding: 0 0.08em;
+    vertical-align: 0.08em;
 }
 
 .hero-title {
-    margin-bottom: 18px;
+    margin-bottom: 8px;
 }
 
 .hero-monogram {
-    height: 104px;
+    height: clamp(76px, 18vw, 112px);
     width: auto;
-    opacity: 0.92;
+}
+
+/* Ornamento do hero: filetes dourados com o losango fúcsia ao centro */
+.hero-ornamento {
+    margin: 22px auto 20px;
 }
 
 .hero-date {
-    display: inline-flex;
-    align-items: center;
-    gap: 16px;
-    font-size: clamp(0.78rem, 2.6vw, 0.92rem);
-    font-weight: 400;
-    margin-bottom: 52px;
-    letter-spacing: 4px;
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+    color: var(--butter-deep);
+    font-variant-numeric: tabular-nums;
+}
+
+.hero-local {
+    font-family: var(--font-label);
+    font-size: clamp(0.62rem, 2.2vw, 0.72rem);
+    font-weight: 300;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.94);
-    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.55);
-}
-
-/* Filetes dourados nas laterais da data */
-.hero-date::before,
-.hero-date::after {
-    content: '';
-    width: clamp(24px, 8vw, 56px);
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold));
-}
-
-.hero-date::after {
-    background: linear-gradient(90deg, var(--gold), transparent);
+    letter-spacing: 0.22em;
+    line-height: 1.6;
+    margin-bottom: 46px;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 /* Countdown */
@@ -466,73 +551,74 @@ body {
 .countdown-item {
     text-align: center;
     min-width: clamp(58px, 17vw, 84px);
-    padding: 16px 6px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: var(--raio);
-    background: rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    padding: 16px 8px 14px;
+    border: 1px solid var(--gold-linha);
+    border-radius: var(--raio-papel);
+    background: rgba(60, 42, 24, 0.28);
 }
 
 .countdown-number {
     display: block;
-    font-family: var(--serif);
-    font-size: clamp(1.9rem, 7vw, 2.9rem);
-    font-weight: 400;
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 7vw, 2.6rem);
+    font-weight: 600;
     line-height: 1;
     font-variant-numeric: tabular-nums;
-    color: #fff;
+    color: var(--branco);
 }
 
 .countdown-label {
     display: block;
     margin-top: 8px;
-    font-size: 0.62rem;
+    font-family: var(--font-label);
+    font-size: 0.6rem;
+    font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--gold);
+    letter-spacing: 0.2em;
+    color: var(--butter-deep);
 }
 
-/* Buttons */
+/* ---- Botão ----
+   Padrão (sobre papel): fúcsia com texto manteiga. Esta é uma das poucas
+   peças em que a fúcsia preenche a área toda. */
 .btn-primary {
     position: relative;
     display: inline-block;
-    padding: 17px 46px;
-    background: var(--gold);
-    color: var(--grafite);
+    padding: 14px 30px;
+    min-height: 44px;
+    background: var(--fuchsia);
+    color: var(--butter-deep);
     text-decoration: none;
     text-transform: uppercase;
-    letter-spacing: 2.4px;
-    font-size: 0.76rem;
+    letter-spacing: 0.2em;
+    font-family: var(--font-label);
+    font-size: 0.66rem;
     font-weight: 500;
-    border-radius: 50px;
-    overflow: hidden;
+    line-height: 1.4;
+    border-radius: var(--raio-pill);
     transition: background var(--dur-rapida) var(--ease),
                 transform var(--dur-rapida) var(--ease),
                 box-shadow var(--dur-rapida) var(--ease);
 }
 
-/* Brilho que atravessa o botão no hover */
-.btn-primary::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -60%;
-    width: 40%;
-    height: 100%;
-    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.42), transparent);
-    transform: skewX(-18deg);
-    transition: left var(--dur) var(--ease);
-}
-
-.btn-primary:hover::before {
-    left: 120%;
-}
-
 .btn-primary:hover {
-    background: var(--gold-dk);
+    background: #A82259;   /* fúcsia ~8% mais escura */
+    color: var(--butter-deep);
     transform: translateY(-2px);
-    box-shadow: 0 14px 34px rgba(198, 166, 100, 0.32);
+    box-shadow: var(--sombra-selo);
+}
+
+/* Sobre fundo escuro a fúcsia perderia o contraste com o marrom do overlay:
+   o botão inverte para manteiga com texto marrom. */
+.hero .btn-primary {
+    background: var(--butter);
+    color: var(--brown);
+}
+
+.hero .btn-primary:hover {
+    background: #D9B34C;
+    color: var(--brown);
+    box-shadow: 0 10px 26px rgba(60, 42, 24, 0.44);
 }
 
 /* Scroll Indicator */
@@ -553,10 +639,10 @@ body {
 
 .scroll-indicator span {
     display: block;
-    width: 30px;
-    height: 50px;
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    border-radius: 25px;
+    width: 26px;
+    height: 44px;
+    border: 1.5px solid var(--gold);
+    border-radius: 22px;
     position: relative;
 }
 
@@ -566,9 +652,9 @@ body {
     top: 8px;
     left: 50%;
     transform: translateX(-50%);
-    width: 6px;
-    height: 6px;
-    background: #fff;
+    width: 5px;
+    height: 5px;
+    background: var(--butter-deep);
     border-radius: 50%;
     animation: scroll 2s infinite;
 }
@@ -578,35 +664,36 @@ body {
     100% { opacity: 0; top: 30px; }
 }
 
-/* ========== SECTION TITLE ========== */
+/* ========== TÍTULO DE SEÇÃO ==========
+   Composição fixa: rótulo em caixa alta → título → ornamento. */
 .section-eyebrow {
     display: block;
     text-align: center;
-    font-size: 0.66rem;
+    font-family: var(--font-label);
+    font-size: 0.68rem;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 3.6px;
-    color: var(--gold-texto);
-    margin-bottom: 14px;
+    letter-spacing: 0.28em;
+    color: var(--gold-ink);
+    margin-bottom: 12px;
 }
 
 .section-title {
-    font-family: var(--serif);
-    font-size: clamp(2rem, 5.4vw, 3.15rem);
-    font-weight: 400;
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 4.6vw, 2.15rem);
+    font-weight: 500;
     text-align: center;
     margin-bottom: 64px;
-    color: var(--grafite);
-    letter-spacing: 0.6px;
-    line-height: 1.25;
+    color: var(--brown);
+    line-height: 1.1;
     position: relative;
 }
 
-/* Filete com losango central — assinatura visual das seções */
+/* Ornamento embutido — filete dourado com o losango fúcsia ao centro */
 .section-title::after {
     content: '';
     display: block;
-    width: 92px;
+    width: 120px;
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--gold), transparent);
     margin: 22px auto 0;
@@ -616,12 +703,13 @@ body {
     content: '';
     position: absolute;
     left: 50%;
-    bottom: -26px;
-    width: 5px;
-    height: 5px;
-    margin-left: -2.5px;
-    background: var(--gold);
+    bottom: -25px;
+    width: 6px;
+    height: 6px;
+    margin-left: -3px;
+    background: var(--fuchsia);
     transform: rotate(45deg);
+    z-index: 1;
 }
 
 /* ========== NOSSA HISTORIA — sticky scroll reveal ==========
@@ -676,39 +764,42 @@ body {
     padding-bottom: 0;
 }
 
-/* Marcador no trilho */
+/* Marcador no trilho — losango, o mesmo motivo dos ornamentos.
+   Ao entrar na tela vira fúcsia: é o acento marcando o capítulo lido. */
 .timeline-item::before {
     content: '';
     position: absolute;
-    left: -34px;
-    top: 12px;
-    width: 13px;
-    height: 13px;
-    margin-left: 0;
-    background: var(--marfim-alt);
+    left: -32px;
+    top: 14px;
+    width: 9px;
+    height: 9px;
+    background: var(--butter-deep);
     border: 1px solid var(--gold);
-    border-radius: 50%;
+    transform: rotate(45deg);
     transition: background var(--dur) var(--ease),
+                border-color var(--dur) var(--ease),
                 box-shadow var(--dur) var(--ease);
 }
 
 .timeline-item.animate-in::before {
-    background: var(--gold);
-    box-shadow: 0 0 0 5px var(--gold-soft);
+    background: var(--fuchsia);
+    border-color: var(--fuchsia);
+    box-shadow: 0 0 0 4px rgba(195, 43, 110, 0.14);
 }
 
 /* O ano fica grudado no topo enquanto o capítulo passa */
 .timeline-date {
     position: sticky;
     top: 128px;
-    font-family: var(--serif);
-    font-size: clamp(1.4rem, 3.6vw, 2rem);
-    font-weight: 400;
-    color: var(--gold-texto);
-    letter-spacing: 1px;
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3.6vw, 1.9rem);
+    font-weight: 600;
+    color: var(--gold-ink);
+    letter-spacing: 0.02em;
     line-height: 1;
     padding-top: 4px;
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
 }
 
 .timeline-content {
@@ -716,19 +807,18 @@ body {
 }
 
 .timeline-content h3 {
-    font-family: var(--serif);
-    font-size: clamp(1.3rem, 3.4vw, 1.72rem);
-    font-weight: 400;
-    letter-spacing: 0.4px;
-    line-height: 1.35;
-    margin-bottom: 14px;
-    color: var(--grafite);
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 3.2vw, 1.6rem);
+    font-weight: 500;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    color: var(--brown);
 }
 
 .timeline-content p {
-    color: var(--grafite-mid);
-    font-size: 1rem;
-    line-height: 1.85;
+    color: var(--brown-soft);
+    font-size: 1.06rem;
+    line-height: 1.75;
 }
 
 /* ========== CERIMONIA / CRONOGRAMA ========== */
@@ -745,27 +835,40 @@ body {
     margin: 0 auto 56px;
 }
 
+/* Card de papel com moldura dourada — a peça de papelaria da identidade */
 .evento-card {
+    position: relative;
     text-align: center;
-    padding: 52px 32px;
-    background: var(--branco);
-    border: 1px solid var(--linha);
-    border-radius: var(--raio-lg);
-    box-shadow: 0 4px 28px rgba(43, 43, 43, 0.04);
+    padding: 46px 34px;
+    background: var(--paper-warm);
+    border-radius: var(--raio-papel);
+    box-shadow: var(--sombra-card);
     transition: transform var(--dur) var(--ease),
                 box-shadow var(--dur) var(--ease);
 }
 
-.evento-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 44px rgba(43, 43, 43, 0.08);
+/* Filete dourado interno, recuado como numa peça impressa */
+.evento-card::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 1px solid var(--gold-linha);
+    border-radius: var(--raio-papel);
+    pointer-events: none;
 }
 
+.evento-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-papel);
+}
+
+/* Mesma caixa de 76px da aquarela: os dois cards alinham linha a linha */
 .evento-icon {
-    width: 68px;
-    height: 68px;
-    margin: 0 auto 24px;
-    background: var(--gold);
+    position: relative;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 22px;
+    background: var(--butter);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -775,7 +878,20 @@ body {
 .evento-icon svg {
     width: 30px;
     height: 30px;
-    color: var(--grafite);
+    color: var(--brown);
+}
+
+/* Aquarela da igreja no card da cerimônia — vem do kit da identidade */
+.evento-aquarela {
+    position: relative;
+    display: block;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 22px;
+    object-fit: cover;
+    object-position: center 22%;
+    border-radius: var(--raio-papel);
+    border: 1px solid var(--gold);
 }
 
 /* Mesma caixa do círculo dourado, para os dois cards alinharem linha a linha */
@@ -792,59 +908,65 @@ body {
 }
 
 .evento-card h3 {
-    font-family: var(--serif);
-    font-size: 1.55rem;
-    font-weight: 400;
-    letter-spacing: 0.5px;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
     margin-bottom: 4px;
-    color: var(--grafite);
+    color: var(--brown);
 }
 
 .evento-horario {
-    font-family: var(--serif);
-    font-size: 2.6rem;
-    font-weight: 400;
-    color: var(--gold-texto);
-    line-height: 1.2;
-    margin-bottom: 16px;
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 600;
+    color: var(--gold-ink);
+    line-height: 1.15;
+    margin-bottom: 14px;
     font-variant-numeric: tabular-nums;
 }
 
 .evento-local {
+    font-family: var(--font-body);
     font-weight: 500;
-    font-size: 0.98rem;
+    font-size: 1.02rem;
+    color: var(--brown);
     margin-bottom: 6px;
 }
 
 .evento-endereco {
-    color: var(--grafite-mid);
-    font-size: 0.88rem;
+    font-family: var(--font-body);
+    color: var(--brown-soft);
+    font-size: 0.94rem;
     line-height: 1.6;
 }
 
 .evento-mapa-link {
     display: inline-block;
     margin-top: 18px;
-    font-size: 0.72rem;
+    font-family: var(--font-label);
+    font-size: 0.66rem;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--gold-texto);
+    letter-spacing: 0.2em;
+    color: var(--fuchsia);
     text-decoration: none;
-    border-bottom: 1px solid var(--gold-soft);
+    border-bottom: 1px solid var(--gold-linha);
     padding-bottom: 3px;
-    transition: border-color var(--dur-rapida) var(--ease);
+    transition: color var(--dur-rapida) var(--ease),
+                border-color var(--dur-rapida) var(--ease);
 }
 
 .evento-mapa-link:hover,
 .evento-mapa-link:focus-visible {
+    color: var(--brown);
     border-bottom-color: var(--gold);
 }
 
 .mapa {
-    border-radius: var(--raio-lg);
+    border-radius: var(--raio-papel);
     overflow: hidden;
-    border: 1px solid var(--linha);
-    box-shadow: 0 12px 44px rgba(43, 43, 43, 0.07);
+    border: 1.5px solid var(--gold);
+    box-shadow: var(--sombra-card);
 }
 
 .mapa iframe {
@@ -875,24 +997,26 @@ body {
 }
 
 .cronograma-hora {
-    font-family: var(--serif);
+    font-family: var(--font-display);
     font-size: 1.5rem;
-    color: var(--gold-texto);
+    font-weight: 600;
+    color: var(--gold-ink);
     font-variant-numeric: tabular-nums;
-    letter-spacing: 1px;
+    letter-spacing: 0.02em;
 }
 
 .cronograma-desc h4 {
-    font-family: var(--serif);
-    font-size: 1.12rem;
-    font-weight: 400;
-    letter-spacing: 0.3px;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--brown);
     margin-bottom: 3px;
 }
 
 .cronograma-desc p {
-    font-size: 0.88rem;
-    color: var(--grafite-mid);
+    font-family: var(--font-body);
+    font-size: 0.94rem;
+    color: var(--brown-soft);
 }
 
 /* ========== GALERIA — parallax de 3 colunas ==========
@@ -925,9 +1049,9 @@ body {
     position: relative;
     margin: 0;
     overflow: hidden;
-    border-radius: var(--raio);
-    background: var(--linha);
-    box-shadow: 0 6px 30px rgba(43, 43, 43, 0.08);
+    border-radius: var(--raio-papel);
+    background: var(--paper-warm);
+    box-shadow: var(--sombra-card);
 }
 
 .galeria-figura img {
@@ -945,12 +1069,12 @@ body {
     filter: saturate(1.06);
 }
 
-/* Véu dourado sutil no hover */
+/* Véu marrom sutil no hover */
 .galeria-figura::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, transparent 55%, rgba(43, 43, 43, 0.35));
+    background: linear-gradient(180deg, transparent 55%, rgba(70, 48, 24, 0.38));
     opacity: 0;
     transition: opacity var(--dur) var(--ease);
     pointer-events: none;
@@ -965,16 +1089,13 @@ body {
    O JS adiciona .animate-in quando entram na viewport. */
 .reveal {
     opacity: 0;
-    filter: blur(10px);
-    transform: translateY(26px);
+    transform: translateY(12px);
     transition: opacity var(--dur-lenta) var(--ease),
-                filter var(--dur-lenta) var(--ease),
                 transform var(--dur-lenta) var(--ease);
 }
 
 .reveal.animate-in {
     opacity: 1;
-    filter: blur(0);
     transform: none;
 }
 
@@ -998,37 +1119,48 @@ body {
 }
 
 .cta-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: 8px;
-    padding: 56px 40px;
-    background: var(--branco);
-    border: 1px solid var(--linha);
-    border-radius: var(--raio-lg);
+    padding: 52px 40px;
+    background: var(--paper-warm);
+    border-radius: var(--raio-papel);
     text-decoration: none;
-    color: var(--grafite);
-    box-shadow: 0 4px 28px rgba(43, 43, 43, 0.04);
+    color: var(--brown);
+    box-shadow: var(--sombra-card);
     transition: transform var(--dur) var(--ease),
                 box-shadow var(--dur) var(--ease);
 }
 
+.cta-card::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 1px solid var(--gold-linha);
+    border-radius: var(--raio-papel);
+    pointer-events: none;
+}
+
 .cta-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 16px 44px rgba(43, 43, 43, 0.09);
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-papel);
+    color: var(--brown);
 }
 
 .cta-card:focus-visible {
-    outline: 3px solid var(--gold);
-    outline-offset: 3px;
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
 }
 
 .cta-icon {
-    width: 80px;
-    height: 80px;
+    position: relative;
+    width: 76px;
+    height: 76px;
     margin-bottom: 16px;
-    background: var(--gold);
+    background: var(--butter);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1036,20 +1168,22 @@ body {
 }
 
 .cta-icon svg {
-    width: 36px;
-    height: 36px;
-    color: var(--grafite);
+    width: 34px;
+    height: 34px;
+    color: var(--brown);
 }
 
 .cta-card h3 {
-    font-family: var(--serif);
-    font-size: 1.8rem;
-    font-weight: 400;
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--brown);
 }
 
 .cta-card p {
-    color: var(--grafite-mid);
-    font-size: 0.95rem;
+    font-family: var(--font-body);
+    color: var(--brown-soft);
+    font-size: 1rem;
     max-width: 300px;
     margin-bottom: 16px;
 }
@@ -1072,10 +1206,12 @@ body {
 
 .presentes-intro {
     text-align: center;
-    max-width: 600px;
+    max-width: 58ch;
     margin: -30px auto 50px;
-    color: var(--grafite-mid);
+    font-family: var(--font-body);
+    color: var(--brown-soft);
     font-size: 1.1rem;
+    line-height: 1.7;
 }
 
 .presentes-grid {
@@ -1094,35 +1230,59 @@ body {
 }
 
 .categoria-card {
-    background: #fff;
-    padding: 60px 40px;
-    border-radius: 15px;
+    position: relative;
+    background: var(--paper-warm);
+    padding: 56px 40px;
+    border-radius: var(--raio-papel);
     text-align: center;
-    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: var(--sombra-card);
+    transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
     cursor: pointer;
 }
 
-.categoria-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+.categoria-card::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 1px solid var(--gold-linha);
+    border-radius: var(--raio-papel);
+    pointer-events: none;
 }
 
-.categoria-icon {
-    font-size: 4rem;
+.categoria-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-papel);
+}
+
+.categoria-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--brown);
+    margin-bottom: 6px;
+}
+
+.categoria-card p {
+    font-family: var(--font-body);
+    color: var(--brown-soft);
     margin-bottom: 20px;
 }
 
+.categoria-icon {
+    position: relative;
+    margin-bottom: 18px;
+}
+
 .categoria-icon svg {
-    width: 56px;
-    height: 56px;
-    color: var(--gold-texto);
+    width: 52px;
+    height: 52px;
+    color: var(--gold-ink);
 }
 
 .presente-icon svg {
-    width: 48px;
-    height: 48px;
-    color: var(--gold-texto);
+    width: 46px;
+    height: 46px;
+    color: var(--gold-ink);
 }
 
 .voltar-categorias {
@@ -1131,63 +1291,74 @@ body {
     margin-bottom: 10px;
 }
 
+/* Botão secundário: contorno dourado, texto marrom */
 .btn-voltar {
-    padding: 12px 30px;
-    background: #666;
-    color: #fff;
-    border: none;
-    border-radius: 25px;
-    font-size: 0.95rem;
+    padding: 12px 28px;
+    min-height: 44px;
+    background: transparent;
+    color: var(--brown);
+    border: 1.5px solid var(--gold);
+    border-radius: var(--raio-pill);
+    font-family: var(--font-label);
+    font-size: 0.68rem;
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: var(--sans);
+    transition: background var(--dur-rapida) var(--ease),
+                transform var(--dur-rapida) var(--ease);
 }
 
 .btn-voltar:hover {
-    background: #555;
-    transform: translateX(-5px);
+    background: var(--gold-soft);
+    transform: translateX(-3px);
 }
 
 .presente-card {
-    background: #fff;
-    padding: 40px 30px;
-    border-radius: 15px;
+    position: relative;
+    background: var(--paper-warm);
+    padding: 38px 30px;
+    border-radius: var(--raio-papel);
     text-align: center;
-    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease;
+    box-shadow: var(--sombra-card);
+    transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 
 .presente-card:hover {
-    transform: scale(1.05);
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-papel);
 }
 
 /* Presente indisponível/reservado */
 .presente-card.indisponivel {
-    opacity: 0.5;
-    background: #f5f5f5;
+    opacity: 0.55;
+    background: var(--paper);
     position: relative;
 }
 
 .presente-card.indisponivel:hover {
     transform: none;
+    box-shadow: var(--sombra-card);
     cursor: not-allowed;
 }
 
+/* Selo de lacre — uma das poucas peças em que a fúcsia preenche tudo */
 .presente-card.indisponivel::after {
     content: 'JÁ RESERVADO';
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) rotate(-15deg);
-    background: #e74c3c;
-    color: white;
-    padding: 10px 30px;
-    font-weight: 700;
-    font-size: 1.2rem;
-    letter-spacing: 2px;
-    border-radius: 5px;
-    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+    transform: translate(-50%, -50%) rotate(-12deg);
+    background: var(--fuchsia);
+    color: var(--butter-deep);
+    padding: 9px 20px;
+    font-family: var(--font-label);
+    font-weight: 500;
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    white-space: nowrap;
+    border-radius: var(--raio-papel);
+    box-shadow: var(--sombra-selo);
     z-index: 10;
 }
 
@@ -1199,7 +1370,8 @@ body {
 }
 
 .presente-card.indisponivel .btn-presente {
-    background: #ccc;
+    background: var(--muted);
+    color: var(--paper);
     cursor: not-allowed;
     pointer-events: none;
 }
@@ -1213,49 +1385,59 @@ body {
     width: 100%;
     height: 200px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: var(--raio-papel);
+    border: 1px solid var(--gold-linha);
     margin-bottom: 20px;
 }
 
 .presente-card h3 {
-    font-family: var(--serif);
-    font-size: 1.5rem;
-    margin-bottom: 15px;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--brown);
+    margin-bottom: 12px;
 }
 
 .presente-card p {
-    color: var(--grafite-mid);
-    margin-bottom: 15px;
-    font-size: 0.95rem;
+    font-family: var(--font-body);
+    color: var(--brown-soft);
+    margin-bottom: 14px;
+    font-size: 1rem;
 }
 
 .presente-valor {
-    font-size: 1.5rem;
+    font-family: var(--font-display);
+    font-size: 1.6rem;
     font-weight: 600;
-    color: var(--gold-texto);
+    color: var(--gold-ink);
     margin-bottom: 20px;
+    font-variant-numeric: tabular-nums;
 }
 
 .btn-presente {
     display: inline-block;
-    padding: 12px 30px;
-    background: var(--gold);
-    color: var(--grafite);
+    padding: 12px 28px;
+    background: var(--fuchsia);
+    color: var(--butter-deep);
     text-decoration: none;
-    border-radius: 25px;
-    font-size: 0.85rem;
+    border-radius: var(--raio-pill);
+    font-family: var(--font-label);
+    font-size: 0.66rem;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: all 0.3s ease;
+    letter-spacing: 0.2em;
+    transition: background var(--dur-rapida) var(--ease),
+                transform var(--dur-rapida) var(--ease),
+                box-shadow var(--dur-rapida) var(--ease);
     border: none;
     cursor: pointer;
-    font-family: var(--sans);
 }
 
 .btn-presente:hover {
-    background: var(--gold-dk);
-    transform: scale(1.05);
+    background: #A82259;
+    color: var(--butter-deep);
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-selo);
 }
 
 .btn-presente:disabled,
@@ -1274,45 +1456,74 @@ body {
     margin-bottom: 50px;
 }
 
+/* Bloco nobre em marrom com moldura dourada. O roxo do banco sairia da
+   paleta, então a peça segue a identidade e o Nubank aparece só como
+   rótulo — é dado bancário, não uma marca em destaque. */
 .nubank-card {
-    background: linear-gradient(135deg, #820AD1 0%, #6B0FB3 50%, #530B8F 100%);
-    padding: 50px;
-    border-radius: 20px;
+    position: relative;
+    background: var(--brown);
+    padding: 46px 40px;
+    border-radius: var(--raio-papel);
     text-align: center;
-    color: #fff;
+    color: var(--paper);
     max-width: 600px;
     margin: 0 auto;
-    box-shadow: 0 20px 60px rgba(130, 10, 209, 0.3);
+    box-shadow: var(--sombra-papel);
+}
+
+.nubank-card::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 1px solid var(--gold);
+    border-radius: var(--raio-papel);
+    pointer-events: none;
 }
 
 .nubank-logo {
-    margin-bottom: 20px;
+    position: relative;
+    margin-bottom: 16px;
+    font-family: var(--font-label);
+    font-size: 0.66rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    color: var(--butter);
 }
 
 .nubank-card h3 {
-    font-size: 1.8rem;
-    margin-bottom: 15px;
+    position: relative;
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    font-weight: 500;
+    color: var(--butter-deep);
+    margin-bottom: 12px;
 }
 
 .nubank-desc {
-    opacity: 0.9;
-    margin-bottom: 30px;
+    position: relative;
+    font-family: var(--font-body);
+    color: rgba(251, 247, 234, 0.86);
+    margin-bottom: 28px;
     font-size: 1.05rem;
 }
 
 .nubank-dados {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 25px;
+    position: relative;
+    background: rgba(251, 247, 234, 0.08);
+    border: 1px solid var(--gold-linha);
+    border-radius: var(--raio-papel);
+    padding: 22px 24px;
+    margin-bottom: 24px;
     text-align: left;
 }
 
 .dado-item {
     display: flex;
     justify-content: space-between;
+    gap: 16px;
     padding: 10px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(201, 162, 74, 0.24);
 }
 
 .dado-item:last-child {
@@ -1320,20 +1531,27 @@ body {
 }
 
 .dado-label {
-    opacity: 0.8;
-    font-size: 0.9rem;
+    font-family: var(--font-label);
+    font-size: 0.66rem;
+    font-weight: 300;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--butter);
 }
 
 .dado-valor {
+    font-family: var(--font-body);
     font-weight: 500;
+    color: var(--paper);
 }
 
 .nubank-pix {
-    margin: 25px 0;
+    position: relative;
+    margin: 24px 0;
 }
 
 .nubank-pix p {
-    margin-bottom: 15px;
+    margin-bottom: 14px;
 }
 
 .pix-box {
@@ -1341,72 +1559,86 @@ body {
     align-items: center;
     justify-content: center;
     gap: 15px;
-    background: rgba(255, 255, 255, 0.15);
-    padding: 15px 25px;
-    border-radius: 10px;
+    background: rgba(251, 247, 234, 0.10);
+    border: 1px solid var(--gold-linha);
+    padding: 15px 24px;
+    border-radius: var(--raio-papel);
     flex-wrap: wrap;
 }
 
 .pix-box span {
-    font-size: 1.2rem;
-    font-family: monospace;
-    letter-spacing: 1px;
+    font-size: 1.05rem;
+    font-family: var(--font-body);
+    letter-spacing: 0.06em;
+    color: var(--paper);
 }
 
+/* Sobre o marrom o botão inverte para manteiga, como manda a identidade */
 .btn-copy {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 20px;
-    background: #fff;
-    color: #820AD1;
+    padding: 11px 22px;
+    min-height: 44px;
+    background: var(--butter);
+    color: var(--brown);
     border: none;
-    border-radius: 25px;
-    font-weight: 600;
+    border-radius: var(--raio-pill);
+    font-family: var(--font-label);
+    font-size: 0.66rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: var(--sans);
+    transition: background var(--dur-rapida) var(--ease),
+                transform var(--dur-rapida) var(--ease);
 }
 
 .btn-copy:hover {
-    transform: scale(1.05);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    background: #D9B34C;
+    transform: translateY(-2px);
 }
 
 .qrcode-section {
-    margin-top: 25px;
+    position: relative;
+    margin-top: 24px;
 }
 
 .qrcode-section p {
-    margin-bottom: 15px;
-    opacity: 0.9;
+    margin-bottom: 14px;
+    color: rgba(251, 247, 234, 0.86);
 }
 
 .qrcode-placeholder {
     width: 180px;
     height: 180px;
-    background: #fff;
+    background: var(--paper);
     margin: 0 auto;
-    border-radius: 15px;
+    border-radius: var(--raio-papel);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #820AD1;
-    font-weight: 500;
+    font-family: var(--font-label);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--brown-label);
 }
 
 /* ========== CONFIRMAR SECTION ========== */
 .confirmar {
     padding: 120px 0;
-    background: #fff;
+    background: var(--paper-warm);
 }
 
 .confirmar-intro {
     text-align: center;
-    max-width: 600px;
+    max-width: 58ch;
     margin: -30px auto 50px;
-    color: var(--grafite-mid);
+    font-family: var(--font-body);
+    color: var(--brown-soft);
     font-size: 1.1rem;
+    line-height: 1.7;
 }
 
 .rsvp-form {
@@ -1415,27 +1647,41 @@ body {
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--brown-label);
+}
+
+/* Campos com linha inferior, no espírito da papelaria — nunca caixas fechadas */
 .form-group input,
 .form-group select,
 .form-group textarea {
     width: 100%;
-    padding: 18px 25px;
-    border: 2px solid #eee;
-    border-radius: 10px;
-    font-family: var(--sans);
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-    background: #fff;
+    padding: 12px 2px;
+    border: none;
+    border-bottom: 1px solid rgba(91, 65, 39, 0.4);
+    border-radius: 0;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    color: var(--brown);
+    background: transparent;
+    transition: border-color var(--dur-rapida) var(--ease);
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: var(--gold);
+    border-bottom-color: var(--fuchsia);
+    border-bottom-width: 2px;
 }
 
 .form-group textarea {
@@ -1445,23 +1691,27 @@ body {
 
 .btn-submit {
     width: 100%;
-    padding: 18px;
-    background: var(--gold);
-    color: var(--grafite);
+    padding: 16px;
+    min-height: 44px;
+    background: var(--fuchsia);
+    color: var(--butter-deep);
     border: none;
-    border-radius: 10px;
-    font-family: var(--sans);
-    font-size: 1rem;
+    border-radius: var(--raio-pill);
+    font-family: var(--font-label);
+    font-size: 0.7rem;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 0.2em;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background var(--dur-rapida) var(--ease),
+                transform var(--dur-rapida) var(--ease),
+                box-shadow var(--dur-rapida) var(--ease);
 }
 
 .btn-submit:hover {
-    background: var(--gold-dk);
+    background: #A82259;
     transform: translateY(-2px);
+    box-shadow: var(--sombra-selo);
 }
 
 /* Focus visível — navegação por teclado */
@@ -1488,7 +1738,7 @@ body {
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(60, 42, 24, 0.72);
     overflow-y: auto;
 }
 
@@ -1499,13 +1749,24 @@ body {
 }
 
 .modal-content {
-    background: #fff;
-    padding: 50px;
-    border-radius: 20px;
+    background: var(--paper-warm);
+    padding: 46px;
+    border-radius: var(--raio-papel);
     max-width: 500px;
     width: 90%;
     position: relative;
-    animation: modalSlideIn 0.3s ease;
+    box-shadow: var(--sombra-papel);
+    animation: modalSlideIn 0.24s ease;
+}
+
+/* Moldura interna, como nas peças impressas */
+.modal-content::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 1px solid var(--gold-linha);
+    border-radius: var(--raio-papel);
+    pointer-events: none;
 }
 
 @keyframes modalSlideIn {
@@ -1534,26 +1795,32 @@ body {
 }
 
 .modal-content h2 {
-    font-family: var(--serif);
-    font-size: 2rem;
-    margin-bottom: 15px;
-    color: var(--grafite);
+    position: relative;
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin-bottom: 14px;
+    color: var(--brown);
 }
 
 .modal-content p {
-    color: var(--grafite-mid);
-    margin-bottom: 30px;
+    position: relative;
+    font-family: var(--font-body);
+    color: var(--brown-soft);
+    margin-bottom: 28px;
 }
 
 .sucesso-cobranca {
+    position: relative;
     text-align: center;
     padding: 30px 0;
 }
 
 .sucesso-cobranca h3 {
-    font-family: var(--serif);
-    font-size: 1.8rem;
-    color: #2E7D32;
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    font-weight: 500;
+    color: var(--olive-deep);
     margin-bottom: 20px;
 }
 
@@ -1570,8 +1837,8 @@ body {
 /* ========== FOOTER MINIMALISTA ========== */
 .footer {
     padding: 84px 0 60px;
-    background: var(--grafite);
-    color: #fff;
+    background: var(--brown);
+    color: var(--paper);
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -1590,11 +1857,11 @@ body {
 }
 
 .footer-versiculo {
-    font-family: var(--serif);
+    font-family: var(--font-body);
     font-style: italic;
-    font-size: 1rem;
+    font-size: 1.02rem;
     line-height: 1.8;
-    color: rgba(255, 255, 255, 0.72);
+    color: rgba(251, 247, 234, 0.78);
     max-width: 46ch;
     margin: 0 auto 34px;
 }
@@ -1609,25 +1876,40 @@ body {
 }
 
 .footer-links a {
-    color: rgba(255, 255, 255, 0.72);
+    color: rgba(251, 247, 234, 0.78);
     text-decoration: none;
-    font-size: 0.72rem;
+    font-family: var(--font-label);
+    font-size: 0.66rem;
+    font-weight: 300;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 0.2em;
     transition: color var(--dur-rapida) var(--ease);
 }
 
 .footer-links a:hover,
 .footer-links a:focus-visible {
-    color: var(--gold);
+    color: var(--butter);
 }
 
+/* Nomes dos noivos em script, com o "&" em fúcsia */
 .footer-creditos {
-    font-size: 0.68rem;
-    letter-spacing: 1.4px;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.34);
+    font-family: var(--font-script);
+    font-size: 2.2rem;
+    line-height: 0.9;
+    letter-spacing: normal;
+    text-transform: none;
+    color: var(--butter-deep);
     margin-top: 26px;
+}
+
+/* Exceção deliberada: sobre o marrom do rodapé a fúcsia daria 1.7:1 e o
+   "&" sumiria. A própria spec do rodapé pede a família manteiga aqui. */
+.footer-creditos .e-comercial {
+    color: var(--butter);
+    font-size: 0.5em;
+    line-height: 0.6;
+    padding: 0 0.08em;
+    vertical-align: 0.08em;
 }
 
 /* Marca d'água do emblema do Carmo */
@@ -1653,24 +1935,31 @@ body {
 }
 
 .footer-names {
-    font-family: var(--serif);
-    font-size: 2rem;
+    font-family: var(--font-script);
+    font-size: 2.2rem;
+    line-height: 0.9;
+    color: var(--butter-deep);
     margin-bottom: 10px;
 }
 
 .footer-monogram {
-    height: 80px;
+    height: 84px;
     width: auto;
     margin-bottom: 15px;
 }
 
 .footer-date {
-    opacity: 0.7;
+    font-family: var(--font-label);
+    font-size: 0.68rem;
+    font-weight: 300;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: #DFC98F;
     margin-bottom: 20px;
 }
 
 .footer-hashtag {
-    color: var(--gold);
+    color: var(--butter);
     font-size: 1.1rem;
 }
 
@@ -1682,11 +1971,12 @@ body {
         top: 100%;
         left: 0;
         right: 0;
-        background: #fff;
+        background: var(--paper);
+        border-bottom: 1px solid var(--gold-linha);
         flex-direction: column;
         padding: 20px;
         gap: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 10px 30px rgba(70, 48, 24, 0.12);
     }
 
     .nav-links.active {
@@ -1694,28 +1984,37 @@ body {
     }
 
     .nav-links a {
-        color: var(--grafite);
+        color: var(--brown);
     }
 
     .hamburger {
         display: flex;
     }
 
-    .hero-title {
-        font-size: 3rem;
-    }
-
-    .hero-monogram {
-        height: 120px;
-    }
-
     .hero-subtitle {
-        font-size: 0.95rem;
-        letter-spacing: 1.5px;
+        font-size: 0.98rem;
     }
 
     .hero {
         padding: 100px 0 100px;
+    }
+
+    /* Molduras: só a externa, com recuo menor */
+    .moldura-dourada::after,
+    .evento-card::before,
+    .cta-card::before,
+    .categoria-card::before,
+    .modal-content::before,
+    .nubank-card::before {
+        inset: 8px;
+    }
+
+    .moldura-dourada::after {
+        display: none;
+    }
+
+    .moldura-dourada::before {
+        inset: 12px;
     }
 
     .countdown {
@@ -1970,25 +2269,13 @@ body {
         scroll-behavior: auto !important;
     }
 
-    /* A aurora vira um brilho estático */
-    .aurora span {
-        animation: none !important;
-        transform: none !important;
-    }
-
-    /* Sem brilhos piscando sobre os nomes */
-    .sparkle {
-        display: none !important;
-    }
-
     /* Sem parallax na galeria */
     .galeria-coluna {
         transform: none !important;
     }
 
-    /* Reveal vira fade simples e curto, sem desfoque nem deslocamento */
+    /* Reveal vira fade simples e curto, sem deslocamento */
     .reveal {
-        filter: none;
         transform: none;
         opacity: 0;
         transition: opacity 0.2s linear !important;
@@ -2005,15 +2292,10 @@ body {
         top: 8px;
         opacity: 1;
     }
-
-    .btn-primary::before {
-        display: none;
-    }
 }
 
 /* Fallback: se o JS não rodar, o conteúdo nunca fica invisível */
 .sem-js .reveal {
     opacity: 1;
-    filter: none;
     transform: none;
 }
