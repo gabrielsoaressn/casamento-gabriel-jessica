@@ -24,7 +24,8 @@ http://38.52.130.145:3000
 ## 📁 Estrutura do Deploy
 
 ### Frontend (GitHub Pages)
-- **Branch**: `gh-pages`
+- **Publicação**: automática pelo workflow `.github/workflows/deploy.yml` a cada
+  push na `master` (a branch `gh-pages` é anterior a ele e ficou obsoleta)
 - **Arquivos**: HTML, CSS, JavaScript, Imagens
 - **Configuração**: `config.js` aponta para o servidor backend
 
@@ -183,11 +184,14 @@ Resposta esperada:
 3. Commit e push — confira que as imagens novas entraram (`git status`), porque
    `git commit -am` sozinho ignora arquivo que ainda não está versionado:
    ```bash
-   git add .
+   git add images/presentes presentes/presentes-data.js
    git commit -m "Adiciona novos presentes"
    git push origin master
-   git push origin gh-pages
    ```
+
+   O push na `master` já publica o site: o workflow `.github/workflows/deploy.yml`
+   faz o deploy no GitHub Pages sozinho. A branch `gh-pages` é de antes desse
+   workflow e não é mais servida — não precisa atualizá-la.
 
 ### Atualizar Backend
 
