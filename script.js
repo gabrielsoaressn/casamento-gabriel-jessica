@@ -299,6 +299,151 @@ let presenteSelecionado = {
 // Variável para armazenar presentes reservados
 let presentesReservados = [];
 
+// ──────────────────────────────────────────────────────────────────
+// Montagem da lista de presentes
+// Os cards saem de presentes/presentes-data.js (CATEGORIAS_PRESENTES e
+// PRESENTES). A página /presentes chega vazia do servidor e é preenchida
+// aqui; as outras páginas não carregam o arquivo de dados e passam batido.
+// ──────────────────────────────────────────────────────────────────
+
+function escaparHtml(texto) {
+    return String(texto).replace(/[&<>"']/g, caractere => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    })[caractere]);
+}
+
+function formatarReais(valor) {
+    return valor.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+function semPrecoFechado(presente) {
+    return presente.valor === null || presente.valor === undefined;
+}
+
+// Coração — cheio nos cards de presente sem foto; de traço na grade de
+// categorias, onde os cinco vizinhos são todos desenhos de linha.
+const CAMINHO_CORACAO = 'M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z';
+
+const ICONE_CORACAO = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="${CAMINHO_CORACAO}"></path>
+    </svg>`;
+
+const ICONE_CORACAO_TRACO = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="${CAMINHO_CORACAO}"></path>
+    </svg>`;
+
+function montarCardPresente(presente) {
+    const valorLivre = semPrecoFechado(presente);
+    const nome = escaparHtml(presente.nome);
+    const rotulo = valorLivre ? 'Contribuir' : 'Presentear';
+
+    const visual = presente.imagem
+        ? `<img src="../images/presentes/${escaparHtml(presente.imagem)}" alt="${nome}" class="presente-imagem" loading="lazy">`
+        : `<div class="presente-icon">${ICONE_CORACAO}</div>`;
+
+    return `
+                <div class="presente-card${valorLivre ? ' presente-card--desejo' : ''}" data-presente-id="${escaparHtml(presente.id)}">
+                    ${visual}
+                    <h3>${nome}</h3>
+                    <p>${escaparHtml(presente.descricao)}</p>
+                    <p class="presente-valor">${valorLivre ? 'Valor livre' : 'R$ ' + formatarReais(presente.valor)}</p>
+                    <button type="button" class="btn-presente" data-rotulo="${rotulo}" data-nome="${nome}" aria-label="${rotulo}: ${nome}">${rotulo}</button>
+                </div>`;
+}
+
+function montarCardCategoria(categoria, quantidade) {
+    return `
+                <div class="categoria-card" data-categoria="${escaparHtml(categoria.id)}">
+                    <div class="categoria-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${categoria.icone}</svg>
+                    </div>
+                    <h3>${escaparHtml(categoria.nome)}</h3>
+                    <p>${escaparHtml(categoria.descricao)}</p>
+                    <span class="categoria-contagem">${quantidade} ${quantidade === 1 ? 'presente' : 'presentes'}</span>
+                    <button type="button" class="btn-presente" aria-label="Ver presentes de ${escaparHtml(categoria.nome)}">Ver Presentes</button>
+                </div>`;
+}
+
+// Não é uma categoria: abre o modal de valor livre, sem reservar nada.
+function montarCardContribuicaoLivre() {
+    return `
+                <div class="categoria-card" data-categoria="__livre">
+                    <div class="categoria-icon">${ICONE_CORACAO_TRACO}</div>
+                    <h3>Outro Presente</h3>
+                    <p>Contribua com o valor que desejar</p>
+                    <span class="categoria-contagem">Valor livre</span>
+                    <button type="button" class="btn-presente">Contribuir</button>
+                </div>`;
+}
+
+function montarListaCategoria(categoria, presentes) {
+    const comPreco = presentes.filter(presente => !semPrecoFechado(presente));
+    const semPreco = presentes.filter(semPrecoFechado);
+
+    // Itens da lista de desejos do documento: entram depois dos que já têm
+    // preço, sob um subtítulo, para não parecerem produtos incompletos.
+    const blocoDesejos = semPreco.length === 0 ? '' : `
+                <div class="desejos-titulo">
+                    <h4>Também estão na nossa lista</h4>
+                    <p>Itens sem preço fechado — contribua com o valor que quiser.</p>
+                </div>${semPreco.map(montarCardPresente).join('')}`;
+
+    return `
+            <div class="presentes-grid lista-categoria" data-categoria="${escaparHtml(categoria.id)}" style="display: none;">
+                <div class="voltar-categorias">
+                    <button type="button" class="btn-voltar" onclick="voltarCategorias('${escaparHtml(categoria.id)}')">← Voltar</button>
+                    <h3 class="categoria-titulo">${escaparHtml(categoria.nome)}</h3>
+                </div>${comPreco.map(montarCardPresente).join('')}${blocoDesejos}
+            </div>`;
+}
+
+function renderizarPresentes() {
+    const grade = document.getElementById('categorias-presentes');
+    const listas = document.getElementById('listas-presentes');
+    if (!grade || !listas) return;
+
+    if (typeof CATEGORIAS_PRESENTES === 'undefined' || typeof PRESENTES === 'undefined') {
+        console.error('presentes-data.js não carregou — a lista de presentes ficaria vazia');
+        return;
+    }
+
+    const daCategoria = categoria => PRESENTES.filter(presente => presente.categoria === categoria.id);
+
+    grade.innerHTML = CATEGORIAS_PRESENTES
+        .map(categoria => montarCardCategoria(categoria, daCategoria(categoria).length))
+        .join('') + montarCardContribuicaoLivre();
+
+    listas.innerHTML = CATEGORIAS_PRESENTES
+        .map(categoria => montarListaCategoria(categoria, daCategoria(categoria)))
+        .join('');
+
+    grade.addEventListener('click', evento => {
+        const card = evento.target.closest('.categoria-card');
+        if (!card) return;
+
+        if (card.dataset.categoria === '__livre') {
+            abrirModalValorPersonalizado();
+        } else {
+            mostrarCategoria(card.dataset.categoria);
+        }
+    });
+
+    listas.addEventListener('click', evento => {
+        const card = evento.target.closest('.presente-card');
+        if (!card || card.classList.contains('indisponivel')) return;
+
+        const presente = PRESENTES.find(item => item.id === card.dataset.presenteId);
+        if (presente) selecionarPresente(presente.id, presente.valor, presente.nome);
+    });
+}
+
 // Função para carregar presentes reservados do servidor
 async function carregarPresentesReservados() {
     try {
@@ -316,31 +461,40 @@ async function carregarPresentesReservados() {
 
 // Função para marcar presentes como indisponíveis visualmente
 function marcarPresentesIndisponiveis() {
-    // Buscar todos os cards de presentes
-    const cards = document.querySelectorAll('.presente-card');
-
-    cards.forEach(card => {
+    document.querySelectorAll('.presente-card').forEach(card => {
         const botao = card.querySelector('.btn-presente');
-        if (botao) {
-            // Extrair o presente ID do onclick do botão
-            const onclickAttr = botao.getAttribute('onclick');
-            if (onclickAttr) {
-                const match = onclickAttr.match(/selecionarPresente\('([^']+)'/);
-                if (match) {
-                    const presenteId = match[1];
+        if (!botao) return;
 
-                    // Verificar se está reservado
-                    const reservado = presentesReservados.find(p =>
-                        p.presenteId === presenteId &&
-                        (p.status === 'pendente' || p.status === 'pago')
-                    );
+        // Cards montados por renderizarPresentes trazem o id no dataset;
+        // cards escritos à mão ainda guardam o id dentro do onclick.
+        let presenteId = card.dataset.presenteId;
+        if (!presenteId) {
+            const onclickAttr = botao.getAttribute('onclick') || '';
+            const match = onclickAttr.match(/selecionarPresente\('([^']+)'/);
+            presenteId = match ? match[1] : null;
+        }
+        if (!presenteId) return;
 
-                    if (reservado) {
-                        card.classList.add('indisponivel');
-                        botao.disabled = true;
-                        botao.textContent = 'Indisponível';
-                    }
-                }
+        const reservado = presentesReservados.some(p =>
+            p.presenteId === presenteId &&
+            (p.status === 'pendente' || p.status === 'pago')
+        );
+
+        if (reservado) {
+            card.classList.add('indisponivel');
+            botao.disabled = true;
+            botao.textContent = 'Indisponível';
+            if (botao.dataset.nome) {
+                botao.setAttribute('aria-label', `Indisponível: ${botao.dataset.nome}`);
+            }
+        } else if (card.classList.contains('indisponivel')) {
+            // Uma reserva pendente expira em 24h e o presente volta à lista:
+            // sem isto, o card só destravaria recarregando a página.
+            card.classList.remove('indisponivel');
+            botao.disabled = false;
+            botao.textContent = botao.dataset.rotulo || 'Presentear';
+            if (botao.dataset.nome) {
+                botao.setAttribute('aria-label', `${botao.textContent}: ${botao.dataset.nome}`);
             }
         }
     });
@@ -351,6 +505,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // A home e a página de confirmação não têm lista de presentes: buscar o
     // status ali só gastaria uma requisição e sujaria o console quando a API
     // estivesse fora do ar.
+    // Precisa vir antes da consulta: é o que cria os cards a serem marcados.
+    renderizarPresentes();
+
     const temListaDePresentes = document.getElementById('categorias-presentes')
         || document.querySelector('.presente-card');
 
@@ -568,33 +725,50 @@ function setDisplay(id, valor) {
     if (el) el.style.display = valor;
 }
 
-// Função para mostrar categoria de presentes
-function mostrarCategoria(categoria) {
-    setDisplay('categorias-presentes', 'none');
+function esconderTodasAsCategorias() {
+    document.querySelectorAll('.lista-categoria').forEach(lista => {
+        lista.style.display = 'none';
+    });
+}
 
-    if (categoria === 'casa') {
-        setDisplay('presentes-casa', 'grid');
-        setDisplay('presentes-lua-mel', 'none');
-    } else if (categoria === 'lua-mel') {
-        setDisplay('presentes-lua-mel', 'grid');
-        setDisplay('presentes-casa', 'none');
-    }
-
-    // Remarcar presentes indisponíveis na categoria exibida
-    setTimeout(marcarPresentesIndisponiveis, 100);
-
+function voltarAoTopoDosPresentes() {
     const secao = document.getElementById('presentes');
     if (secao) secao.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// Função para voltar às categorias
-function voltarCategorias() {
-    setDisplay('categorias-presentes', 'grid');
-    setDisplay('presentes-casa', 'none');
-    setDisplay('presentes-lua-mel', 'none');
+// Função para mostrar categoria de presentes
+function mostrarCategoria(categoria) {
+    setDisplay('categorias-presentes', 'none');
 
-    const secao = document.getElementById('presentes');
-    if (secao) secao.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    let aberta = null;
+    document.querySelectorAll('.lista-categoria').forEach(lista => {
+        const ehAAberta = lista.dataset.categoria === categoria;
+        lista.style.display = ehAAberta ? 'grid' : 'none';
+        if (ehAAberta) aberta = lista;
+    });
+
+    // Todos os cards já existem no DOM, mas a lista de reservados pode ter
+    // chegado antes deles na primeira carga.
+    marcarPresentesIndisponiveis();
+    voltarAoTopoDosPresentes();
+
+    // O botão clicado acabou de ser escondido junto com a grade de categorias:
+    // sem isto o foco do teclado cairia no <body> e a navegação recomeçaria
+    // lá do topo da página.
+    const voltar = aberta && aberta.querySelector('.btn-voltar');
+    if (voltar) voltar.focus({ preventScroll: true });
+}
+
+// Função para voltar às categorias
+function voltarCategorias(categoria) {
+    setDisplay('categorias-presentes', 'grid');
+    esconderTodasAsCategorias();
+    voltarAoTopoDosPresentes();
+
+    // Devolve o foco ao card de onde o convidado saiu.
+    const card = categoria && document.querySelector(`.categoria-card[data-categoria="${categoria}"]`);
+    const botao = card && card.querySelector('.btn-presente');
+    if (botao) botao.focus({ preventScroll: true });
 }
 
 // Função para abrir modal com presente selecionado
@@ -610,16 +784,23 @@ function selecionarPresente(id, valor, nome) {
         return;
     }
 
-    presenteSelecionado = { id, valor, nome };
+    // Itens da lista de desejos não têm preço: quem escolhe o valor é o convidado.
+    const valorLivre = valor === null || valor === undefined;
+    presenteSelecionado = { id, valor: valorLivre ? 0 : valor, nome };
 
     document.getElementById('modalTitulo').textContent = `Presentear: ${nome}`;
-    document.getElementById('modalDescricao').textContent = `Valor: R$ ${valor.toFixed(2).replace('.', ',')}`;
+    document.getElementById('modalDescricao').textContent = valorLivre
+        ? 'Escolha quanto deseja contribuir para este presente'
+        : `Valor: R$ ${formatarReais(valor)}`;
 
     document.getElementById('presenteId').value = id;
-    document.getElementById('presenteValor').value = valor;
+    document.getElementById('presenteValor').value = valorLivre ? '' : valor;
     document.getElementById('presenteNome').value = nome;
 
-    document.getElementById('valorPersonalizadoGroup').style.display = 'none';
+    // O campo de valor fica dentro do form mesmo escondido: deixar o required
+    // ligado de uma seleção anterior travaria o envio sem mensagem visível.
+    document.getElementById('valorPersonalizadoGroup').style.display = valorLivre ? 'block' : 'none';
+    document.getElementById('valorPersonalizado').required = valorLivre;
     document.getElementById('formPresente').style.display = 'block';
     document.getElementById('resultadoCobranca').style.display = 'none';
 
@@ -635,6 +816,7 @@ function abrirModalValorPersonalizado() {
 
     document.getElementById('presenteId').value = 'personalizado';
     document.getElementById('presenteNome').value = 'Contribuição Personalizada';
+    document.getElementById('presenteValor').value = '';
 
     document.getElementById('valorPersonalizadoGroup').style.display = 'block';
     document.getElementById('valorPersonalizado').required = true;
@@ -686,15 +868,16 @@ async function gerarCobranca(event) {
 
     // Obter dados do formulário
     const formData = new FormData(event.target);
+    const valorFixo = parseFloat(formData.get('presenteValor'));
     const dados = {
         nome: formData.get('nome'),
         email: formData.get('email'),
         telefone: formData.get('telefone'),
         presenteId: formData.get('presenteId'),
         presenteNome: formData.get('presenteNome'),
-        valor: formData.get('presenteId') === 'personalizado'
-            ? parseFloat(formData.get('valor'))
-            : parseFloat(formData.get('presenteValor'))
+        // Sem preço fechado (contribuição livre ou item da lista de desejos),
+        // vale o que o convidado digitou.
+        valor: valorFixo > 0 ? valorFixo : parseFloat(formData.get('valor'))
     };
 
     try {
@@ -708,7 +891,20 @@ async function gerarCobranca(event) {
         });
 
         if (!response.ok) {
-            throw new Error('Erro ao gerar cobrança');
+            const corpo = await response.json().catch(() => ({}));
+
+            // 409: alguém reservou o presente entre a abertura do modal e o
+            // envio. Recarregar a lista trava o card para este convidado.
+            if (response.status === 409) {
+                carregarPresentesReservados();
+                fecharModal();
+            }
+
+            const erro = new Error(
+                corpo.message || corpo.error || 'Erro ao gerar cobrança'
+            );
+            erro.paraOConvidado = Boolean(corpo.message || corpo.error);
+            throw erro;
         }
 
         const resultado = await response.json();
@@ -725,7 +921,11 @@ async function gerarCobranca(event) {
 
     } catch (error) {
         console.error('Erro:', error);
-        showToast('Erro ao gerar link de pagamento. Tente novamente.');
+        // Erro de rede vira mensagem genérica; recusa do backend (presente já
+        // reservado, valor abaixo do mínimo) vai com o texto de lá.
+        showToast(error.paraOConvidado
+            ? error.message
+            : 'Erro ao gerar link de pagamento. Tente novamente.');
 
         // Resetar botão
         btnTexto.style.display = 'inline';

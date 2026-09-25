@@ -27,7 +27,33 @@ export class PresentesService {
     });
 
     if (existing) {
-      return null;
+      // Reserva ainda de pé: o presente é de outro convidado.
+      if (existing.status === 'pendente' || existing.status === 'pago') {
+        return null;
+      }
+
+      // Reserva que expirou (checkout abandonado) ou foi cancelada. O presente
+      // já voltou para a lista em verificarDisponibilidade, então aqui ele
+      // precisa mesmo ser reservado de novo — e como presente_id é UNIQUE,
+      // isso é feito reaproveitando a linha, não inserindo outra. Sem isto a
+      // segunda reserva virava no-op: o convidado pagava e o webhook nunca
+      // achava o reference_id novo para dar baixa.
+      const statusAnterior = existing.status;
+
+      existing.presenteNome = presenteNome;
+      existing.presenteValor = presenteValor;
+      existing.nomeConvidado = nomeConvidado;
+      existing.emailConvidado = emailConvidado;
+      existing.telefoneConvidado = telefoneConvidado;
+      existing.referenceId = referenceId;
+      existing.status = 'pendente';
+      existing.dataPagamento = null;
+
+      this.logger.log(
+        `Presente ${presenteId} reservado de novo (reserva anterior: ${statusAnterior})`,
+      );
+
+      return this.presenteRepository.save(existing);
     }
 
     const presente = this.presenteRepository.create({

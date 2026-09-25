@@ -177,9 +177,11 @@ Resposta esperada:
 
 ### Atualizar Presentes
 
-1. Adicione imagens na pasta `Lista de Presentes/`
-2. Edite `index.html` adicionando novos cards
-3. Commit e push:
+1. Adicione as imagens já otimizadas em `images/presentes/`
+2. Edite `presentes/presentes-data.js` acrescentando os itens ao array `PRESENTES`
+   (veja "Personalizar Lista de Presentes" no README.md)
+3. Commit e push — confira que as imagens novas entraram (`git status`), porque
+   `git commit -am` sozinho ignora arquivo que ainda não está versionado:
    ```bash
    git add .
    git commit -m "Adiciona novos presentes"

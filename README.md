@@ -187,19 +187,32 @@ pm2 save
 
 ### Personalizar Lista de Presentes
 
-Edite o arquivo `index.html` na seção de presentes para adicionar/remover itens:
+A lista mora em `presentes/presentes-data.js` — é de lá que os cards são
+montados. Para adicionar, tirar ou corrigir um presente, mexa só nesse arquivo:
 
-```html
-<div class="presente-card" data-presente="id-do-presente" data-valor="valor-em-centavos">
-    <div class="presente-icon">🎁</div>
-    <h3>Nome do Presente</h3>
-    <p>Descrição</p>
-    <p class="presente-valor">R$ 100,00</p>
-    <button class="btn-presente" onclick="selecionarPresente('id', 100.00, 'Nome')">
-        Presentear
-    </button>
-</div>
+```js
+{
+    id: 'jogo-de-taboas',           // vai para presentes_reservados.presente_id (UNIQUE)
+    nome: 'Jogo de Tábuas',
+    descricao: 'Para os jantares de sexta',
+    valor: 149.90,                  // null = o convidado escolhe quanto contribuir
+    imagem: 'jogo-de-taboas.jpg',   // arquivo em images/presentes; sem ela, o card usa o ícone
+    categoria: 'cozinha'            // um dos ids de CATEGORIAS_PRESENTES
+}
 ```
+
+Duas regras que valem a pena guardar:
+
+- **O `id` de um presente já publicado nunca muda.** É ele que liga o card à
+  reserva no banco; trocando o id, uma reserva existente deixa de casar e o
+  presente volta a aparecer como disponível.
+- **A imagem vai em `images/presentes/`**, já redimensionada (largura máxima de
+  900px) e em JPEG, para o card não carregar um arquivo de vários MB:
+
+  ```bash
+  convert original.png -background white -alpha remove -alpha off \
+      -resize '900x900>' -quality 85 -strip images/presentes/nome-do-presente.jpg
+  ```
 
 ### Webhook do PicPay
 

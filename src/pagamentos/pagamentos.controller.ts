@@ -130,7 +130,7 @@ export class PagamentosController {
 
       if (presenteId !== 'personalizado') {
         try {
-          await this.presentesService.reservar(
+          const reserva = await this.presentesService.reservar(
             presenteId,
             presenteNome,
             valor,
@@ -139,7 +139,18 @@ export class PagamentosController {
             telefone,
             result.referenceId,
           );
-          this.logger.log(`Presente ${presenteId} reservado para ${nome}`);
+
+          if (reserva) {
+            this.logger.log(`Presente ${presenteId} reservado para ${nome}`);
+          } else {
+            // Corrida entre dois convidados: alguém reservou entre a checagem
+            // de disponibilidade e aqui. O link de pagamento já foi gerado, então
+            // o pagamento precisa ser conferido à mão.
+            this.logger.warn(
+              `Presente ${presenteId} NÃO foi reservado para ${nome} (já reservado por outro convidado) — ` +
+                `cobrança ${result.referenceId} ficou sem reserva no banco`,
+            );
+          }
         } catch (dbError) {
           this.logger.error('Erro ao reservar presente no banco:', dbError);
         }

@@ -1248,9 +1248,9 @@ a:hover {
 
 /* auto-fit + justify-content centraliza mesmo com um único card */
 .categorias-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 380px));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 330px));
     justify-content: center;
-    max-width: 800px;
+    max-width: 1100px;
 }
 
 .categoria-card {
@@ -1309,10 +1309,34 @@ a:hover {
     color: var(--gold-ink);
 }
 
+/* Rótulo discreto entre a descrição e o botão da categoria */
+.categoria-contagem {
+    display: block;
+    margin: -10px 0 18px;
+    font-family: var(--font-label);
+    font-size: 0.62rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--gold-ink);
+}
+
 .voltar-categorias {
     grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex-wrap: wrap;
     text-align: left;
     margin-bottom: 10px;
+}
+
+.categoria-titulo {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    font-weight: 500;
+    color: var(--brown);
 }
 
 /* Botão secundário: contorno dourado, texto marrom */
@@ -1346,6 +1370,7 @@ a:hover {
     text-align: center;
     box-shadow: var(--sombra-card);
     transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+    cursor: pointer;
 }
 
 .presente-card:hover {
@@ -1436,6 +1461,65 @@ a:hover {
     color: var(--gold-ink);
     margin-bottom: 20px;
     font-variant-numeric: tabular-nums;
+}
+
+/* Abertura do bloco de itens que vieram da lista sem preço fechado */
+.desejos-titulo {
+    grid-column: 1 / -1;
+    margin: 26px 0 2px;
+    padding-top: 28px;
+    border-top: 1px solid var(--hairline);
+    text-align: center;
+}
+
+.desejos-titulo h4 {
+    margin: 0 0 8px;
+    font-family: var(--font-label);
+    font-size: 0.68rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--gold-ink);
+}
+
+.desejos-titulo p {
+    margin: 0;
+    font-family: var(--font-body);
+    color: var(--brown-soft);
+}
+
+/* Presente com preço mas sem foto: o ícone ocupa a altura que a imagem
+   ocuparia, senão o card fica mais baixo que o vizinho da mesma linha. */
+.presente-card:not(.presente-card--desejo) .presente-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    margin-bottom: 20px;
+}
+
+/* Sem foto e sem preço, o card do desejo pede menos peso que os demais */
+.presente-card--desejo {
+    padding: 30px 24px;
+}
+
+.presente-card--desejo .presente-icon {
+    margin-bottom: 14px;
+}
+
+.presente-card--desejo .presente-icon svg {
+    width: 34px;
+    height: 34px;
+    color: var(--gold);
+}
+
+.presente-card--desejo .presente-valor {
+    font-family: var(--font-label);
+    font-size: 0.66rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--brown-label);
 }
 
 .btn-presente {
@@ -2214,6 +2298,10 @@ a:hover {
     }
 
     .presente-imagem {
+        height: 150px;
+    }
+
+    .presente-card:not(.presente-card--desejo) .presente-icon {
         height: 150px;
     }
 
