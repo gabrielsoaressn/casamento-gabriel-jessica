@@ -305,8 +305,9 @@ const PRESENTES = [
     },
     {
         id: 'ferro-passar',
-        nome: 'Ferro de Passar',
-        valor: null,
+        nome: 'Ferro de Passar Seco e Vapor Electrolux Efficient ESI11, Base Antiaderente, Vapor Vertical, 1200W, Cabo 1,35 m',
+        valor: 129.90,
+        imagem: 'ferro-passar-electrolux-esi11.jpg',
         categoria: 'casa'
     },
     {
