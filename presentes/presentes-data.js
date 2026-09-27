@@ -231,8 +231,9 @@ const PRESENTES = [
     },
     {
         id: 'jogo-tacas',
-        nome: 'Jogo de Taças',
-        valor: null,
+        nome: '6 Taças de Cristal para Vinho Tinto e Branco 460 ml Linha Xtra Titanio Incolor',
+        valor: 135.20,
+        imagem: 'tacas-cristal-xtra-460ml.jpg',
         categoria: 'cozinha'
     },
     {
@@ -258,10 +259,33 @@ const PRESENTES = [
         categoria: 'quarto'
     },
     {
+        // Os dois jogos de cama de 200 fios têm o mesmo nome e a mesma foto;
+        // o id leva o preço para os dois não colidirem na reserva.
+        id: 'jogo-cama-queen-200-fios-buddemeyer-339',
+        nome: 'Jogo de Cama Queen 200 Fios 100% Algodão Branco Buddemeyer',
+        valor: 339.90,
+        imagem: 'jogo-cama-buddemeyer-200-fios.jpg',
+        categoria: 'quarto'
+    },
+    {
+        id: 'jogo-cama-queen-200-fios-buddemeyer-329',
+        nome: 'Jogo de Cama Queen 200 Fios 100% Algodão Branco Buddemeyer',
+        valor: 329.90,
+        imagem: 'jogo-cama-buddemeyer-200-fios.jpg',
+        categoria: 'quarto'
+    },
+    {
         id: 'edredom-queen-iasmin',
         nome: 'Edredom Queen 200 Fios 100% Algodão Iasmin',
         valor: 539.90,
         imagem: 'edredom-queen-iasmin.jpg',
+        categoria: 'quarto'
+    },
+    {
+        id: 'kit-manta-peseira-tricot-almofadas',
+        nome: 'Kit Manta Peseira de Tricot + 2 Capas de Almofada Cama Casal',
+        valor: 134.60,
+        imagem: 'kit-manta-peseira-tricot.jpg',
         categoria: 'quarto'
     },
     {
