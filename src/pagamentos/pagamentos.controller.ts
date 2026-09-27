@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { PagamentosService } from './pagamentos.service';
 import { PresentesService } from '../presentes/presentes.service';
+import { buscarPresente } from '../presentes/catalogo';
 
 // Webhook do Mercado Pago (notification v1)
 // Docs: https://www.mercadopago.com.br/developers/pt/docs/your-integrations/notifications/webhooks
@@ -88,9 +89,26 @@ export class PagamentosController {
 
   @Post('criar-cobranca')
   async criarCobranca(@Body() body: CriarCobrancaBody) {
-    const { nome, email, telefone, presenteId, presenteNome, valor } = body;
+    const { nome, email, telefone, presenteId } = body;
+    let { presenteNome, valor } = body;
 
-    if (!nome || !email || !valor) {
+    // Presente da lista: nome e preço saem do catálogo, nunca do navegador.
+    // Só a contribuição livre ('personalizado') e os itens sem preço fechado
+    // aceitam o valor digitado pelo convidado.
+    if (presenteId !== 'personalizado') {
+      const presente = buscarPresente(presenteId);
+      if (!presente) {
+        throw new HttpException('Presente não encontrado', HttpStatus.BAD_REQUEST);
+      }
+      presenteNome = presente.nome;
+      if (presente.valor !== null) {
+        valor = presente.valor;
+      }
+    }
+
+    valor = Number(valor);
+
+    if (!nome || !email || !Number.isFinite(valor)) {
       throw new HttpException('Dados incompletos', HttpStatus.BAD_REQUEST);
     }
 

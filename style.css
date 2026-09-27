@@ -58,6 +58,7 @@
     --leitura:   62ch;
     --secao:     clamp(72px, 11vw, 96px);
     --largura:   1120px;
+    --altura-navbar: 78px;   /* navbar fixo: 14px + logo 50px + 14px */
 
     /* ---- Movimento — 180–240ms, nada acima de 400ms ---- */
     --ease:      cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -1246,13 +1247,6 @@ a:hover {
     margin: 0 auto;
 }
 
-/* auto-fit + justify-content centraliza mesmo com um único card */
-.categorias-grid {
-    grid-template-columns: repeat(auto-fit, minmax(260px, 330px));
-    justify-content: center;
-    max-width: 1100px;
-}
-
 .categoria-card {
     position: relative;
     background: var(--card);
@@ -1309,57 +1303,103 @@ a:hover {
     color: var(--gold-ink);
 }
 
-/* Rótulo discreto entre a descrição e o botão da categoria */
-.categoria-contagem {
-    display: block;
-    margin: -10px 0 18px;
-    font-family: var(--font-label);
-    font-size: 0.62rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: var(--gold-ink);
+.categoria-card .btn-presente {
+    margin-top: 4px;
 }
 
-.voltar-categorias {
-    grid-column: 1 / -1;
+/* ---- Barra de atalhos: gruda no topo enquanto a lista rola ----
+   Fica logo abaixo do navbar fixo; quando o navbar some (rolando para
+   baixo) ela sobe junto. No celular vira uma fileira que rola de lado. */
+.presentes-atalhos {
+    position: sticky;
+    top: var(--altura-navbar);
+    z-index: 900;
     display: flex;
-    align-items: center;
-    gap: 22px;
+    gap: 10px;
+    justify-content: center;
     flex-wrap: wrap;
-    text-align: left;
-    margin-bottom: 10px;
+    max-width: 1100px;
+    margin: 0 auto 56px;
+    padding: 12px 16px;
+    background: var(--cream);
+    border-top: 1px solid var(--gold-linha);
+    border-bottom: 1px solid var(--gold-linha);
+    transition: top var(--dur-rapida) var(--ease);
 }
 
-.categoria-titulo {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: 1.7rem;
-    font-weight: 500;
-    color: var(--brown);
+.navbar.navbar-hidden ~ .presentes .presentes-atalhos {
+    top: 0;
 }
 
-/* Botão secundário: contorno dourado, texto marrom */
-.btn-voltar {
-    padding: 12px 28px;
-    min-height: 44px;
-    background: transparent;
-    color: var(--brown);
-    border: 1.5px solid var(--gold);
+.atalho-link {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 8px 18px;
+    border: 1px solid var(--gold);
     border-radius: var(--raio-pill);
     font-family: var(--font-label);
     font-size: 0.68rem;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
-    cursor: pointer;
+    letter-spacing: 0.16em;
+    color: var(--brown);
+    text-decoration: none;
+    white-space: nowrap;
     transition: background var(--dur-rapida) var(--ease),
-                transform var(--dur-rapida) var(--ease);
+                color var(--dur-rapida) var(--ease);
 }
 
-.btn-voltar:hover {
+.atalho-link:hover {
     background: var(--gold-soft);
-    transform: translateX(-3px);
+}
+
+.atalho-link[aria-current] {
+    background: var(--brown);
+    border-color: var(--brown);
+    color: var(--paper);
+}
+
+.atalho-link:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 2px;
+}
+
+/* ---- Seções de categoria, uma depois da outra ---- */
+.categoria-secao {
+    /* o salto da âncora para abaixo do navbar e da barra de atalhos */
+    scroll-margin-top: calc(var(--altura-navbar) + 88px);
+}
+
+.categoria-secao + .categoria-secao {
+    margin-top: 72px;
+}
+
+.categoria-titulo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin: 0 0 32px;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--brown);
+    text-align: center;
+}
+
+.categoria-titulo svg {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    color: var(--gold-ink);
+}
+
+.contribuicao-livre {
+    max-width: 380px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .presente-card {
@@ -1825,8 +1865,7 @@ a:hover {
 /* Focus visível — navegação por teclado */
 .btn-primary:focus-visible,
 .btn-presente:focus-visible,
-.btn-submit:focus-visible,
-.btn-voltar:focus-visible {
+.btn-submit:focus-visible {
     outline: 3px solid var(--gold);
     outline-offset: 3px;
 }
@@ -2218,10 +2257,6 @@ a:hover {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .categorias-grid {
-        grid-template-columns: 1fr;
-    }
-
     .categoria-card {
         padding: 40px 30px;
     }
@@ -2322,6 +2357,34 @@ a:hover {
 
     .presentes-grid {
         gap: 16px;
+    }
+
+    /* Atalhos: uma fileira só, de ponta a ponta, rolando de lado */
+    .presentes-atalhos {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        scrollbar-width: none;
+        margin: 0 -20px 40px;
+        padding: 10px 20px;
+    }
+
+    .presentes-atalhos::-webkit-scrollbar {
+        display: none;
+    }
+
+    .categoria-secao + .categoria-secao {
+        margin-top: 52px;
+    }
+
+    .categoria-titulo {
+        font-size: 1.6rem;
+        margin-bottom: 22px;
+    }
+
+    .categoria-titulo svg {
+        width: 28px;
+        height: 28px;
     }
 
     /* Cards de evento */

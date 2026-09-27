@@ -327,8 +327,8 @@ function semPrecoFechado(presente) {
     return presente.valor === null || presente.valor === undefined;
 }
 
-// Coração — cheio nos cards de presente sem foto; de traço na grade de
-// categorias, onde os cinco vizinhos são todos desenhos de linha.
+// Coração — cheio nos cards de presente sem foto; de traço no bloco de
+// contribuição livre, ao lado dos ícones de linha das seções.
 const CAMINHO_CORACAO = 'M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z';
 
 const ICONE_CORACAO = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -338,6 +338,9 @@ const ICONE_CORACAO = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden=
 const ICONE_CORACAO_TRACO = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="${CAMINHO_CORACAO}"></path>
     </svg>`;
+
+// Âncora do bloco de contribuição livre na barra de atalhos
+const ID_OUTRO_PRESENTE = 'outro-presente';
 
 function montarCardPresente(presente) {
     const valorLivre = semPrecoFechado(presente);
@@ -352,40 +355,28 @@ function montarCardPresente(presente) {
                 <div class="presente-card${valorLivre ? ' presente-card--desejo' : ''}" data-presente-id="${escaparHtml(presente.id)}">
                     ${visual}
                     <h3>${nome}</h3>
-                    <p>${escaparHtml(presente.descricao)}</p>
                     <p class="presente-valor">${valorLivre ? 'Valor livre' : 'R$ ' + formatarReais(presente.valor)}</p>
                     <button type="button" class="btn-presente" data-rotulo="${rotulo}" data-nome="${nome}" aria-label="${rotulo}: ${nome}">${rotulo}</button>
-                </div>`;
-}
-
-function montarCardCategoria(categoria, quantidade) {
-    return `
-                <div class="categoria-card" data-categoria="${escaparHtml(categoria.id)}">
-                    <div class="categoria-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${categoria.icone}</svg>
-                    </div>
-                    <h3>${escaparHtml(categoria.nome)}</h3>
-                    <p>${escaparHtml(categoria.descricao)}</p>
-                    <span class="categoria-contagem">${quantidade} ${quantidade === 1 ? 'presente' : 'presentes'}</span>
-                    <button type="button" class="btn-presente" aria-label="Ver presentes de ${escaparHtml(categoria.nome)}">Ver Presentes</button>
                 </div>`;
 }
 
 // Não é uma categoria: abre o modal de valor livre, sem reservar nada.
 function montarCardContribuicaoLivre() {
     return `
+            <section class="categoria-secao contribuicao-livre" id="${ID_OUTRO_PRESENTE}" aria-label="Outro presente">
                 <div class="categoria-card" data-categoria="__livre">
                     <div class="categoria-icon">${ICONE_CORACAO_TRACO}</div>
                     <h3>Outro Presente</h3>
                     <p>Contribua com o valor que desejar</p>
-                    <span class="categoria-contagem">Valor livre</span>
                     <button type="button" class="btn-presente">Contribuir</button>
-                </div>`;
+                </div>
+            </section>`;
 }
 
-function montarListaCategoria(categoria, presentes) {
+function montarSecaoCategoria(categoria, presentes) {
     const comPreco = presentes.filter(presente => !semPrecoFechado(presente));
     const semPreco = presentes.filter(semPrecoFechado);
+    const id = escaparHtml(categoria.id);
 
     // Itens da lista de desejos do documento: entram depois dos que já têm
     // preço, sob um subtítulo, para não parecerem produtos incompletos.
@@ -396,52 +387,99 @@ function montarListaCategoria(categoria, presentes) {
                 </div>${semPreco.map(montarCardPresente).join('')}`;
 
     return `
-            <div class="presentes-grid lista-categoria" data-categoria="${escaparHtml(categoria.id)}" style="display: none;">
-                <div class="voltar-categorias">
-                    <button type="button" class="btn-voltar" onclick="voltarCategorias('${escaparHtml(categoria.id)}')">← Voltar</button>
-                    <h3 class="categoria-titulo">${escaparHtml(categoria.nome)}</h3>
-                </div>${comPreco.map(montarCardPresente).join('')}${blocoDesejos}
-            </div>`;
+            <section class="categoria-secao" id="${id}" aria-labelledby="titulo-${id}">
+                <h3 class="categoria-titulo" id="titulo-${id}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${categoria.icone}</svg>
+                    ${escaparHtml(categoria.nome)}
+                </h3>
+                <div class="presentes-grid">${comPreco.map(montarCardPresente).join('')}${blocoDesejos}
+                </div>
+            </section>`;
+}
+
+function montarAtalho(id, nome) {
+    return `<a href="#${escaparHtml(id)}" class="atalho-link">${escaparHtml(nome)}</a>`;
+}
+
+// Destaca na barra de atalhos a seção que está na tela e mantém o atalho
+// visível — no celular a barra rola de lado e ele poderia ficar escondido.
+function acompanharSecaoAtual(barra) {
+    if (!('IntersectionObserver' in window)) return;
+
+    const links = new Map(
+        [...barra.querySelectorAll('.atalho-link')].map(link => [link.hash.slice(1), link])
+    );
+
+    const observador = new IntersectionObserver(entradas => {
+        entradas.forEach(entrada => {
+            if (!entrada.isIntersecting) return;
+            const atual = links.get(entrada.target.id);
+            if (!atual || atual.getAttribute('aria-current')) return;
+
+            links.forEach(link => link.removeAttribute('aria-current'));
+            atual.setAttribute('aria-current', 'true');
+            barra.scrollTo({
+                left: atual.offsetLeft - (barra.clientWidth - atual.offsetWidth) / 2,
+                behavior: 'smooth'
+            });
+        });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+
+    document.querySelectorAll('.categoria-secao').forEach(secao => observador.observe(secao));
 }
 
 function renderizarPresentes() {
-    const grade = document.getElementById('categorias-presentes');
+    const barra = document.getElementById('atalhos-presentes');
     const listas = document.getElementById('listas-presentes');
-    if (!grade || !listas) return;
+    if (!barra || !listas) return;
 
     if (typeof CATEGORIAS_PRESENTES === 'undefined' || typeof PRESENTES === 'undefined') {
         console.error('presentes-data.js não carregou — a lista de presentes ficaria vazia');
         return;
     }
 
-    const daCategoria = categoria => PRESENTES.filter(presente => presente.categoria === categoria.id);
+    // Todas as categorias numa página só, na ordem de CATEGORIAS_PRESENTES.
+    // Categoria sem nenhum presente não ganha seção nem atalho.
+    const secoes = CATEGORIAS_PRESENTES
+        .map(categoria => ({
+            categoria,
+            presentes: PRESENTES.filter(presente => presente.categoria === categoria.id)
+        }))
+        .filter(({ presentes }) => presentes.length > 0);
 
-    grade.innerHTML = CATEGORIAS_PRESENTES
-        .map(categoria => montarCardCategoria(categoria, daCategoria(categoria).length))
+    listas.innerHTML = secoes
+        .map(({ categoria, presentes }) => montarSecaoCategoria(categoria, presentes))
         .join('') + montarCardContribuicaoLivre();
 
-    listas.innerHTML = CATEGORIAS_PRESENTES
-        .map(categoria => montarListaCategoria(categoria, daCategoria(categoria)))
-        .join('');
-
-    grade.addEventListener('click', evento => {
-        const card = evento.target.closest('.categoria-card');
-        if (!card) return;
-
-        if (card.dataset.categoria === '__livre') {
-            abrirModalValorPersonalizado();
-        } else {
-            mostrarCategoria(card.dataset.categoria);
-        }
-    });
+    barra.innerHTML = secoes
+        .map(({ categoria }) => montarAtalho(categoria.id, categoria.nome))
+        .join('') + montarAtalho(ID_OUTRO_PRESENTE, 'Outro presente');
+    barra.hidden = false;
 
     listas.addEventListener('click', evento => {
+        if (evento.target.closest('.categoria-card[data-categoria="__livre"]')) {
+            abrirModalValorPersonalizado();
+            return;
+        }
+
         const card = evento.target.closest('.presente-card');
         if (!card || card.classList.contains('indisponivel')) return;
 
         const presente = PRESENTES.find(item => item.id === card.dataset.presenteId);
         if (presente) selecionarPresente(presente.id, presente.valor, presente.nome);
     });
+
+    acompanharSecaoAtual(barra);
+
+    // As seções só existem depois desta montagem, então o navegador não achou
+    // a âncora de um link compartilhado (ex.: /presentes/#quarto) ao carregar.
+    // Repete no load: fontes e fotos que chegam depois empurram a seção.
+    const alvo = window.location.hash && document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
+    if (alvo && alvo.classList.contains('categoria-secao')) {
+        const irParaAlvo = () => alvo.scrollIntoView({ behavior: 'instant' });
+        irParaAlvo();
+        if (document.readyState !== 'complete') window.addEventListener('load', irParaAlvo, { once: true });
+    }
 }
 
 // Função para carregar presentes reservados do servidor
@@ -508,7 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Precisa vir antes da consulta: é o que cria os cards a serem marcados.
     renderizarPresentes();
 
-    const temListaDePresentes = document.getElementById('categorias-presentes')
+    const temListaDePresentes = document.getElementById('listas-presentes')
         || document.querySelector('.presente-card');
 
     if (temListaDePresentes) {
@@ -717,58 +755,6 @@ function _pararPollingPix() {
         clearInterval(_pixPollingTimer);
         _pixPollingTimer = null;
     }
-}
-
-// Altera display só se o elemento existir (nem toda categoria tem lista própria)
-function setDisplay(id, valor) {
-    const el = document.getElementById(id);
-    if (el) el.style.display = valor;
-}
-
-function esconderTodasAsCategorias() {
-    document.querySelectorAll('.lista-categoria').forEach(lista => {
-        lista.style.display = 'none';
-    });
-}
-
-function voltarAoTopoDosPresentes() {
-    const secao = document.getElementById('presentes');
-    if (secao) secao.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-// Função para mostrar categoria de presentes
-function mostrarCategoria(categoria) {
-    setDisplay('categorias-presentes', 'none');
-
-    let aberta = null;
-    document.querySelectorAll('.lista-categoria').forEach(lista => {
-        const ehAAberta = lista.dataset.categoria === categoria;
-        lista.style.display = ehAAberta ? 'grid' : 'none';
-        if (ehAAberta) aberta = lista;
-    });
-
-    // Todos os cards já existem no DOM, mas a lista de reservados pode ter
-    // chegado antes deles na primeira carga.
-    marcarPresentesIndisponiveis();
-    voltarAoTopoDosPresentes();
-
-    // O botão clicado acabou de ser escondido junto com a grade de categorias:
-    // sem isto o foco do teclado cairia no <body> e a navegação recomeçaria
-    // lá do topo da página.
-    const voltar = aberta && aberta.querySelector('.btn-voltar');
-    if (voltar) voltar.focus({ preventScroll: true });
-}
-
-// Função para voltar às categorias
-function voltarCategorias(categoria) {
-    setDisplay('categorias-presentes', 'grid');
-    esconderTodasAsCategorias();
-    voltarAoTopoDosPresentes();
-
-    // Devolve o foco ao card de onde o convidado saiu.
-    const card = categoria && document.querySelector(`.categoria-card[data-categoria="${categoria}"]`);
-    const botao = card && card.querySelector('.btn-presente');
-    if (botao) botao.focus({ preventScroll: true });
 }
 
 // Função para abrir modal com presente selecionado
