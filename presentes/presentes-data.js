@@ -237,6 +237,15 @@ const PRESENTES = [
         categoria: 'cozinha'
     },
     {
+        // Os noivos querem ganhar dois jogos destas taças. Cada id só é
+        // reservado uma vez, então o segundo jogo é outra entrada.
+        id: 'jogo-tacas-2',
+        nome: '6 Taças de Cristal para Vinho Tinto e Branco 460 ml Linha Xtra Titanio Incolor',
+        valor: 135.20,
+        imagem: 'tacas-cristal-xtra-460ml.jpg',
+        categoria: 'cozinha'
+    },
+    {
         id: 'jogo-sobremesa',
         nome: 'Jogo de Sobremesa',
         valor: null,
