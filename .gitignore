@@ -47,6 +47,7 @@ build/
 tools/limpar-fotos/.venv/
 tools/limpar-fotos/modelos/
 tools/limpar-fotos/originais/
+tools/limpar-fotos/entrada/
 tools/limpar-fotos/processadas/
 tools/limpar-fotos/mascaras/
 tools/limpar-fotos/mascaras-manuais/
