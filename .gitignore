@@ -41,3 +41,14 @@ Photos-*.zip
 # Build
 dist/
 build/
+
+# Ferramenta de limpeza das fotos da galeria (tools/limpar-fotos): ambiente,
+# pesos dos modelos e as fotos pessoais que ela processa não vão para o git
+tools/limpar-fotos/.venv/
+tools/limpar-fotos/modelos/
+tools/limpar-fotos/originais/
+tools/limpar-fotos/processadas/
+tools/limpar-fotos/mascaras/
+tools/limpar-fotos/mascaras-manuais/
+tools/limpar-fotos/relatorio.json
+tools/limpar-fotos/revisao.html

@@ -1,0 +1,3 @@
+easyocr
+simple-lama-inpainting
+opencv-python-headless

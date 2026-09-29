@@ -2195,9 +2195,11 @@ a:hover {
         grid-column: 1 / -1;
     }
 
+    /* O enquadramento segue a foto que estiver por último: na atual os
+       dois rostos ocupam o meio da foto. */
     .galeria-coluna:last-child .galeria-figura:last-child img {
         aspect-ratio: 4 / 3;
-        object-position: center 28%;
+        object-position: center 50%;
     }
 
     .mapa iframe {

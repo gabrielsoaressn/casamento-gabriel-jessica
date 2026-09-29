@@ -1,0 +1,38 @@
+{
+  "WhatsApp Image 2026-09-28 at 22.27.07": {
+    "mascara_retangulos": [
+      [
+        80,
+        154,
+        110,
+        210
+      ]
+    ],
+    "texto_nao_detectado": "cursor de digitação logo depois do \"E\" da letra de música"
+  },
+  "lcuky": {
+    "mascara_retangulos": [
+      [
+        74,
+        272,
+        262,
+        326
+      ]
+    ],
+    "texto_nao_detectado": "\"ACROSS\" semitransparente, abaixo de \"WHISPER\""
+  },
+  "voeli": {
+    "mascara_retangulos": [
+      [
+        386,
+        254,
+        470,
+        304
+      ]
+    ],
+    "texto_nao_detectado": "emojis 💙🌊 no fim da frase"
+  },
+  "coqueirinho": {
+    "sem_recorte": true
+  }
+}
