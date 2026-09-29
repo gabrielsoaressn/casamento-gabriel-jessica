@@ -371,6 +371,13 @@ const PRESENTES = [
         imagem: 'auxiliar-partida-compressor-pneu.webp',
         categoria: 'casa'
     },
+    {
+        id: 'carregador-portatil-20000mah',
+        nome: 'Carregador Portátil de 20000mAh',
+        valor: 95.00,
+        imagem: 'carregador-portatil-20000mah.webp',
+        categoria: 'casa'
+    },
 
     // ---------- Sala e Escritório ----------
     {
