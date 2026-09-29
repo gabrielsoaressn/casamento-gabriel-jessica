@@ -364,6 +364,13 @@ const PRESENTES = [
         imagem: 'maleta-ferramentas-129-pecas.webp',
         categoria: 'casa'
     },
+    {
+        id: 'auxiliar-partida-compressor-pneu',
+        nome: 'Auxiliar de Partida Bateria Portátil com Compressor de Pneu',
+        valor: 167.40,
+        imagem: 'auxiliar-partida-compressor-pneu.webp',
+        categoria: 'casa'
+    },
 
     // ---------- Sala e Escritório ----------
     {
