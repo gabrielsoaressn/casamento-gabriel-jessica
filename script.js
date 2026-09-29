@@ -357,20 +357,12 @@ function textoCotasRestantes(presente) {
         : `Restam ${restantes} de ${presente.cotas} cotas`;
 }
 
-// Coração — cheio nos cards de presente sem foto; de traço no bloco de
-// contribuição livre, ao lado dos ícones de linha das seções.
+// Coração — nos cards de presente sem foto.
 const CAMINHO_CORACAO = 'M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z';
 
 const ICONE_CORACAO = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="${CAMINHO_CORACAO}"></path>
     </svg>`;
-
-const ICONE_CORACAO_TRACO = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="${CAMINHO_CORACAO}"></path>
-    </svg>`;
-
-// Âncora do bloco de contribuição livre na barra de atalhos
-const ID_OUTRO_PRESENTE = 'outro-presente';
 
 function montarCardPresente(presente) {
     const valorLivre = semPrecoFechado(presente);
@@ -399,31 +391,8 @@ function montarCardPresente(presente) {
                 </div>`;
 }
 
-// Não é uma categoria: abre o modal de valor livre, sem reservar nada.
-function montarCardContribuicaoLivre() {
-    return `
-            <section class="categoria-secao contribuicao-livre" id="${ID_OUTRO_PRESENTE}" aria-label="Outro presente">
-                <div class="categoria-card" data-categoria="__livre">
-                    <div class="categoria-icon">${ICONE_CORACAO_TRACO}</div>
-                    <h3>Outro Presente</h3>
-                    <p>Contribua com o valor que desejar</p>
-                    <button type="button" class="btn-presente">Contribuir</button>
-                </div>
-            </section>`;
-}
-
 function montarSecaoCategoria(categoria, presentes) {
-    const comPreco = presentes.filter(presente => !semPrecoFechado(presente));
-    const semPreco = presentes.filter(semPrecoFechado);
     const id = escaparHtml(categoria.id);
-
-    // Itens da lista de desejos do documento: entram depois dos que já têm
-    // preço, sob um subtítulo, para não parecerem produtos incompletos.
-    const blocoDesejos = semPreco.length === 0 ? '' : `
-                <div class="desejos-titulo">
-                    <h4>Também estão na nossa lista</h4>
-                    <p>Itens sem preço fechado — contribua com o valor que quiser.</p>
-                </div>${semPreco.map(montarCardPresente).join('')}`;
 
     return `
             <section class="categoria-secao" id="${id}" aria-labelledby="titulo-${id}">
@@ -431,7 +400,7 @@ function montarSecaoCategoria(categoria, presentes) {
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${categoria.icone}</svg>
                     ${escaparHtml(categoria.nome)}
                 </h3>
-                <div class="presentes-grid">${comPreco.map(montarCardPresente).join('')}${blocoDesejos}
+                <div class="presentes-grid">${presentes.map(montarCardPresente).join('')}
                 </div>
             </section>`;
 }
@@ -488,19 +457,14 @@ function renderizarPresentes() {
 
     listas.innerHTML = secoes
         .map(({ categoria, presentes }) => montarSecaoCategoria(categoria, presentes))
-        .join('') + montarCardContribuicaoLivre();
+        .join('');
 
     barra.innerHTML = secoes
         .map(({ categoria }) => montarAtalho(categoria.id, categoria.nome))
-        .join('') + montarAtalho(ID_OUTRO_PRESENTE, 'Outro presente');
+        .join('');
     barra.hidden = false;
 
     listas.addEventListener('click', evento => {
-        if (evento.target.closest('.categoria-card[data-categoria="__livre"]')) {
-            abrirModalValorPersonalizado();
-            return;
-        }
-
         const card = evento.target.closest('.presente-card');
         if (!card || card.classList.contains('indisponivel')) return;
 
@@ -842,7 +806,9 @@ function selecionarPresente(presente) {
     abrirModal();
 }
 
-// Função para abrir modal com valor personalizado
+// Função para abrir modal com valor personalizado. Hoje a página não tem
+// nenhum botão que a chame (o bloco "Outro presente" saiu), mas o fluxo
+// de valor livre continua no checkout e no backend caso volte.
 function abrirModalValorPersonalizado() {
     presenteSelecionado = { id: 'personalizado', nome: 'Contribuição Personalizada', valor: 0 };
 

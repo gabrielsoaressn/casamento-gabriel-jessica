@@ -18,9 +18,9 @@
 // nome    Nome completo do produto, com marca, tamanho e quantidade, para
 //         o convidado conseguir achar o mesmo item numa loja.
 // valor   Em reais. É este valor que vai para o Mercado Pago: o backend
-//         ignora o que o navegador mandar. null = item sem preço fechado
-//         (veio da lista de desejos do documento): o convidado escolhe
-//         quanto contribuir, respeitando o mínimo de R$ 10.
+//         ignora o que o navegador mandar. null = valor livre: o convidado
+//         escolhe quanto contribuir (mínimo de R$ 10). Hoje nenhum item usa,
+//         mas o checkout e o backend continuam aceitando.
 // imagem  Arquivo em /images/presentes. Sem imagem, o card cai no ícone.
 // cotas   Opcional. Divide um presente caro em partes iguais: o card mostra
 //         o valor de uma cota (valor / cotas) e quantas ainda restam, e cada
@@ -249,12 +249,6 @@ const PRESENTES = [
         imagem: 'tacas-cristal-xtra-460ml.jpg',
         categoria: 'cozinha'
     },
-    {
-        id: 'jogo-sobremesa',
-        nome: 'Jogo de Sobremesa',
-        valor: null,
-        categoria: 'cozinha'
-    },
 
     // ---------- Quarto ----------
     {
@@ -347,78 +341,6 @@ const PRESENTES = [
         nome: 'Ferro de Passar Seco e Vapor Electrolux Efficient ESI11, Base Antiaderente, Vapor Vertical, 1200W, Cabo 1,35 m',
         valor: 129.90,
         imagem: 'ferro-passar-electrolux-esi11.jpg',
-        categoria: 'casa'
-    },
-    {
-        id: 'tabua-passar-roupa',
-        nome: 'Tábua de Passar Roupa',
-        valor: null,
-        categoria: 'casa'
-    },
-    {
-        id: 'varal',
-        nome: 'Varal',
-        valor: null,
-        categoria: 'casa'
-    },
-    {
-        id: 'jogo-panos-prato',
-        nome: 'Jogo de Panos de Prato',
-        valor: null,
-        categoria: 'casa'
-    },
-    {
-        id: 'panos-limpeza',
-        nome: 'Panos de Limpeza',
-        valor: null,
-        categoria: 'casa'
-    },
-    {
-        id: 'tapetes',
-        nome: 'Tapetes',
-        valor: null,
-        categoria: 'casa'
-    },
-    {
-        id: 'cesto-organizador',
-        nome: 'Cesto Organizador',
-        valor: null,
-        categoria: 'casa'
-    },
-    {
-        id: 'organizador-gavetas',
-        nome: 'Organizador de Gavetas',
-        valor: null,
-        categoria: 'casa'
-    },
-    {
-        id: 'vassoura',
-        nome: 'Vassoura',
-        valor: null,
-        categoria: 'casa'
-    },
-    {
-        id: 'rodo',
-        nome: 'Rodo',
-        valor: null,
-        categoria: 'casa'
-    },
-    {
-        id: 'pa',
-        nome: 'Pá',
-        valor: null,
-        categoria: 'casa'
-    },
-    {
-        id: 'balde',
-        nome: 'Balde',
-        valor: null,
-        categoria: 'casa'
-    },
-    {
-        id: 'mop',
-        nome: 'Mop',
-        valor: null,
         categoria: 'casa'
     },
 

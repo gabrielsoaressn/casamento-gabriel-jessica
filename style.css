@@ -1247,55 +1247,12 @@ a:hover {
     margin: 0 auto;
 }
 
-.categoria-card {
-    position: relative;
-    background: var(--card);
-    padding: 56px 40px;
-    border-radius: var(--raio-papel);
-    text-align: center;
-    box-shadow: var(--sombra-card);
-    transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
-    cursor: pointer;
-}
 
-.categoria-card::before {
-    content: '';
-    position: absolute;
-    inset: 12px;
-    border: 1px solid var(--gold-linha);
-    border-radius: var(--raio-papel);
-    pointer-events: none;
-}
 
-.categoria-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--sombra-papel);
-}
 
-.categoria-card h3 {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: var(--brown);
-    margin-bottom: 6px;
-}
 
-.categoria-card p {
-    font-family: var(--font-body);
-    color: var(--brown-soft);
-    margin-bottom: 20px;
-}
 
-.categoria-icon {
-    position: relative;
-    margin-bottom: 18px;
-}
 
-.categoria-icon svg {
-    width: 52px;
-    height: 52px;
-    color: var(--gold-ink);
-}
 
 .presente-icon svg {
     width: 46px;
@@ -1303,9 +1260,6 @@ a:hover {
     color: var(--gold-ink);
 }
 
-.categoria-card .btn-presente {
-    margin-top: 4px;
-}
 
 /* ---- Barra de atalhos: gruda no topo enquanto a lista rola ----
    Fica logo abaixo do navbar fixo; quando o navbar some (rolando para
@@ -1396,11 +1350,6 @@ a:hover {
     color: var(--gold-ink);
 }
 
-.contribuicao-livre {
-    max-width: 380px;
-    margin-left: auto;
-    margin-right: auto;
-}
 
 .presente-card {
     position: relative;
@@ -1533,30 +1482,8 @@ a:hover {
     color: var(--gold-ink);
 }
 
-/* Abertura do bloco de itens que vieram da lista sem preço fechado */
-.desejos-titulo {
-    grid-column: 1 / -1;
-    margin: 26px 0 2px;
-    padding-top: 28px;
-    border-top: 1px solid var(--hairline);
-    text-align: center;
-}
 
-.desejos-titulo h4 {
-    margin: 0 0 8px;
-    font-family: var(--font-label);
-    font-size: 0.68rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: var(--gold-ink);
-}
 
-.desejos-titulo p {
-    margin: 0;
-    font-family: var(--font-body);
-    color: var(--brown-soft);
-}
 
 /* Presente com preço mas sem foto: o ícone ocupa a altura que a imagem
    ocuparia, senão o card fica mais baixo que o vizinho da mesma linha. */
@@ -2192,7 +2119,6 @@ a:hover {
     .moldura-dourada::after,
     .evento-card::before,
     .cta-card::before,
-    .categoria-card::before,
     .modal-content::before,
     .nubank-card::before {
         inset: 8px;
@@ -2287,9 +2213,6 @@ a:hover {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .categoria-card {
-        padding: 40px 30px;
-    }
 
     .modal-content {
         padding: 30px 20px;
