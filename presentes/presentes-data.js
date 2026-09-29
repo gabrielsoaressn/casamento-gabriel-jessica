@@ -343,6 +343,20 @@ const PRESENTES = [
         imagem: 'ferro-passar-electrolux-esi11.jpg',
         categoria: 'casa'
     },
+    {
+        id: 'echo-dot-5-geracao',
+        nome: 'Echo Dot 5ª Geração Alto-falante de 1,73" Azul Amazon',
+        valor: 399.00,
+        imagem: 'echo-dot-5-geracao-azul.webp',
+        categoria: 'casa'
+    },
+    {
+        id: 'furadeira-parafusadeira-48v',
+        nome: 'Furadeira e Parafusadeira Sem Fio 48V',
+        valor: 139.00,
+        imagem: 'furadeira-parafusadeira-48v.webp',
+        categoria: 'casa'
+    },
 
     // ---------- Sala e Escritório ----------
     {
