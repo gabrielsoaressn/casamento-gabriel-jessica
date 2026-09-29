@@ -10,7 +10,11 @@ import {
 } from '@nestjs/common';
 import { PagamentosService } from './pagamentos.service';
 import { PresentesService } from '../presentes/presentes.service';
-import { buscarPresente } from '../presentes/catalogo';
+import {
+  buscarPresente,
+  idsDasCotas,
+  valorDaCota,
+} from '../presentes/catalogo';
 
 // Webhook do Mercado Pago (notification v1)
 // Docs: https://www.mercadopago.com.br/developers/pt/docs/your-integrations/notifications/webhooks
@@ -95,14 +99,15 @@ export class PagamentosController {
     // Presente da lista: nome e preço saem do catálogo, nunca do navegador.
     // Só a contribuição livre ('personalizado') e os itens sem preço fechado
     // aceitam o valor digitado pelo convidado.
-    if (presenteId !== 'personalizado') {
-      const presente = buscarPresente(presenteId);
-      if (!presente) {
-        throw new HttpException('Presente não encontrado', HttpStatus.BAD_REQUEST);
-      }
+    const presente =
+      presenteId !== 'personalizado' ? buscarPresente(presenteId) : undefined;
+    if (presenteId !== 'personalizado' && !presente) {
+      throw new HttpException('Presente não encontrado', HttpStatus.BAD_REQUEST);
+    }
+    if (presente) {
       presenteNome = presente.nome;
       if (presente.valor !== null) {
-        valor = presente.valor;
+        valor = presente.cotas ? valorDaCota(presente) : presente.valor;
       }
     }
 
@@ -119,7 +124,25 @@ export class PagamentosController {
       );
     }
 
-    if (presenteId !== 'personalizado') {
+    // Id gravado na reserva. Num presente em cotas é o da próxima cota
+    // livre (ex.: ar-condicionado-cota-3), não o do presente.
+    let reservaId = presenteId;
+
+    if (presente?.cotas) {
+      const ids = idsDasCotas(presente);
+      const cotaLivre = await this.presentesService.primeiraCotaLivre(ids);
+      if (!cotaLivre) {
+        throw new HttpException(
+          {
+            error: 'Todas as cotas deste presente já foram reservadas',
+            message: 'Por favor, escolha outro presente da lista',
+          },
+          HttpStatus.CONFLICT,
+        );
+      }
+      reservaId = cotaLivre;
+      presenteNome = `${presente.nome} (cota ${ids.indexOf(cotaLivre) + 1} de ${presente.cotas})`;
+    } else if (presente) {
       const disponivel =
         await this.presentesService.verificarDisponibilidade(presenteId);
       if (!disponivel) {
@@ -141,7 +164,7 @@ export class PagamentosController {
         nome,
         email,
         telefone,
-        presenteId,
+        reservaId,
         presenteNome,
         valor,
       );
@@ -149,7 +172,7 @@ export class PagamentosController {
       if (presenteId !== 'personalizado') {
         try {
           const reserva = await this.presentesService.reservar(
-            presenteId,
+            reservaId,
             presenteNome,
             valor,
             nome,
@@ -159,13 +182,13 @@ export class PagamentosController {
           );
 
           if (reserva) {
-            this.logger.log(`Presente ${presenteId} reservado para ${nome}`);
+            this.logger.log(`Presente ${reservaId} reservado para ${nome}`);
           } else {
             // Corrida entre dois convidados: alguém reservou entre a checagem
             // de disponibilidade e aqui. O link de pagamento já foi gerado, então
             // o pagamento precisa ser conferido à mão.
             this.logger.warn(
-              `Presente ${presenteId} NÃO foi reservado para ${nome} (já reservado por outro convidado) — ` +
+              `Presente ${reservaId} NÃO foi reservado para ${nome} (já reservado por outro convidado) — ` +
                 `cobrança ${result.referenceId} ficou sem reserva no banco`,
             );
           }

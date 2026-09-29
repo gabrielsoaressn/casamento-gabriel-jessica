@@ -81,6 +81,21 @@ export class PresentesService {
     return !presente;
   }
 
+  // Recebe os ids das cotas de um presente, em ordem, e devolve o primeiro
+  // que ninguém reservou — ou null se o presente já foi todo dado.
+  async primeiraCotaLivre(idsDasCotas: string[]): Promise<string | null> {
+    const ocupadas = await this.presenteRepository.find({
+      where: {
+        presenteId: In(idsDasCotas),
+        status: In(['pendente', 'pago']),
+      },
+      select: ['presenteId'],
+    });
+    const idsOcupados = new Set(ocupadas.map((cota) => cota.presenteId));
+
+    return idsDasCotas.find((id) => !idsOcupados.has(id)) ?? null;
+  }
+
   async listarReservados(): Promise<PresenteReservado[]> {
     return this.presenteRepository.find({
       where: {

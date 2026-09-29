@@ -22,6 +22,10 @@
 //         (veio da lista de desejos do documento): o convidado escolhe
 //         quanto contribuir, respeitando o mínimo de R$ 10.
 // imagem  Arquivo em /images/presentes. Sem imagem, o card cai no ícone.
+// cotas   Opcional. Divide um presente caro em partes iguais: o card mostra
+//         o valor de uma cota (valor / cotas) e quantas ainda restam, e cada
+//         convidado compra uma. No banco cada cota é uma reserva à parte,
+//         com o id "<id>-cota-<n>" (n de 1 a cotas).
 //
 // Os preços vieram de "Lista de presentes de casamento.docx"; as fotos
 // saíram do mesmo documento (convertidas para JPEG em images/presentes).
@@ -299,9 +303,10 @@ const PRESENTES = [
     },
     {
         id: 'ar-condicionado',
-        nome: 'Ar-Condicionado',
-        valor: 1500.00,
-        imagem: 'ar-condicionado.jpg',
+        nome: 'Ar-condicionado Split 9.000 BTUs Philco Eco Inverter Frio',
+        valor: 1819.25,
+        cotas: 5,
+        imagem: 'ar-condicionado-philco-9000-btus.jpg',
         categoria: 'quarto'
     },
 
@@ -324,9 +329,10 @@ const PRESENTES = [
     // ---------- Casa ----------
     {
         id: 'robo-limpeza',
-        nome: 'Robô de Limpeza',
-        valor: 899.90,
-        imagem: 'robo-limpeza.jpg',
+        nome: 'Robô Aspirador Xiaomi S40c 5000pa Wifi Passa Pano Automático',
+        valor: 1149.00,
+        cotas: 5,
+        imagem: 'robo-aspirador-xiaomi-s40c.jpg',
         categoria: 'casa'
     },
     {

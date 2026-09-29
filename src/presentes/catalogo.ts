@@ -13,6 +13,7 @@ export interface PresenteCatalogo {
   valor: number | null;
   imagem?: string;
   categoria: string;
+  cotas?: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -22,4 +23,18 @@ const { PRESENTES } = require(
 
 export function buscarPresente(id: string): PresenteCatalogo | undefined {
   return PRESENTES.find((presente) => presente.id === id);
+}
+
+// Presente dividido em cotas: cada cota é reservada à parte, com este id.
+// O front (script.js) monta o mesmo id para contar as cotas que restam.
+export function idsDasCotas(presente: PresenteCatalogo): string[] {
+  return Array.from(
+    { length: presente.cotas ?? 0 },
+    (_, i) => `${presente.id}-cota-${i + 1}`,
+  );
+}
+
+// Arredonda para centavos: o Mercado Pago recebe o valor com duas casas.
+export function valorDaCota(presente: PresenteCatalogo): number {
+  return Math.round((presente.valor * 100) / presente.cotas) / 100;
 }

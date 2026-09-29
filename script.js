@@ -327,6 +327,36 @@ function semPrecoFechado(presente) {
     return presente.valor === null || presente.valor === undefined;
 }
 
+function estaReservado(id) {
+    return presentesReservados.some(p =>
+        p.presenteId === id &&
+        (p.status === 'pendente' || p.status === 'pago')
+    );
+}
+
+// Presente dividido em cotas (campo `cotas` em presentes-data.js). Cada cota
+// é reservada no banco com o id "<id>-cota-<n>" — o mesmo formato que o
+// backend usa em src/presentes/catalogo.ts.
+function valorDaCota(presente) {
+    return Math.round(presente.valor * 100 / presente.cotas) / 100;
+}
+
+function cotasRestantes(presente) {
+    let restantes = 0;
+    for (let n = 1; n <= presente.cotas; n++) {
+        if (!estaReservado(`${presente.id}-cota-${n}`)) restantes++;
+    }
+    return restantes;
+}
+
+function textoCotasRestantes(presente) {
+    const restantes = cotasRestantes(presente);
+    if (restantes === 0) return 'Todas as cotas já foram presenteadas';
+    return restantes === 1
+        ? `Resta 1 de ${presente.cotas} cotas`
+        : `Restam ${restantes} de ${presente.cotas} cotas`;
+}
+
 // Coração — cheio nos cards de presente sem foto; de traço no bloco de
 // contribuição livre, ao lado dos ícones de linha das seções.
 const CAMINHO_CORACAO = 'M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z';
@@ -344,8 +374,17 @@ const ID_OUTRO_PRESENTE = 'outro-presente';
 
 function montarCardPresente(presente) {
     const valorLivre = semPrecoFechado(presente);
+    const emCotas = Boolean(presente.cotas) && !valorLivre;
     const nome = escaparHtml(presente.nome);
-    const rotulo = valorLivre ? 'Contribuir' : 'Presentear';
+    const rotulo = valorLivre ? 'Contribuir' : emCotas ? 'Presentear uma cota' : 'Presentear';
+
+    const preco = valorLivre
+        ? '<p class="presente-valor">Valor livre</p>'
+        : emCotas
+            ? `<p class="presente-valor">R$ ${formatarReais(valorDaCota(presente))} <span class="presente-valor-cota">por cota</span></p>
+                    <p class="presente-cotas">Valor total R$ ${formatarReais(presente.valor)}, dividido em ${presente.cotas} cotas</p>
+                    <p class="presente-cotas presente-cotas-restantes">${textoCotasRestantes(presente)}</p>`
+            : `<p class="presente-valor">R$ ${formatarReais(presente.valor)}</p>`;
 
     const visual = presente.imagem
         ? `<img src="../images/presentes/${escaparHtml(presente.imagem)}" alt="${nome}" class="presente-imagem" loading="lazy">`
@@ -355,7 +394,7 @@ function montarCardPresente(presente) {
                 <div class="presente-card${valorLivre ? ' presente-card--desejo' : ''}" data-presente-id="${escaparHtml(presente.id)}">
                     ${visual}
                     <h3>${nome}</h3>
-                    <p class="presente-valor">${valorLivre ? 'Valor livre' : 'R$ ' + formatarReais(presente.valor)}</p>
+                    ${preco}
                     <button type="button" class="btn-presente" data-rotulo="${rotulo}" data-nome="${nome}" aria-label="${rotulo}: ${nome}">${rotulo}</button>
                 </div>`;
 }
@@ -466,7 +505,7 @@ function renderizarPresentes() {
         if (!card || card.classList.contains('indisponivel')) return;
 
         const presente = PRESENTES.find(item => item.id === card.dataset.presenteId);
-        if (presente) selecionarPresente(presente.id, presente.valor, presente.nome);
+        if (presente) selecionarPresente(presente);
     });
 
     acompanharSecaoAtual(barra);
@@ -513,10 +552,17 @@ function marcarPresentesIndisponiveis() {
         }
         if (!presenteId) return;
 
-        const reservado = presentesReservados.some(p =>
-            p.presenteId === presenteId &&
-            (p.status === 'pendente' || p.status === 'pago')
-        );
+        // Presente em cotas: só fica indisponível quando a última é reservada.
+        const presente = typeof PRESENTES !== 'undefined'
+            && PRESENTES.find(item => item.id === presenteId);
+        let reservado;
+        if (presente && presente.cotas) {
+            reservado = cotasRestantes(presente) === 0;
+            const restantes = card.querySelector('.presente-cotas-restantes');
+            if (restantes) restantes.textContent = textoCotasRestantes(presente);
+        } else {
+            reservado = estaReservado(presenteId);
+        }
 
         if (reservado) {
             card.classList.add('indisponivel');
@@ -758,26 +804,29 @@ function _pararPollingPix() {
 }
 
 // Função para abrir modal com presente selecionado
-function selecionarPresente(id, valor, nome) {
-    // Verificar se o presente está disponível
-    const reservado = presentesReservados.find(p =>
-        p.presenteId === id &&
-        (p.status === 'pendente' || p.status === 'pago')
-    );
+function selecionarPresente(presente) {
+    const { id, nome } = presente;
+    const emCotas = Boolean(presente.cotas) && !semPrecoFechado(presente);
 
-    if (reservado) {
-        showToast('Este presente já foi reservado por outro convidado');
+    if (emCotas ? cotasRestantes(presente) === 0 : estaReservado(id)) {
+        showToast(emCotas
+            ? 'Todas as cotas deste presente já foram reservadas'
+            : 'Este presente já foi reservado por outro convidado');
         return;
     }
 
     // Itens da lista de desejos não têm preço: quem escolhe o valor é o convidado.
-    const valorLivre = valor === null || valor === undefined;
+    // Num presente em cotas o convidado paga uma cota; qual delas, o servidor decide.
+    const valorLivre = semPrecoFechado(presente);
+    const valor = emCotas ? valorDaCota(presente) : presente.valor;
     presenteSelecionado = { id, valor: valorLivre ? 0 : valor, nome };
 
     document.getElementById('modalTitulo').textContent = `Presentear: ${nome}`;
     document.getElementById('modalDescricao').textContent = valorLivre
         ? 'Escolha quanto deseja contribuir para este presente'
-        : `Valor: R$ ${formatarReais(valor)}`;
+        : emCotas
+            ? `Valor de uma cota: R$ ${formatarReais(valor)} (o presente é dividido em ${presente.cotas} cotas)`
+            : `Valor: R$ ${formatarReais(valor)}`;
 
     document.getElementById('presenteId').value = id;
     document.getElementById('presenteValor').value = valorLivre ? '' : valor;
