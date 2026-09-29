@@ -24,6 +24,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # O GitHub Pages deixa o navegador guardar .js/.css por 10 minutos: sem
+      # isto, quem dá F5 logo depois de um deploy continua vendo a lista de
+      # presentes antiga. Carimbar o commit no endereço força o download novo.
+      - name: Versionar JS e CSS
+        run: |
+          find . -name '*.html' -not -path './node_modules/*' -exec \
+            sed -i -E 's#(src|href)="([^":?]+\.(js|css))"#\1="\2?v=${{ github.sha }}"#g' {} +
+          grep -rhoE '(src|href)="[^"]+\?v=[^"]+"' --include='*.html' . | sort -u
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
