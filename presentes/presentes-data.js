@@ -357,6 +357,13 @@ const PRESENTES = [
         imagem: 'furadeira-parafusadeira-48v.webp',
         categoria: 'casa'
     },
+    {
+        id: 'maleta-ferramentas-129-pecas',
+        nome: 'Maleta de Ferramentas Kit com 129 Peças',
+        valor: 140.45,
+        imagem: 'maleta-ferramentas-129-pecas.webp',
+        categoria: 'casa'
+    },
 
     // ---------- Sala e Escritório ----------
     {
