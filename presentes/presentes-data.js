@@ -313,10 +313,10 @@ const PRESENTES = [
         categoria: 'banheiro'
     },
     {
-        // O documento traz o preço, mas não trouxe foto — o card usa o ícone.
         id: 'lixeira-inox-banheiro',
         nome: 'Lixeira Inox 5 L com Pedal e Balde Removível',
         valor: 69.90,
+        imagem: 'lixeira-inox-5l-pedal.webp',
         categoria: 'banheiro'
     },
 

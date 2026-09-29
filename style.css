@@ -1221,6 +1221,64 @@ a:hover {
     margin-top: auto;
 }
 
+/* ========== MENSAGEM PARA OS NOIVOS ========== */
+.mensagem-noivos {
+    padding: var(--secao) 0;
+    background: var(--cream);
+    text-align: center;
+}
+
+.mensagem-intro {
+    max-width: 46ch;
+    margin: 0 auto 40px;
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    color: var(--brown-soft);
+}
+
+.mensagem-card {
+    position: relative;
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 52px 48px 40px;
+    background: var(--card);
+    border-radius: var(--raio-papel);
+    box-shadow: var(--sombra-card);
+    text-align: left;
+}
+
+.mensagem-card::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 1px solid var(--gold-linha);
+    border-radius: var(--raio-papel);
+    pointer-events: none;
+}
+
+.mensagem-card .btn-submit {
+    position: relative;
+}
+
+.mensagem-status {
+    min-height: 1.5em;
+    margin-top: 16px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    text-align: center;
+    color: var(--olive-deep);
+}
+
+.mensagem-status.erro {
+    color: var(--fuchsia);
+}
+
+@media (max-width: 480px) {
+    .mensagem-card {
+        padding: 40px 24px 28px;
+    }
+}
+
 /* ========== PRESENTES ========== */
 .presentes {
     padding: 120px 0;

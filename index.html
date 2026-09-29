@@ -324,6 +324,27 @@
         </div>
     </section>
 
+    <!-- Mensagem para os noivos -->
+    <section class="mensagem-noivos" id="mensagem">
+        <div class="container">
+            <span class="section-eyebrow reveal">Escreva para nós</span>
+            <h2 class="section-title reveal">Deixe uma Mensagem</h2>
+            <p class="mensagem-intro reveal">Um carinho, uma lembrança, um conselho para a vida a dois — vamos ler cada palavra com muito amor.</p>
+            <form class="mensagem-card reveal" id="formMensagem" novalidate>
+                <div class="form-group">
+                    <label for="mensagemNome">Seu nome</label>
+                    <input type="text" id="mensagemNome" name="nome" maxlength="80" autocomplete="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="mensagemTexto">Sua mensagem</label>
+                    <textarea id="mensagemTexto" name="texto" maxlength="1500" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn-submit" id="btnEnviarMensagem">Enviar mensagem</button>
+                <p class="mensagem-status" id="mensagemStatus" role="status" aria-live="polite"></p>
+            </form>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer">
         <img src="images/emblema-ordem-do-carmo.png" alt="" class="carmo-watermark" aria-hidden="true" loading="lazy">
@@ -337,6 +358,7 @@
                 <li><a href="#cerimonia">O Grande Dia</a></li>
                 <li><a href="presentes/">Presentes</a></li>
                 <li><a href="confirmar/">Confirmar Presença</a></li>
+                <li><a href="#mensagem">Deixe uma Mensagem</a></li>
             </ul>
             <p class="footer-creditos">Gabriel <span class="e-comercial">&amp;</span> Jéssica</p>
         </div>
@@ -344,5 +366,6 @@
 
     <script src="config.js"></script>
     <script src="script.js"></script>
+    <script src="musica.js"></script>
 </body>
 </html>

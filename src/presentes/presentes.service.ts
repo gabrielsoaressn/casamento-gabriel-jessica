@@ -126,6 +126,12 @@ export class PresentesService {
     return this.presenteRepository.save(presente);
   }
 
+  async buscarPorReferenceId(
+    referenceId: string,
+  ): Promise<PresenteReservado | null> {
+    return this.presenteRepository.findOne({ where: { referenceId } });
+  }
+
   async buscarStatusPorReferenceId(referenceId: string): Promise<string | null> {
     const presente = await this.presenteRepository.findOne({
       where: { referenceId },

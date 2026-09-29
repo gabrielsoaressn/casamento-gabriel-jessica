@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { PagamentosService } from './pagamentos.service';
 import { PresentesService } from '../presentes/presentes.service';
+import { NotificacoesService } from '../notificacoes/notificacoes.service';
 import {
   buscarPresente,
   idsDasCotas,
@@ -89,6 +90,7 @@ export class PagamentosController {
   constructor(
     private readonly pagamentosService: PagamentosService,
     private readonly presentesService: PresentesService,
+    private readonly notificacoes: NotificacoesService,
   ) {}
 
   @Post('criar-cobranca')
@@ -196,6 +198,18 @@ export class PagamentosController {
           this.logger.error('Erro ao reservar presente no banco:', dbError);
         }
       }
+
+      this.notificacoes.enviar(`🛒 Checkout aberto: ${presenteNome}`, [
+        `${nome} abriu o checkout de um presente.`,
+        '',
+        `Presente: ${presenteNome}`,
+        `Valor: ${formatarReais(valor)}`,
+        `E-mail: ${email}`,
+        `Telefone: ${telefone || '—'}`,
+        `Referência: ${result.referenceId}`,
+        '',
+        'O presente fica reservado por 24 horas enquanto o pagamento não sai.',
+      ]);
 
       return result;
     } catch (error) {
@@ -392,60 +406,100 @@ export class PagamentosController {
       `[MP Webhook] payment ${paymentId} → status=${status} | external_reference=${externalReference}`,
     );
 
+    if (!externalReference) {
+      this.logger.warn(
+        `[MP Webhook] payment ${paymentId} (${status}) sem external_reference — ` +
+          `verifique se a Preference está sendo criada com external_reference = referenceId.`,
+      );
+      return;
+    }
+
+    // external_reference é o MESMO valor gravado em
+    // presentes_reservados.reference_id quando o checkout foi aberto
+    // (PagamentosController.criarCobranca → presentesService.reservar).
+    const reserva =
+      await this.presentesService.buscarPorReferenceId(externalReference);
+    const valor = formatarReais(Number(payment.transaction_amount ?? 0));
+
     if (status === 'approved') {
-      // ================================================================
-      // ATUALIZAÇÃO DO PRESENTE/COTA NO BANCO
-      // ----------------------------------------------------------------
-      // Convenção do projeto (mesma usada pelo webhook PicPay logo acima):
-      //   await this.presentesService.atualizarStatus(referenceId, 'pago')
-      //
-      // O `referenceId` vem do campo `external_reference` que precisa ser
-      // enviado quando criamos a Preference do MP — usar o MESMO valor que
-      // gravamos em `presentes_reservados.referenceId` ao reservar o presente
-      // (veja PagamentosController.criarCobranca → presentesService.reservar).
-      //
-      // Ex.: ao criar a preference no MP, mandar:
-      //   { external_reference: orderNumber, ... }
-      // onde `orderNumber` é o referenceId persistido no banco.
-      // ================================================================
-      if (!externalReference) {
+      if (!reserva) {
+        // A reserva expirou e outro convidado já pegou o presente (o
+        // reference_id da linha foi trocado), mas este pagamento entrou
+        // mesmo assim. Só dá para resolver à mão.
         this.logger.warn(
-          `[MP Webhook] payment ${paymentId} approved sem external_reference — ` +
-            `verifique se a Preference está sendo criada com external_reference = referenceId.`,
+          `[MP Webhook] external_reference ${externalReference} não encontrado em presentes_reservados`,
         );
+        this.notificacoes.enviar('⚠️ Pagamento aprovado sem reserva', [
+          `O Mercado Pago aprovou um pagamento de ${valor}, mas a reserva dele não existe mais`,
+          '(provavelmente expirou e o presente foi reservado por outra pessoa).',
+          '',
+          `Referência: ${externalReference}`,
+          `Pagamento MP: ${paymentId}`,
+          `E-mail do pagador: ${payment.payer?.email ?? '—'}`,
+        ]);
         return;
       }
 
-      try {
-        const atualizado = await this.presentesService.atualizarStatus(
-          externalReference,
-          'pago',
-        );
-        if (atualizado) {
-          this.logger.log(
-            `[MP Webhook] presente marcado como pago: ${externalReference}`,
-          );
-        } else {
-          this.logger.warn(
-            `[MP Webhook] external_reference ${externalReference} não encontrado em presentes_reservados`,
-          );
-        }
-      } catch (dbError) {
-        this.logger.error(
-          `[MP Webhook] erro ao atualizar status no banco: ${dbError.message}`,
+      // O MP reenvia a notificação várias vezes; o e-mail sai só na primeira.
+      if (reserva.status === 'pago') {
+        return;
+      }
+
+      await this.presentesService.atualizarStatus(externalReference, 'pago');
+      this.logger.log(
+        `[MP Webhook] presente marcado como pago: ${externalReference}`,
+      );
+      this.notificacoes.enviar(`🎁 Presente comprado: ${reserva.presenteNome}`, [
+        `${reserva.nomeConvidado} comprou um presente!`,
+        '',
+        `Presente: ${reserva.presenteNome}`,
+        `Valor pago: ${valor}`,
+        `E-mail: ${reserva.emailConvidado}`,
+        `Telefone: ${reserva.telefoneConvidado || '—'}`,
+        `Referência: ${externalReference}`,
+      ]);
+      return;
+    }
+
+    // Pagamento recusado ou cancelado: o presente volta para a lista na hora,
+    // sem esperar as 24h da limpeza automática. Só mexe em reserva ainda
+    // pendente — nunca desfaz um pagamento já confirmado.
+    if (status === 'rejected' || status === 'cancelled') {
+      if (reserva?.status === 'pendente') {
+        await this.presentesService.atualizarStatus(externalReference, 'expirado');
+        this.logger.log(
+          `[MP Webhook] pagamento ${status}: presente liberado (${externalReference})`,
         );
       }
       return;
     }
 
-    // Outros status finais que podem demandar tratamento futuro:
-    //   - 'refunded' / 'charged_back': estornar/cancelar a reserva.
-    //       await this.presentesService.atualizarStatus(externalReference, 'cancelado');
-    //   - 'cancelled' / 'rejected': liberar o presente para outro convidado.
-    //       await this.presentesService.atualizarStatus(externalReference, 'expirado');
-    // Por ora apenas registramos no log para evitar mudanças destrutivas em produção.
+    // Estorno ou chargeback de um presente já pago: sai da lista de pagos e
+    // os noivos ficam sabendo.
+    if (status === 'refunded' || status === 'charged_back') {
+      if (reserva?.status === 'pago') {
+        await this.presentesService.atualizarStatus(externalReference, 'cancelado');
+        this.logger.log(
+          `[MP Webhook] pagamento ${status}: reserva cancelada (${externalReference})`,
+        );
+        this.notificacoes.enviar(`↩️ Pagamento estornado: ${reserva.presenteNome}`, [
+          `O pagamento de ${reserva.nomeConvidado} (${valor}) foi ${status === 'refunded' ? 'estornado' : 'contestado (chargeback)'}.`,
+          'O presente voltou a ficar disponível na lista.',
+          '',
+          `Referência: ${externalReference}`,
+        ]);
+      }
+      return;
+    }
+
+    // pending / in_process / authorized: nada a fazer, o MP avisa de novo
+    // quando o pagamento chegar a um status final.
     this.logger.log(
-      `[MP Webhook] status "${status}" não acionou update no banco (somente 'approved' faz update hoje)`,
+      `[MP Webhook] status "${status}" não é final — nenhuma alteração no banco`,
     );
   }
+}
+
+function formatarReais(valor: number): string {
+  return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }

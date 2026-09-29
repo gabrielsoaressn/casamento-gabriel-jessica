@@ -934,3 +934,55 @@ async function gerarCobranca(event) {
         btnGerarCobranca.disabled = false;
     }
 }
+
+// ========== MENSAGEM PARA OS NOIVOS ==========
+const formMensagem = document.getElementById('formMensagem');
+
+if (formMensagem) {
+    formMensagem.addEventListener('submit', async (evento) => {
+        evento.preventDefault();
+
+        const botao = document.getElementById('btnEnviarMensagem');
+        const status = document.getElementById('mensagemStatus');
+        const nome = formMensagem.nome.value.trim();
+        const texto = formMensagem.texto.value.trim();
+
+        status.classList.remove('erro');
+        if (!nome || !texto) {
+            status.classList.add('erro');
+            status.textContent = 'Escreva seu nome e a mensagem antes de enviar.';
+            return;
+        }
+
+        botao.disabled = true;
+        botao.textContent = 'Enviando...';
+        status.textContent = '';
+
+        try {
+            const resposta = await fetch(`${API_URL}/api/mensagens`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, texto })
+            });
+
+            if (!resposta.ok) {
+                const corpo = await resposta.json().catch(() => ({}));
+                // 429 vem com texto pronto para o convidado; o resto vira genérico
+                throw new Error(resposta.status === 429 && corpo.message
+                    ? corpo.message
+                    : 'Não conseguimos enviar agora. Tente novamente em instantes.');
+            }
+
+            formMensagem.reset();
+            status.textContent = `Obrigado, ${nome.split(' ')[0]}! Sua mensagem chegou até nós. 💛`;
+        } catch (erro) {
+            status.classList.add('erro');
+            status.textContent = erro instanceof TypeError
+                ? 'Não conseguimos enviar agora. Tente novamente em instantes.'
+                : erro.message;
+        } finally {
+            botao.disabled = false;
+            botao.textContent = 'Enviar mensagem';
+        }
+    });
+}

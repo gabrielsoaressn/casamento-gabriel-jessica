@@ -11,6 +11,8 @@ import { PresentesModule } from './presentes/presentes.module';
 import { PagamentosModule } from './pagamentos/pagamentos.module';
 import { HealthModule } from './health/health.module';
 import { RsvpModule } from './rsvp/rsvp.module';
+import { NotificacoesModule } from './notificacoes/notificacoes.module';
+import { MensagensModule } from './mensagens/mensagens.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { RsvpModule } from './rsvp/rsvp.module';
     PagamentosModule,
     HealthModule,
     RsvpModule,
+    NotificacoesModule,
+    MensagensModule,
   ],
   controllers: [AppController],
 })
