@@ -1,5 +1,6 @@
 // ============================================================================
-// Música de fundo — "Fly Me To The Moon" (violão fingerstyle).
+// Música de fundo — "Fly Me To The Moon" e depois "Lucky", em violão
+// fingerstyle, uma atrás da outra e voltando ao começo.
 //
 // Navegadores bloqueiam áudio com som antes de o visitante interagir com a
 // página. Então: tenta tocar ao abrir; se for bloqueado, começa no primeiro
@@ -20,20 +21,32 @@
         try { armazenamento.setItem(chave, valor); } catch { /* modo privado */ }
     };
 
-    const arquivo = new URL('audio/fly-me-to-the-moon.mp3', document.currentScript.src);
-    const audio = new Audio(arquivo.href);
-    audio.loop = true;
+    const FAIXAS = ['audio/fly-me-to-the-moon.mp3', 'audio/lucky.mp3']
+        .map((caminho) => new URL(caminho, document.currentScript.src).href);
+
+    // Posição salva como "faixa:segundos" (ex.: "1:42.7")
+    const [faixaSalva, segundosSalvos] = (ler(sessionStorage, CHAVE_POSICAO) || '')
+        .split(':').map(parseFloat);
+    let faixaAtual = faixaSalva >= 0 && faixaSalva < FAIXAS.length ? faixaSalva : 0;
+
+    const audio = new Audio(FAIXAS[faixaAtual]);
     audio.volume = 0.35;
     audio.preload = 'auto';
 
-    const posicaoSalva = parseFloat(ler(sessionStorage, CHAVE_POSICAO));
-    if (posicaoSalva > 0) {
+    if (segundosSalvos > 0) {
         audio.addEventListener('loadedmetadata', () => {
-            if (posicaoSalva < audio.duration) audio.currentTime = posicaoSalva;
+            if (segundosSalvos < audio.duration) audio.currentTime = segundosSalvos;
         }, { once: true });
     }
+
+    audio.addEventListener('ended', () => {
+        faixaAtual = (faixaAtual + 1) % FAIXAS.length;
+        audio.src = FAIXAS[faixaAtual];
+        audio.play().catch(() => {});
+    });
+
     window.addEventListener('pagehide', () => {
-        gravar(sessionStorage, CHAVE_POSICAO, String(audio.currentTime));
+        gravar(sessionStorage, CHAVE_POSICAO, `${faixaAtual}:${audio.currentTime}`);
     });
 
     const estilo = document.createElement('style');
