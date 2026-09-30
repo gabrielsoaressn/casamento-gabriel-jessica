@@ -378,6 +378,13 @@ const PRESENTES = [
         imagem: 'carregador-portatil-20000mah.webp',
         categoria: 'casa'
     },
+    {
+        id: 'ventilador-coluna-cadence-40cm',
+        nome: 'Ventilador de Coluna Cadence 40 cm',
+        valor: 169.00,
+        imagem: 'ventilador-coluna-cadence-40cm.webp',
+        categoria: 'casa'
+    },
 
     // ---------- Sala e Escritório ----------
     {
