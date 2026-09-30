@@ -380,7 +380,7 @@ const PRESENTES = [
     },
     {
         id: 'ventilador-coluna-cadence-40cm',
-        nome: 'Ventilador de Coluna Cadence 40 cm',
+        nome: 'Ventilador de Coluna Cadence VTR830 40 cm 6 Pás 3 Velocidades Preto',
         valor: 169.00,
         imagem: 'ventilador-coluna-cadence-40cm.webp',
         categoria: 'casa'
@@ -413,6 +413,14 @@ const PRESENTES = [
         nome: 'Cadeira de Escritório',
         valor: 359.00,
         imagem: 'cadeira-escritorio.jpg',
+        categoria: 'escritorio'
+    },
+    {
+        id: 'smart-tv-40-full-hd',
+        nome: 'Smart TV 40 Polegadas Full HD Wi-Fi Android TV - Com Controle Remoto Padrão',
+        valor: 1454.50,
+        cotas: 5,
+        imagem: 'smart-tv-40-full-hd.webp',
         categoria: 'escritorio'
     }
 ];
