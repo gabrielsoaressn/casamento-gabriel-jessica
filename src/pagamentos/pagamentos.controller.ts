@@ -127,7 +127,7 @@ export class PagamentosController {
     }
 
     // Id gravado na reserva. Num presente em cotas é o da próxima cota
-    // livre (ex.: ar-condicionado-cota-3), não o do presente.
+    // livre (ex.: robo-limpeza-cota-3), não o do presente.
     let reservaId = presenteId;
 
     if (presente?.cotas) {

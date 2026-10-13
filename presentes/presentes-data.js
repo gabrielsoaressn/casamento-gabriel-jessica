@@ -295,14 +295,6 @@ const PRESENTES = [
         imagem: 'kit-manta-peseira-tricot.jpg',
         categoria: 'quarto'
     },
-    {
-        id: 'ar-condicionado',
-        nome: 'Ar-condicionado Split 9.000 BTUs Philco Eco Inverter Frio',
-        valor: 1819.25,
-        cotas: 5,
-        imagem: 'ar-condicionado-philco-9000-btus.jpg',
-        categoria: 'quarto'
-    },
 
     // ---------- Banheiro ----------
     {
@@ -383,6 +375,20 @@ const PRESENTES = [
         nome: 'Ventilador de Coluna Cadence VTR830 40 cm 6 Pás 3 Velocidades Preto',
         valor: 169.00,
         imagem: 'ventilador-coluna-cadence-40cm.webp',
+        categoria: 'casa'
+    },
+    {
+        id: 'mop-giratorio-360-centrifuga',
+        nome: 'Mop Giratório 360° Esfregão Multiuso com Centrífuga, Balde, Alça, Cabo Reforçado, 2 Microfibras, Cesto Inox 9L',
+        valor: 45.99,
+        imagem: 'mop-giratorio-360-centrifuga.webp',
+        categoria: 'casa'
+    },
+    {
+        id: 'kit-5-lampadas-led-pera-inteligentes',
+        nome: 'Kit 5 Lâmpadas LED Pera Inteligentes',
+        valor: 68.90,
+        imagem: 'kit-5-lampadas-led-pera-inteligentes.webp',
         categoria: 'casa'
     },
 
