@@ -634,6 +634,39 @@ a:hover {
     box-shadow: 0 10px 26px rgba(60, 42, 24, 0.44);
 }
 
+/* Ações do hero: lado a lado no desktop, empilhadas no celular.
+   Confirmar presença é a principal; o secundário fica só no contorno. */
+.hero-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+}
+
+.hero .btn-secundario {
+    background: transparent;
+    color: var(--butter-deep);
+    box-shadow: inset 0 0 0 1.5px var(--butter);
+}
+
+.hero .btn-secundario:hover {
+    background: rgba(231, 196, 92, 0.16);   /* manteiga translúcida */
+    color: var(--butter-deep);
+    box-shadow: inset 0 0 0 1.5px var(--butter), 0 10px 26px rgba(60, 42, 24, 0.44);
+}
+
+@media (max-width: 480px) {
+    .hero-acoes {
+        flex-direction: column;
+    }
+
+    .hero-acoes .btn-primary {
+        min-width: 240px;
+        text-align: center;
+    }
+}
+
 /* Scroll Indicator */
 .scroll-indicator {
     position: absolute;
