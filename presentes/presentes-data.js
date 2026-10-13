@@ -311,6 +311,13 @@ const PRESENTES = [
         imagem: 'lixeira-inox-5l-pedal.webp',
         categoria: 'banheiro'
     },
+    {
+        id: 'chuveiro-zagonel-moment-preto-7500w',
+        nome: 'Chuveiro Ducha Elétrico Parede Zagonel Eletrônica Moment Preto 7.5 kW',
+        valor: 125.00,
+        imagem: 'chuveiro-zagonel-moment-preto-7500w.webp',
+        categoria: 'banheiro'
+    },
 
     // ---------- Casa ----------
     {
