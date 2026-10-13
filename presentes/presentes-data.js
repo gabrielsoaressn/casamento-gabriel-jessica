@@ -422,6 +422,14 @@ const PRESENTES = [
         cotas: 5,
         imagem: 'smart-tv-40-full-hd.webp',
         categoria: 'escritorio'
+    },
+    {
+        id: 'conjunto-mesa-jantar-6-cadeiras',
+        nome: 'Conjunto de Mesa Sala de Jantar 6 Cadeiras Freijó Quartzo Neve',
+        valor: 1629.00,
+        cotas: 5,
+        imagem: 'conjunto-mesa-jantar-6-cadeiras.webp',
+        categoria: 'escritorio'
     }
 ];
 
