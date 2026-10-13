@@ -1,374 +1,198 @@
 # 🚀 Guia de Deploy do Backend no Servidor
 
-## 📋 Informações do Servidor
+## 📋 Como o site está no ar
 
-- **IP**: 38.52.130.145
-- **Porta da API**: 3001
-- **Banco de Dados**: PostgreSQL (mesmo servidor)
-- **URL do Frontend**: https://gabrielsoaressn.github.io/casamento-gabriel-jessica
+| Parte | Onde roda | Como atualiza |
+|---|---|---|
+| **Site** (HTML, CSS, JS, imagens) | GitHub Pages — https://gabrielsoaressn.github.io/casamento-gabriel-jessica | Sozinho, a cada push na `master` (`.github/workflows/deploy.yml`) |
+| **API** (NestJS) | Servidor `38.52.130.145`, atrás do Nginx em https://38-52-130-145.sslip.io | À mão, pelo **Passo 1** abaixo |
+| **Banco** (PostgreSQL) | Mesmo servidor, database `casamento` | — |
 
-## ⚡ Resumo Executivo
+Dados do processo da API no servidor:
 
-**Configurações necessárias no servidor:**
+- **Pasta**: `/root/projeto-c/casamento-gabriel-jessica`
+- **Processo PM2**: `casamento-nestjs` (roda `dist/main.js`)
+- **Porta interna**: 3847 (não fica exposta; o Nginx encaminha `/api/` e `/confirmar` para ela)
+- **Node**: 20
 
-1. **PostgreSQL** - Criar database `casamento` e configurar acesso
-2. **PM2** - Instalar e configurar processo Node.js
-3. **Firewall** - Abrir porta 3001
-4. **Arquivo .env** - Configurar variáveis de ambiente com token do PicPay
-5. **CORS** - Já configurado para aceitar requisições do GitHub Pages
-
-> **Nota:** A porta foi alterada para **3001** porque a porta 3000 já estava em uso pelo imobai-frontend.
-
----
-
-## 🌐 Passo 0: Ativar GitHub Pages no Repositório
-
-**IMPORTANTE:** Antes de configurar o servidor, ative o GitHub Pages:
-
-1. Acesse: https://github.com/gabrielsoaressn/casamento-gabriel-jessica/settings/pages
-2. Em **Source**, selecione **GitHub Actions**
-3. O workflow já está configurado em `.github/workflows/deploy.yml`
-4. A cada push na branch `master`, o site será automaticamente atualizado
-5. O site ficará disponível em: https://gabrielsoaressn.github.io/casamento-gabriel-jessica
+> ⚠️ O servidor é compartilhado com vários outros projetos no PM2. Reinicie
+> **só** o `casamento-nestjs`; nunca rode `pm2 restart all` nem `pm2 delete all`.
 
 ---
 
-## 🔧 Passo 1: Configurar PostgreSQL
+## 🔄 Passo 1: Atualizar a API (o dia a dia)
 
-### 1.1. Conectar ao servidor via SSH
-
-```bash
-ssh usuario@38.52.130.145
-```
-
-### 1.2. Configurar pg_hba.conf
-
-Edite o arquivo de configuração do PostgreSQL:
+Faça isso **sempre que mudar a lista de presentes** (`presentes/presentes-data.js`)
+ou qualquer coisa em `src/`. O backend lê a lista para saber quanto cobrar no
+Mercado Pago: se o servidor não for atualizado, presente novo dá erro no
+pagamento e presente removido continua valendo para a API.
 
 ```bash
-sudo nano /etc/postgresql/[versão]/main/pg_hba.conf
+ssh root@38.52.130.145
+cd /root/projeto-c/casamento-gabriel-jessica
+git pull --ff-only origin master
 ```
 
-Adicione estas linhas no final:
+Depois, conforme o que mudou:
 
-```
-# Permitir conexões locais do Node.js
-host    casamento       metricsdb       127.0.0.1/32            md5
-host    casamento       metricsdb       ::1/128                 md5
+- **Só a lista de presentes, imagens, HTML/CSS/JS do site:** basta reiniciar.
 
-# Permitir conexões externas (se necessário para desenvolvimento)
-host    casamento       metricsdb       0.0.0.0/0               md5
-```
+  ```bash
+  pm2 restart casamento-nestjs
+  ```
 
-### 1.3. Configurar postgresql.conf
+- **Mudou algo em `src/` (código TypeScript):** compile antes de reiniciar.
+
+  ```bash
+  npm run build
+  pm2 restart casamento-nestjs
+  ```
+
+- **Mudou o `package.json`:** rode `npm install` antes do build.
+
+Conferir:
 
 ```bash
-sudo nano /etc/postgresql/[versão]/main/postgresql.conf
+pm2 logs casamento-nestjs --lines 20 --nostream   # deve mostrar "Servidor rodando na porta 3847"
+curl https://38-52-130-145.sslip.io/api/health    # {"status":"ok", ...}
 ```
 
-Certifique-se que tenha:
-
-```
-listen_addresses = '*'
-```
-
-### 1.4. Reiniciar PostgreSQL
-
-```bash
-sudo systemctl restart postgresql
-```
-
-### 1.5. Criar o database
-
-```bash
-sudo -u postgres psql
-```
-
-No psql:
-
-```sql
-CREATE DATABASE casamento;
-GRANT ALL PRIVILEGES ON DATABASE casamento TO metricsdb;
-\q
-```
+> Há um `test-picpay.js` fora do git nessa pasta. Deixe-o lá; o `git pull` não mexe nele.
 
 ---
 
-## 📦 Passo 2: Instalar Dependências no Servidor
+## 🔑 Passo 2: Variáveis de ambiente (`.env`)
 
-### 2.1. Instalar Node.js (se não tiver)
+O arquivo fica em `/root/projeto-c/casamento-gabriel-jessica/.env` e não vai
+para o git. O modelo comentado está em `.env.example`. Depois de editar, rode
+`pm2 restart casamento-nestjs`.
+
+| Variável | Para quê |
+|---|---|
+| `PORT` | Porta interna da API: `3847` (é a que o Nginx espera) |
+| `SITE_URL` | `https://38-52-130-145.sslip.io` |
+| `FRONTEND_URL` | `https://gabrielsoaressn.github.io/casamento-gabriel-jessica` (links de convite e retorno do pagamento) |
+| `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | Conexão com o PostgreSQL (`localhost`, database `casamento`) |
+| `MERCADO_PAGO_ACCESS_TOKEN` | Token de produção: cria a cobrança e confere o pagamento no webhook |
+| `MERCADO_PAGO_PUBLIC_KEY`, `MERCADO_PAGO_CLIENT_ID`, `MERCADO_PAGO_CLIENT_SECRET` | Credenciais do app no Mercado Pago |
+| `PICPAY_CLIENT_ID`, `PICPAY_CLIENT_SECRET`, `PICPAY_TOKEN` | Integração PicPay (o `/api/health` mostra `picpayConfigured`) |
+| `ADMIN_TOKEN` | Senha da tela `admin-rsvp.html` |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_NOTIFICACOES` | Avisos por e-mail (presente pago, mensagens). Opcional: sem elas o site funciona, só não envia e-mail |
+
+Webhook a cadastrar no painel do Mercado Pago:
+`https://38-52-130-145.sslip.io/api/webhook/mercadopago`
+
+---
+
+## 🌐 Passo 3: Nginx e HTTPS
+
+A configuração está em `/etc/nginx/sites-available/default`, no bloco
+`server_name 38-52-130-145.sslip.io`. Ela encaminha para `127.0.0.1:3847`:
+
+- `/api/` → endpoints da API
+- `/confirmar` → página de RSVP e links de convite (`/confirmar/CODIGO`)
+
+O certificado é do Let's Encrypt, gerado pelo Certbot, e se renova sozinho
+(`certbot.timer`). Depois de editar o Nginx:
 
 ```bash
+nginx -t && systemctl reload nginx
+```
+
+O `config.js` do site aponta para `https://38-52-130-145.sslip.io` em produção.
+Se o domínio da API mudar, atualize esse arquivo também.
+
+---
+
+## 🗄️ Passo 4: Banco de dados
+
+O TypeORM roda com `synchronize: false`, ou seja, **não cria nem altera
+tabelas sozinho**. Tabelas usadas:
+
+| Tabela | Criada por |
+|---|---|
+| `presentes_reservados` | `setup-tables.js` |
+| `convites`, `convidados` | `scripts/criar-tabelas-rsvp.sql` |
+| `mensagens` | `scripts/criar-tabela-mensagens.sql` |
+
+Se um commit trouxer tabela ou coluna nova, rode o SQL correspondente antes
+de reiniciar a API:
+
+```bash
+psql -h localhost -U <DB_USER> -d casamento -f scripts/<arquivo>.sql
+```
+
+Mais detalhes em `SETUP_BANCO.md`.
+
+---
+
+## 🆕 Instalação do zero (só se o servidor for refeito)
+
+```bash
+# Node 20 e PM2
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
-```
-
-### 2.2. Instalar PM2 (gerenciador de processos)
-
-```bash
 sudo npm install -g pm2
-```
 
----
-
-## 📂 Passo 3: Fazer Deploy do Código
-
-### 3.1. Clonar o repositório no servidor
-
-```bash
-cd /var/www
-sudo git clone https://github.com/gabrielsoaressn/casamento-gabriel-jessica.git
+# Código
+mkdir -p /root/projeto-c && cd /root/projeto-c
+git clone https://github.com/gabrielsoaressn/casamento-gabriel-jessica.git
 cd casamento-gabriel-jessica
-```
-
-### 3.2. Instalar dependências
-
-```bash
 npm install
-```
+cp .env.example .env   # e preencha conforme o Passo 2
 
-### 3.3. Criar arquivo .env
+# Banco: crie o database "casamento" e as tabelas (Passo 4)
 
-```bash
-nano .env
-```
-
-Cole o seguinte conteúdo:
-
-```env
-PORT=3001
-SITE_URL=https://gabrielsoaressn.github.io/casamento-gabriel-jessica
-
-# API do PicPay
-PICPAY_API_URL=https://api.picpay.com
-PICPAY_TOKEN=seu_token_do_picpay_aqui
-PICPAY_SELLER_TOKEN=seu_seller_token_aqui
-
-# Banco de dados (já está configurado em db.js, mas pode sobrescrever aqui se quiser)
-# DB_HOST=38.52.130.145
-# DB_PORT=5432
-# DB_NAME=casamento
-# DB_USER=metricsuser
-# DB_PASSWORD=SUA_SENHA_AQUI
-```
-
-### 3.4. Inicializar o banco de dados
-
-```bash
-NODE_PATH=/usr/lib/node_modules node init-db.js
-```
-
-Ou se preferir criar manualmente:
-
-```bash
-PGPASSWORD=$DB_PASSWORD psql -h localhost -U metricsdb -d postgres -c "CREATE DATABASE casamento;"
-NODE_PATH=/usr/lib/node_modules node setup-tables.js
-```
-
----
-
-## ▶️ Passo 4: Iniciar o Servidor
-
-### 4.1. Iniciar com PM2
-
-```bash
-pm2 start server.js --name casamento-api
+# Compilar e subir
+npm run build
+pm2 start dist/main.js --name casamento-nestjs
 pm2 save
-pm2 startup
+pm2 startup             # execute o comando que ele mostrar
 ```
 
-Copie e execute o comando que o PM2 mostrar.
-
-### 4.2. Verificar se está rodando
-
-```bash
-pm2 status
-pm2 logs casamento-api
-```
-
-### 4.3. Testar a API
-
-```bash
-curl http://localhost:3000/api/health
-```
-
-Deve retornar:
-
-```json
-{
-  "status": "ok",
-  "timestamp": "...",
-  "picpayConfigured": false
-}
-```
-
----
-
-## 🔥 Passo 5: Configurar Firewall
-
-### 5.1. Abrir porta 3001
-
-```bash
-sudo ufw allow 3001/tcp
-sudo ufw status
-```
-
-### 5.2. Testar acesso externo
-
-Do seu computador local:
-
-```bash
-curl http://38.52.130.145:3001/api/health
-```
-
----
-
-## 🌐 Passo 6: Configurar CORS (Importante!)
-
-O servidor já está configurado para aceitar requisições de qualquer origem com `cors()`, mas se quiser restringir apenas ao GitHub Pages, edite o `server.js`:
-
-```javascript
-const cors = require('cors');
-
-app.use(cors({
-    origin: [
-        'https://gabrielsoaressn.github.io',
-        'http://localhost:5500', // Para desenvolvimento local
-        'http://127.0.0.1:5500'
-    ]
-}));
-```
-
-Depois reinicie:
-
-```bash
-pm2 restart casamento-api
-```
-
----
-
-## 🔄 Passo 7: Atualizar o Código (quando fizer mudanças)
-
-```bash
-cd /var/www/casamento-gabriel-jessica
-git pull origin master
-npm install
-pm2 restart casamento-api
-```
-
----
-
-## 📊 Comandos Úteis do PM2
-
-```bash
-# Ver status
-pm2 status
-
-# Ver logs em tempo real
-pm2 logs casamento-api
-
-# Ver logs de erro
-pm2 logs casamento-api --err
-
-# Reiniciar
-pm2 restart casamento-api
-
-# Parar
-pm2 stop casamento-api
-
-# Remover
-pm2 delete casamento-api
-```
-
----
-
-## 🧪 Testar o Sistema Completo
-
-### 7.1. Acesse o site no GitHub Pages
-
-```
-https://gabrielsoaressn.github.io/casamento-gabriel-jessica
-```
-
-### 7.2. Abra o Console do Navegador (F12)
-
-Procure por erros relacionados a CORS ou conexão com a API.
-
-### 7.3. Teste reservar um presente
-
-Clique em "Ver Presentes" → Escolha um presente → Preencha o formulário
-
-Se tudo funcionar, você verá:
-- O presente ficar cinza/indisponível
-- Outros usuários verão o presente como reservado
+Depois configure o Nginx e o certificado (Passo 3): `certbot --nginx -d 38-52-130-145.sslip.io`.
 
 ---
 
 ## ⚠️ Troubleshooting
 
-### Erro: Cannot connect to database
+**A API não responde / 502 no Nginx**
 
 ```bash
-# Verificar se PostgreSQL está rodando
-sudo systemctl status postgresql
-
-# Ver logs do PostgreSQL
-sudo tail -f /var/log/postgresql/postgresql-*-main.log
-
-# Testar conexão manual
-PGPASSWORD=$DB_PASSWORD psql -h localhost -U metricsdb -d casamento -c "SELECT 1;"
+pm2 describe casamento-nestjs        # status e número de restarts
+pm2 logs casamento-nestjs --err --lines 50 --nostream
+ss -ltnp | grep 3847                 # a API precisa estar escutando aqui
 ```
 
-### Erro: CORS blocked
+**Pagamento de um presente dá erro**: quase sempre a lista do servidor está
+desatualizada em relação ao site. Rode o Passo 1.
 
-Verifique se o CORS está configurado corretamente no server.js e reinicie o PM2.
-
-### Erro: Port 3001 already in use
+**Erro de conexão com o banco**
 
 ```bash
-# Ver o que está usando a porta
-sudo lsof -i :3001
-
-# Matar o processo
-sudo kill -9 [PID]
+systemctl status postgresql
+psql -h localhost -U <DB_USER> -d casamento -c "SELECT 1;"
 ```
 
-### Servidor não responde externamente
-
-```bash
-# Verificar firewall
-sudo ufw status
-
-# Verificar se o servidor está escutando em todas as interfaces
-netstat -tuln | grep 3001
-```
+**O build falhou**: o `dist/` antigo pode ter ficado incompleto. Corrija o erro
+e rode `npm run build` de novo antes de reiniciar; enquanto o processo não for
+reiniciado, a versão anterior continua no ar.
 
 ---
 
-## 🎯 URLs Finais
+## 🗃️ Cópia antiga (legado)
 
-- **Frontend (GitHub Pages)**: https://gabrielsoaressn.github.io/casamento-gabriel-jessica
-- **Backend API**: http://38.52.130.145:3001
-- **Health Check**: http://38.52.130.145:3001/api/health
-- **Presentes Reservados**: http://38.52.130.145:3001/api/presentes-reservados
-
----
-
-## ✅ Checklist Final
-
-- [x] PostgreSQL configurado e rodando
-- [x] Database "casamento" criado
-- [x] Tabelas criadas (presentes_reservados)
-- [x] Código clonado no servidor
-- [x] Dependências instaladas (npm install)
-- [x] Arquivo .env configurado
-- [x] Servidor iniciado com PM2
-- [x] Porta 3001 aberta no firewall
-- [x] CORS configurado
-- [x] API respondendo em http://38.52.130.145:3001/api/health
-- [x] GitHub Pages ativo e funcionando
-- [ ] Teste de reserva de presente funcionando
+`/var/www/casamento-gabriel-jessica` e o processo PM2 `casamento-api` (porta
+3002) são a primeira versão do backend, em Express (`server.js`). **Não estão
+em uso**: o Nginx não encaminha nada para eles. Não faça deploy ali. Podem ser
+removidos (`pm2 delete casamento-api && pm2 save`) quando quiser liberar recursos.
 
 ---
 
-**Dúvidas?** Consulte o SETUP_BANCO.md para mais informações sobre o banco de dados.
+## 🎯 URLs
+
+- **Site**: https://gabrielsoaressn.github.io/casamento-gabriel-jessica
+- **API**: https://38-52-130-145.sslip.io/api/
+- **Health check**: https://38-52-130-145.sslip.io/api/health
+- **Presentes reservados**: https://38-52-130-145.sslip.io/api/presentes-reservados
+- **Webhook Mercado Pago**: https://38-52-130-145.sslip.io/api/webhook/mercadopago
