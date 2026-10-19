@@ -183,9 +183,58 @@
     }
     .cc-qr img { width: 120px; height: 120px; border-radius: 8px; }
 
+    .cc-acoes { display: flex; justify-content: flex-end; margin-top: 10px; }
+
+    /* ── Modal de edição ── */
+    #modal {
+      position: fixed; inset: 0; z-index: 900;
+      background: rgba(91, 65, 39, 0.35);
+      display: none; align-items: flex-start; justify-content: center;
+      padding: 48px 16px; overflow-y: auto;
+    }
+    #modal.show { display: flex; }
+    .modal-card {
+      background: var(--cream); border-radius: 12px;
+      width: 100%; max-width: 480px; padding: 28px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    }
+    .modal-card h2 {
+      font-family: var(--font-display); font-size: 24px; font-weight: 600;
+      margin-bottom: 18px;
+    }
+    .campo { margin-bottom: 16px; }
+    .campo label {
+      display: block; font-family: var(--font-label); font-size: 11px;
+      letter-spacing: 1px; text-transform: uppercase; color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .campo input, .campo select {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 10px 12px; font-size: 15px; font-family: var(--font-body);
+      background: #fff; color: var(--text); outline: none;
+    }
+    .campo input:focus, .campo select:focus { border-color: var(--gold); }
+    .campo .dica { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .pessoa { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .pessoa input { flex: 1; }
+    .pessoa .resposta { font-size: 12px; width: 18px; text-align: center; }
+    .pessoa .remover {
+      border: none; background: none; color: #c53030; font-size: 20px;
+      cursor: pointer; padding: 0 6px; line-height: 1;
+    }
+    .modal-erro { color: #c53030; font-size: 14px; margin-bottom: 12px; display: none; }
+    .modal-erro.show { display: block; }
+    .modal-acoes {
+      display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .modal-acoes .dir { display: flex; gap: 8px; }
+    .btn.perigo { background: transparent; color: #c53030; border: 1.5px solid #c53030; }
+    .btn.perigo:hover { background: rgba(197,48,48,0.08); }
+
     /* ── Print ── */
     @media print {
-      #auth-overlay, header, .filtros, .header-actions, .stats { display: none !important; }
+      #auth-overlay, header, .filtros, .header-actions, .stats, .cc-acoes, #modal { display: none !important; }
       .convites-grid { grid-template-columns: repeat(2, 1fr); padding: 0; gap: 12px; }
       .convite-card { break-inside: avoid; page-break-inside: avoid; }
     }
@@ -216,6 +265,7 @@
       </div>
     </div>
     <div class="header-actions">
+      <button class="btn outline sm" onclick="abrirEdicao()">＋ Novo convite</button>
       <button class="btn outline sm" onclick="exportarCSV()">⬇ Exportar CSV</button>
       <button class="btn outline sm" onclick="window.print()">🖨 Imprimir QR codes</button>
       <button class="btn sm" onclick="carregarDados(true)">↻ Atualizar</button>
@@ -234,6 +284,42 @@
   </div>
 
   <div class="convites-grid" id="grid"></div>
+</div>
+
+<!-- Modal: criar/editar convite -->
+<div id="modal" onclick="if (event.target === this) fecharEdicao()">
+  <form class="modal-card" onsubmit="salvarConvite(event)">
+    <h2 id="modal-titulo">Novo convite</h2>
+    <div class="campo">
+      <label for="f-grupo">Grupo</label>
+      <input id="f-grupo" required maxlength="120" placeholder="Ex.: Família Silva">
+    </div>
+    <div class="campo">
+      <label for="f-entrega">Entrega</label>
+      <select id="f-entrega">
+        <option value="digital">Digital</option>
+        <option value="papel">Papel</option>
+      </select>
+    </div>
+    <div class="campo">
+      <label for="f-codigo">Código</label>
+      <input id="f-codigo" maxlength="30" pattern="[A-Za-z0-9\-]*" placeholder="Deixe vazio para gerar">
+      <div class="dica">Mudar o código invalida o link e o QR code já enviados.</div>
+    </div>
+    <div class="campo">
+      <label>Convidados</label>
+      <div id="f-pessoas"></div>
+      <button type="button" class="btn outline sm" onclick="adicionarPessoa()">＋ Adicionar pessoa</button>
+    </div>
+    <div id="modal-erro" class="modal-erro"></div>
+    <div class="modal-acoes">
+      <button type="button" class="btn perigo sm" id="btn-excluir" onclick="excluirConvite()">Excluir convite</button>
+      <div class="dir">
+        <button type="button" class="btn outline sm" onclick="fecharEdicao()">Cancelar</button>
+        <button type="submit" class="btn sm" id="btn-salvar">Salvar</button>
+      </div>
+    </div>
+  </form>
 </div>
 
 <script src="config.js"></script>
@@ -370,6 +456,9 @@ function renderGrid(lista) {
             <button class="btn outline sm" style="margin-left:8px" onclick="copiar('${esc(c.link)}')">Copiar</button>
           </div>
           ${qrHtml}
+          <div class="cc-acoes">
+            <button class="btn outline sm" onclick="abrirEdicao('${c.id}')">✎ Editar</button>
+          </div>
         </div>
       </div>
     `;
@@ -389,6 +478,114 @@ function copiar(texto) {
     setTimeout(() => t.remove(), 2000);
   });
 }
+
+// ── Criar / editar convite ────────────────────────────────────────────────────
+let _editandoId = null;
+
+function abrirEdicao(id) {
+  const c = id ? _todos.find(x => x.id === id) : null;
+  _editandoId = c ? c.id : null;
+  document.getElementById('modal-titulo').textContent = c ? 'Editar convite' : 'Novo convite';
+  document.getElementById('f-grupo').value   = c ? c.grupo : '';
+  document.getElementById('f-entrega').value = c ? c.entrega : 'digital';
+  document.getElementById('f-codigo').value  = c ? c.codigo : '';
+  document.getElementById('f-pessoas').innerHTML = '';
+  (c ? c.convidados : [{}]).forEach(adicionarPessoa);
+  document.getElementById('btn-excluir').style.visibility = c ? 'visible' : 'hidden';
+  mostrarErroModal('');
+  document.getElementById('modal').classList.add('show');
+  document.getElementById('f-grupo').focus();
+}
+
+function fecharEdicao() {
+  document.getElementById('modal').classList.remove('show');
+  _editandoId = null;
+}
+
+// `p` vem da lista do convite (id + nome + resposta) ou vazio para pessoa nova
+function adicionarPessoa(p = {}) {
+  const linha = document.createElement('div');
+  linha.className = 'pessoa';
+  if (p.id) linha.dataset.id = p.id;
+  const resposta = p.vaiComparecer === true ? '✓' : p.vaiComparecer === false ? '✗' : '';
+  linha.innerHTML = `
+    <span class="resposta" title="Resposta do RSVP">${resposta}</span>
+    <input required maxlength="120" placeholder="Nome" value="${esc(p.nome || '')}">
+    <button type="button" class="remover" title="Remover" onclick="this.parentElement.remove()">×</button>
+  `;
+  document.getElementById('f-pessoas').appendChild(linha);
+  if (!p.nome) linha.querySelector('input').focus();
+}
+
+function mostrarErroModal(msg) {
+  const el = document.getElementById('modal-erro');
+  el.textContent = msg;
+  el.classList.toggle('show', !!msg);
+}
+
+async function salvarConvite(e) {
+  e.preventDefault();
+  const convidados = [...document.querySelectorAll('#f-pessoas .pessoa')].map(l => ({
+    ...(l.dataset.id ? { id: l.dataset.id } : {}),
+    nome: l.querySelector('input').value.trim(),
+  })).filter(p => p.nome);
+  if (convidados.length === 0) {
+    mostrarErroModal('Inclua pelo menos uma pessoa no convite.');
+    return;
+  }
+
+  const corpo = {
+    grupo:   document.getElementById('f-grupo').value.trim(),
+    entrega: document.getElementById('f-entrega').value,
+    codigo:  document.getElementById('f-codigo').value.trim(),
+    convidados,
+  };
+  const url = _editandoId
+    ? `${API_URL}/api/admin/convites/${_editandoId}`
+    : `${API_URL}/api/admin/convites`;
+
+  await enviarAdmin(url, _editandoId ? 'PUT' : 'POST', corpo);
+}
+
+async function excluirConvite() {
+  const c = _todos.find(x => x.id === _editandoId);
+  if (!c) return;
+  const respondeu = c.confirmadoEm ? ' Este convite já respondeu o RSVP.' : '';
+  if (!confirm(`Excluir o convite "${c.grupo}" e todas as ${c.convidados.length} pessoa(s)?${respondeu}`)) return;
+  await enviarAdmin(`${API_URL}/api/admin/convites/${c.id}`, 'DELETE');
+}
+
+async function enviarAdmin(url, method, corpo) {
+  const btn = document.getElementById('btn-salvar');
+  btn.disabled = true;
+  try {
+    const r = await fetch(url, {
+      method,
+      headers: {
+        'Authorization': `Bearer ${_token}`,
+        ...(corpo ? { 'Content-Type': 'application/json' } : {}),
+      },
+      body: corpo ? JSON.stringify(corpo) : undefined,
+    });
+    if (r.status === 401) { sessionStorage.removeItem('admin_token'); location.reload(); return; }
+    if (!r.ok) {
+      const dados = await r.json().catch(() => ({}));
+      const msg = Array.isArray(dados.message) ? dados.message.join(' ') : dados.message;
+      mostrarErroModal(msg || `Erro ${r.status} ao salvar.`);
+      return;
+    }
+    fecharEdicao();
+    await carregarDados();
+  } catch (err) {
+    mostrarErroModal('Erro de conexão: ' + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('modal').classList.contains('show')) fecharEdicao();
+});
 
 // ── Exportar CSV ──────────────────────────────────────────────────────────────
 function exportarCSV() {

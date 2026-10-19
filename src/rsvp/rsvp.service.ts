@@ -5,11 +5,16 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
+import { randomInt } from 'crypto';
 import * as QRCode from 'qrcode';
 import { ConfigService } from '@nestjs/config';
 import { Convite } from './entities/convite.entity';
 import { Convidado } from './entities/convidado.entity';
+import { SalvarConviteDto } from './dto/salvar-convite.dto';
+
+// Sem 0/O e 1/I/L: o código vai impresso no convite de papel e é digitado à mão
+const ALFABETO_CODIGO = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
 // `grupo` é controle interno — nunca vai na resposta pública para o convidado
 export interface ConvitePublico {
@@ -39,6 +44,7 @@ export class RsvpService {
     @InjectRepository(Convidado)
     private readonly convidadoRepo: Repository<Convidado>,
     private readonly config: ConfigService,
+    private readonly dataSource: DataSource,
   ) {
     this.frontendUrl =
       this.config.get<string>('FRONTEND_URL') ||
@@ -152,5 +158,104 @@ export class RsvpService {
         };
       }),
     );
+  }
+
+  /** Cria um convite com as pessoas informadas. */
+  async criarConvite(dto: SalvarConviteDto): Promise<void> {
+    const codigo = dto.codigo || (await this.gerarCodigoLivre());
+    await this.garantirCodigoLivre(codigo);
+
+    await this.conviteRepo.save(
+      this.conviteRepo.create({
+        codigo,
+        entrega: dto.entrega,
+        grupo: dto.grupo,
+        convidados: dto.convidados.map((p) =>
+          this.convidadoRepo.create({ nome: p.nome }),
+        ),
+      }),
+    );
+    this.logger.log(`[Admin] Convite criado: "${dto.grupo}" (${codigo})`);
+  }
+
+  /**
+   * Atualiza o convite e sincroniza a lista de pessoas: quem veio com id é
+   * renomeado (e mantém a resposta), quem veio sem id é incluído e quem
+   * sumiu da lista é removido.
+   */
+  async atualizarConvite(id: string, dto: SalvarConviteDto): Promise<void> {
+    const convite = await this.conviteRepo.findOne({
+      where: { id },
+      relations: ['convidados'],
+    });
+    if (!convite) throw new NotFoundException('Convite não encontrado.');
+
+    const codigo = dto.codigo || convite.codigo;
+    if (codigo.toLowerCase() !== convite.codigo.toLowerCase()) {
+      await this.garantirCodigoLivre(codigo);
+    }
+
+    const idsAtuais = new Set(convite.convidados.map((p) => p.id));
+    const idsMantidos = new Set(
+      dto.convidados.filter((p) => p.id && idsAtuais.has(p.id)).map((p) => p.id),
+    );
+
+    await this.dataSource.transaction(async (m) => {
+      await m.update(Convite, id, {
+        codigo,
+        entrega: dto.entrega,
+        grupo: dto.grupo,
+      });
+
+      const removidos = convite.convidados.filter((p) => !idsMantidos.has(p.id));
+      if (removidos.length) {
+        await m.delete(Convidado, removidos.map((p) => p.id));
+      }
+
+      for (const p of dto.convidados) {
+        if (p.id && idsAtuais.has(p.id)) {
+          await m.update(Convidado, p.id, { nome: p.nome });
+        } else {
+          await m.insert(Convidado, { conviteId: id, nome: p.nome });
+        }
+      }
+    });
+    this.logger.log(`[Admin] Convite atualizado: "${dto.grupo}" (${codigo})`);
+  }
+
+  /** Exclui o convite e todas as pessoas dele. */
+  async excluirConvite(id: string): Promise<void> {
+    const convite = await this.conviteRepo.findOne({ where: { id } });
+    if (!convite) throw new NotFoundException('Convite não encontrado.');
+
+    await this.dataSource.transaction(async (m) => {
+      await m.delete(Convidado, { conviteId: id });
+      await m.delete(Convite, id);
+    });
+    this.logger.log(`[Admin] Convite excluído: "${convite.grupo}" (${convite.codigo})`);
+  }
+
+  private async garantirCodigoLivre(codigo: string): Promise<void> {
+    const existe = await this.conviteRepo
+      .createQueryBuilder('c')
+      .where('LOWER(c.codigo) = :codigo', { codigo: codigo.toLowerCase() })
+      .getExists();
+    if (existe) {
+      throw new ConflictException(`Já existe um convite com o código ${codigo}.`);
+    }
+  }
+
+  private async gerarCodigoLivre(): Promise<string> {
+    for (;;) {
+      const codigo = Array.from(
+        { length: 6 },
+        () => ALFABETO_CODIGO[randomInt(ALFABETO_CODIGO.length)],
+      ).join('');
+      const existe = await this.conviteRepo
+        .createQueryBuilder('c')
+        .where('LOWER(c.codigo) = :codigo', { codigo: codigo.toLowerCase() })
+        .getExists();
+      if (!existe) return codigo;
+    }
   }
 }

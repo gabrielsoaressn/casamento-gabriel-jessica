@@ -2,7 +2,11 @@ import {
   Controller,
   Post,
   Get,
+  Put,
+  Delete,
   Body,
+  Param,
+  ParseUUIDPipe,
   Headers,
   Ip,
   HttpCode,
@@ -16,6 +20,7 @@ import { RsvpService } from './rsvp.service';
 import { RateLimiterService } from './rate-limiter.service';
 import { VerificarDto } from './dto/verificar.dto';
 import { ConfirmarDto } from './dto/confirmar.dto';
+import { SalvarConviteDto } from './dto/salvar-convite.dto';
 
 @Controller('api/rsvp')
 export class RsvpController {
@@ -101,6 +106,43 @@ export class AdminRsvpController {
   /** Lista todos os convites. Requer header Authorization: Bearer ADMIN_TOKEN. */
   @Get('convites')
   async listarConvites(@Headers('authorization') authHeader?: string) {
+    this.autorizar(authHeader);
+    return this.rsvpService.listarTodosAdmin();
+  }
+
+  @Post('convites')
+  @HttpCode(HttpStatus.CREATED)
+  async criarConvite(
+    @Body() dto: SalvarConviteDto,
+    @Headers('authorization') authHeader?: string,
+  ) {
+    this.autorizar(authHeader);
+    await this.rsvpService.criarConvite(dto);
+    return { success: true };
+  }
+
+  @Put('convites/:id')
+  async atualizarConvite(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: SalvarConviteDto,
+    @Headers('authorization') authHeader?: string,
+  ) {
+    this.autorizar(authHeader);
+    await this.rsvpService.atualizarConvite(id, dto);
+    return { success: true };
+  }
+
+  @Delete('convites/:id')
+  async excluirConvite(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Headers('authorization') authHeader?: string,
+  ) {
+    this.autorizar(authHeader);
+    await this.rsvpService.excluirConvite(id);
+    return { success: true };
+  }
+
+  private autorizar(authHeader?: string) {
     const adminToken = this.config.get<string>('ADMIN_TOKEN');
     if (!adminToken) {
       throw new HttpException(
@@ -113,7 +155,5 @@ export class AdminRsvpController {
     if (token !== adminToken) {
       throw new UnauthorizedException('Token de administrador inválido.');
     }
-
-    return this.rsvpService.listarTodosAdmin();
   }
 }
