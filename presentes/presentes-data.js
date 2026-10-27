@@ -295,6 +295,14 @@ const PRESENTES = [
         imagem: 'kit-manta-peseira-tricot.jpg',
         categoria: 'quarto'
     },
+    {
+        id: 'guarda-roupa-2-portas',
+        nome: 'Guarda-Roupa Casal 2 Portas de Correr com Espelho',
+        valor: 1399.00,
+        cotas: 5,
+        imagem: 'guarda-roupa-2-portas-espelho.jpg',
+        categoria: 'quarto'
+    },
 
     // ---------- Banheiro ----------
     {
