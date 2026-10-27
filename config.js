@@ -1,7 +1,7 @@
 // Configuração da API
 const API_CONFIG = {
     // Produção: HTTPS via Nginx reverse proxy (sslip.io + Let's Encrypt → Nest na 3847)
-    production: 'https://38-52-130-145.sslip.io',
+    production: 'https://179-236-75-151.sslip.io',
 
     // Desenvolvimento local
     development: 'http://localhost:3847'

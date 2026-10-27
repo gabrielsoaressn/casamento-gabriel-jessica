@@ -1,5 +1,9 @@
 # 🎉 Site de Casamento - Gabriel & Jéssica
 
+> ⚠️ **Desatualizado.** Este guia descreve a primeira versão do backend
+> (Express, servidor 38.52.130.145, que não existe mais). Para atualizar a API
+> e a lista de presentes no servidor, siga o `DEPLOY_SERVIDOR.md`.
+
 Deploy completo realizado com sucesso!
 
 ## 🌐 URLs do Projeto

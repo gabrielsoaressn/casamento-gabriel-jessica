@@ -5,7 +5,7 @@
 | Parte | Onde roda | Como atualiza |
 |---|---|---|
 | **Site** (HTML, CSS, JS, imagens) | GitHub Pages — https://gabrielsoaressn.github.io/casamento-gabriel-jessica | Sozinho, a cada push na `master` (`.github/workflows/deploy.yml`) |
-| **API** (NestJS) | Servidor `38.52.130.145`, atrás do Nginx em https://38-52-130-145.sslip.io | À mão, pelo **Passo 1** abaixo |
+| **API** (NestJS) | Servidor `179.236.75.151`, atrás do Nginx em https://179-236-75-151.sslip.io | À mão, pelo **Passo 1** abaixo |
 | **Banco** (PostgreSQL) | Mesmo servidor, database `casamento` | — |
 
 Dados do processo da API no servidor:
@@ -28,7 +28,7 @@ Mercado Pago: se o servidor não for atualizado, presente novo dá erro no
 pagamento e presente removido continua valendo para a API.
 
 ```bash
-ssh root@38.52.130.145
+ssh root@179.236.75.151
 cd /root/projeto-c/casamento-gabriel-jessica
 git pull --ff-only origin master
 ```
@@ -54,7 +54,7 @@ Conferir:
 
 ```bash
 pm2 logs casamento-nestjs --lines 20 --nostream   # deve mostrar "Servidor rodando na porta 3847"
-curl https://38-52-130-145.sslip.io/api/health    # {"status":"ok", ...}
+curl https://179-236-75-151.sslip.io/api/health    # {"status":"ok", ...}
 ```
 
 > Há um `test-picpay.js` fora do git nessa pasta. Deixe-o lá; o `git pull` não mexe nele.
@@ -70,7 +70,7 @@ para o git. O modelo comentado está em `.env.example`. Depois de editar, rode
 | Variável | Para quê |
 |---|---|
 | `PORT` | Porta interna da API: `3847` (é a que o Nginx espera) |
-| `SITE_URL` | `https://38-52-130-145.sslip.io` |
+| `SITE_URL` | `https://179-236-75-151.sslip.io` |
 | `FRONTEND_URL` | `https://gabrielsoaressn.github.io/casamento-gabriel-jessica` (links de convite e retorno do pagamento) |
 | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | Conexão com o PostgreSQL (`localhost`, database `casamento`) |
 | `MERCADO_PAGO_ACCESS_TOKEN` | Token de produção: cria a cobrança e confere o pagamento no webhook |
@@ -80,14 +80,15 @@ para o git. O modelo comentado está em `.env.example`. Depois de editar, rode
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_NOTIFICACOES` | Avisos por e-mail (presente pago, mensagens). Opcional: sem elas o site funciona, só não envia e-mail |
 
 Webhook a cadastrar no painel do Mercado Pago:
-`https://38-52-130-145.sslip.io/api/webhook/mercadopago`
+`https://179-236-75-151.sslip.io/api/webhook/mercadopago`
 
 ---
 
 ## 🌐 Passo 3: Nginx e HTTPS
 
-A configuração está em `/etc/nginx/sites-available/default`, no bloco
-`server_name 38-52-130-145.sslip.io`. Ela encaminha para `127.0.0.1:3847`:
+A configuração está em `/etc/nginx/sites-available/casamento` (o `default`
+ainda guarda o bloco do servidor antigo, `38-52-130-145.sslip.io`, que não
+recebe mais nada). Ela encaminha para `127.0.0.1:3847`:
 
 - `/api/` → endpoints da API
 - `/confirmar` → página de RSVP e links de convite (`/confirmar/CODIGO`)
@@ -99,7 +100,7 @@ O certificado é do Let's Encrypt, gerado pelo Certbot, e se renova sozinho
 nginx -t && systemctl reload nginx
 ```
 
-O `config.js` do site aponta para `https://38-52-130-145.sslip.io` em produção.
+O `config.js` do site aponta para `https://179-236-75-151.sslip.io` em produção.
 Se o domínio da API mudar, atualize esse arquivo também.
 
 ---
@@ -150,7 +151,7 @@ pm2 save
 pm2 startup             # execute o comando que ele mostrar
 ```
 
-Depois configure o Nginx e o certificado (Passo 3): `certbot --nginx -d 38-52-130-145.sslip.io`.
+Depois configure o Nginx e o certificado (Passo 3): `certbot --nginx -d 179-236-75-151.sslip.io`.
 
 ---
 
@@ -192,7 +193,7 @@ removidos (`pm2 delete casamento-api && pm2 save`) quando quiser liberar recurso
 ## 🎯 URLs
 
 - **Site**: https://gabrielsoaressn.github.io/casamento-gabriel-jessica
-- **API**: https://38-52-130-145.sslip.io/api/
-- **Health check**: https://38-52-130-145.sslip.io/api/health
-- **Presentes reservados**: https://38-52-130-145.sslip.io/api/presentes-reservados
-- **Webhook Mercado Pago**: https://38-52-130-145.sslip.io/api/webhook/mercadopago
+- **API**: https://179-236-75-151.sslip.io/api/
+- **Health check**: https://179-236-75-151.sslip.io/api/health
+- **Presentes reservados**: https://179-236-75-151.sslip.io/api/presentes-reservados
+- **Webhook Mercado Pago**: https://179-236-75-151.sslip.io/api/webhook/mercadopago
