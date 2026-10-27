@@ -303,6 +303,29 @@ const PRESENTES = [
         imagem: 'guarda-roupa-2-portas-espelho.jpg',
         categoria: 'quarto'
     },
+    {
+        // Os noivos querem três cortinas iguais. Cada id só é reservado
+        // uma vez, então cada cortina é uma entrada.
+        id: 'cortina-blackout-300x250',
+        nome: 'Cortina Blackout 3,00 x 2,50 Metros',
+        valor: 75.90,
+        imagem: 'cortina-blackout.webp',
+        categoria: 'quarto'
+    },
+    {
+        id: 'cortina-blackout-300x250-2',
+        nome: 'Cortina Blackout 3,00 x 2,50 Metros',
+        valor: 75.90,
+        imagem: 'cortina-blackout.webp',
+        categoria: 'quarto'
+    },
+    {
+        id: 'cortina-blackout-300x250-3',
+        nome: 'Cortina Blackout 3,00 x 2,50 Metros',
+        valor: 75.90,
+        imagem: 'cortina-blackout.webp',
+        categoria: 'quarto'
+    },
 
     // ---------- Banheiro ----------
     {
