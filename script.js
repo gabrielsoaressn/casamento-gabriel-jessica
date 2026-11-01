@@ -536,7 +536,7 @@ function marcarPresentesIndisponiveis() {
                 botao.setAttribute('aria-label', `Indisponível: ${botao.dataset.nome}`);
             }
         } else if (card.classList.contains('indisponivel')) {
-            // Uma reserva pendente expira em 24h e o presente volta à lista:
+            // Uma reserva pendente expira em 30 min e o presente volta à lista:
             // sem isto, o card só destravaria recarregando a página.
             card.classList.remove('indisponivel');
             botao.disabled = false;

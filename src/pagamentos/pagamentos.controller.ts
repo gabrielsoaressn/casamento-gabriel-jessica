@@ -208,7 +208,7 @@ export class PagamentosController {
         `Telefone: ${telefone || '—'}`,
         `Referência: ${result.referenceId}`,
         '',
-        'O presente fica reservado por 24 horas enquanto o pagamento não sai.',
+        'O presente fica reservado por 30 minutos enquanto o pagamento não sai.',
       ]);
 
       return result;
@@ -462,7 +462,7 @@ export class PagamentosController {
     }
 
     // Pagamento recusado ou cancelado: o presente volta para a lista na hora,
-    // sem esperar as 24h da limpeza automática. Só mexe em reserva ainda
+    // sem esperar os 30 min da limpeza automática. Só mexe em reserva ainda
     // pendente — nunca desfaz um pagamento já confirmado.
     if (status === 'rejected' || status === 'cancelled') {
       if (reserva?.status === 'pendente') {

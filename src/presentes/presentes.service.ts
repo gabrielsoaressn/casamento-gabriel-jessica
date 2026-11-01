@@ -4,6 +4,10 @@ import { Repository, In } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PresenteReservado } from './entities/presente-reservado.entity';
 
+// Quanto tempo um presente fica reservado esperando o pagamento. O link de
+// pagamento expira junto, para ninguém pagar um presente que já voltou à lista.
+export const RESERVA_VALIDADE_MS = 30 * 60 * 1000;
+
 @Injectable()
 export class PresentesService {
   private readonly logger = new Logger(PresentesService.name);
@@ -140,9 +144,9 @@ export class PresentesService {
     return presente?.status ?? null;
   }
 
-  @Cron(CronExpression.EVERY_HOUR, { name: 'limpar-reservas-expiradas' })
+  @Cron(CronExpression.EVERY_5_MINUTES, { name: 'limpar-reservas-expiradas' })
   async limparExpiradas(): Promise<PresenteReservado[]> {
-    const dataLimite = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const dataLimite = new Date(Date.now() - RESERVA_VALIDADE_MS);
 
     const expirados = await this.presenteRepository
       .createQueryBuilder()

@@ -91,7 +91,7 @@ A aplicação criará automaticamente a seguinte estrutura:
 
 ## Funcionalidades Automáticas
 
-1. **Limpeza de Reservas Expiradas**: A aplicação limpa automaticamente reservas pendentes com mais de 24 horas a cada 1 hora.
+1. **Limpeza de Reservas Expiradas**: A aplicação limpa automaticamente reservas pendentes com mais de 30 minutos a cada 5 minutos.
 
 2. **Atualização de Status**: O webhook do PicPay atualiza automaticamente o status dos presentes quando o pagamento é confirmado.
 

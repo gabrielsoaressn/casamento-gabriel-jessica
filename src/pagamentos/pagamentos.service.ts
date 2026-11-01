@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { randomUUID } from 'crypto';
+import { RESERVA_VALIDADE_MS } from '../presentes/presentes.service';
 
 export interface PaymentResponse {
   success: boolean;
@@ -157,7 +158,7 @@ export class PagamentosService {
       callbackUrl: `${this.siteUrl}/api/webhook/picpay`,
       returnUrl: `${this.frontendUrl}/?pagamento=sucesso`,
       value: valor,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+      expiresAt: new Date(Date.now() + RESERVA_VALIDADE_MS).toISOString(),
       buyer: {
         firstName,
         lastName,
@@ -238,7 +239,7 @@ export class PagamentosService {
     const [firstName, ...lastNameParts] = nome.trim().split(' ');
     const lastName = lastNameParts.join(' ') || firstName;
 
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    const expiresAt = new Date(Date.now() + RESERVA_VALIDADE_MS).toISOString();
 
     const body = {
       items: [
