@@ -183,7 +183,7 @@
     }
     .cc-qr img { width: 120px; height: 120px; border-radius: 8px; }
 
-    .cc-acoes { display: flex; justify-content: flex-end; margin-top: 10px; }
+    .cc-acoes { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 
     /* ── Modal de edição ── */
     #modal {
@@ -267,7 +267,7 @@
     <div class="header-actions">
       <button class="btn outline sm" onclick="abrirEdicao()">＋ Novo convite</button>
       <button class="btn outline sm" onclick="exportarCSV()">⬇ Exportar CSV</button>
-      <button class="btn outline sm" onclick="baixarMensagens()">💌 Baixar mensagens</button>
+      <button class="btn outline sm" onclick="baixarMensagensConvite()">💌 Baixar mensagens dos convites</button>
       <button class="btn outline sm" onclick="window.print()">🖨 Imprimir QR codes</button>
       <button class="btn sm" onclick="carregarDados(true)">↻ Atualizar</button>
     </div>
@@ -458,6 +458,7 @@ function renderGrid(lista) {
           </div>
           ${qrHtml}
           <div class="cc-acoes">
+            <button class="btn outline sm" onclick="copiarMensagem('${c.id}')">💌 Copiar mensagem</button>
             <button class="btn outline sm" onclick="abrirEdicao('${c.id}')">✎ Editar</button>
           </div>
         </div>
@@ -470,10 +471,10 @@ function esc(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-function copiar(texto) {
+function copiar(texto, aviso = 'Link copiado!') {
   navigator.clipboard.writeText(texto).then(() => {
     const t = document.createElement('div');
-    t.textContent = 'Link copiado!';
+    t.textContent = aviso;
     t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#5B4127;color:#F4E4B0;padding:10px 24px;border-radius:50px;font-size:13px;z-index:9999';
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 2000);
@@ -611,27 +612,53 @@ function exportarCSV() {
   baixarCSV(linhas, 'rsvp-casamento.csv');
 }
 
-// ── Baixar mensagens ──────────────────────────────────────────────────────────
-async function baixarMensagens() {
-  try {
-    const r = await fetch(`${API_URL}/api/admin/mensagens`, {
-      headers: { 'Authorization': `Bearer ${_token}` },
-    });
-    if (r.status === 401) { sessionStorage.removeItem('admin_token'); location.reload(); return; }
-    if (!r.ok) { alert(`Erro ${r.status} ao buscar as mensagens.`); return; }
-    const mensagens = await r.json();
-    if (mensagens.length === 0) { alert('Nenhuma mensagem recebida ainda.'); return; }
+// ── Mensagens para enviar com o convite ───────────────────────────────────────
+// Mesmo texto de dados/mensagens-convites.txt, gerado da lista atual do painel:
+// convite criado ou editado aqui já sai com o código certo.
+function mensagemConvite(c) {
+  return `🤍 Com imensa alegria, compartilhamos este convite para celebrar um dos momentos mais especiais de nossas vidas: o nosso casamento, que com a poderosa intercessão de Nossa Senhora do Carmo, São José e Santa Teresinha, tornou-se um sonho concreto.🌹
 
-    const linhas = [['Data', 'Nome', 'Mensagem']];
-    mensagens.forEach(m => linhas.push([
-      new Date(m.createdAt).toLocaleString('pt-BR'),
-      m.nome,
-      m.texto,
-    ]));
-    baixarCSV(linhas, 'mensagens-casamento.csv');
-  } catch (e) {
-    alert('Erro ao baixar mensagens: ' + e.message);
-  }
+Será uma honra contar com sua presença nesse dia tão significativo, preparado com muito amor, carinho e simplicidade.
+
+*Data*: 05 de dezembro de 2026 
+*Local da cerimônia*: Igreja Nossa Senhora do Carmo - Centro
+*Horário:* 9h30
+
+✨ Este convite é pessoal e possui um código individual para acesso e confirmação de presença no site.
+O código desse convite: ${c.codigo}
+
+Com carinho, esperamos sua confirmação celebrar esse momento inesquecível!`;
+}
+
+// "Ana", "Ana e Bia", "Ana, Bia e Caio"
+function juntarNomes(nomes) {
+  return nomes.length <= 1 ? (nomes[0] || '') : nomes.slice(0, -1).join(', ') + ' e ' + nomes.at(-1);
+}
+
+function baixarMensagensConvite() {
+  if (_todos.length === 0) { alert('Nenhum convite cadastrado.'); return; }
+  const blocos = _todos.map((c, i) => {
+    const entrega = c.entrega === 'papel' ? 'impresso' : 'digital';
+    return `=== Convite ${i + 1} | ${c.grupo} | ${entrega} | Senha: ${c.codigo} ===
+Enviar para: ${juntarNomes(c.convidados.map(p => p.nome))}
+
+${mensagemConvite(c)}
+
+------------------------------------------------------------
+`;
+  });
+  const blob = new Blob([blocos.join('\n')], { type: 'text/plain;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'mensagens-convites.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function copiarMensagem(id) {
+  const c = _todos.find(x => x.id === id);
+  if (c) copiar(mensagemConvite(c), 'Mensagem copiada!');
 }
 
 // Gera o arquivo com BOM para o Excel abrir os acentos corretamente
