@@ -1,18 +1,22 @@
 import {
   Controller,
   Post,
+  Get,
   Body,
+  Headers,
   Ip,
   HttpCode,
   HttpException,
   HttpStatus,
   Logger,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Mensagem } from './entities/mensagem.entity';
 import { CriarMensagemDto } from './dto/criar-mensagem.dto';
 import { NotificacoesService } from '../notificacoes/notificacoes.service';
+import { autorizarAdmin } from '../config/admin-auth';
 
 // Formulário aberto ao público: no máximo 5 mensagens por IP a cada hora,
 // o bastante para quem quer escrever de novo e pouco para quem quer spam.
@@ -57,5 +61,21 @@ export class MensagensController {
     ]);
 
     return { success: true };
+  }
+}
+
+@Controller('api/admin/mensagens')
+export class AdminMensagensController {
+  constructor(
+    @InjectRepository(Mensagem)
+    private readonly repositorio: Repository<Mensagem>,
+    private readonly config: ConfigService,
+  ) {}
+
+  /** Todas as mensagens, da mais antiga à mais recente. Requer ADMIN_TOKEN. */
+  @Get()
+  async listar(@Headers('authorization') authHeader?: string) {
+    autorizarAdmin(this.config, authHeader);
+    return this.repositorio.find({ order: { createdAt: 'ASC' } });
   }
 }

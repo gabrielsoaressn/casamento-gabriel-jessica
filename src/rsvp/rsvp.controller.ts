@@ -13,7 +13,6 @@ import {
   HttpStatus,
   HttpException,
   Logger,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RsvpService } from './rsvp.service';
@@ -21,6 +20,7 @@ import { RateLimiterService } from './rate-limiter.service';
 import { VerificarDto } from './dto/verificar.dto';
 import { ConfirmarDto } from './dto/confirmar.dto';
 import { SalvarConviteDto } from './dto/salvar-convite.dto';
+import { autorizarAdmin } from '../config/admin-auth';
 
 @Controller('api/rsvp')
 export class RsvpController {
@@ -143,17 +143,6 @@ export class AdminRsvpController {
   }
 
   private autorizar(authHeader?: string) {
-    const adminToken = this.config.get<string>('ADMIN_TOKEN');
-    if (!adminToken) {
-      throw new HttpException(
-        'ADMIN_TOKEN não configurado no servidor',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-
-    const token = authHeader?.replace(/^Bearer\s+/i, '').trim();
-    if (token !== adminToken) {
-      throw new UnauthorizedException('Token de administrador inválido.');
-    }
+    autorizarAdmin(this.config, authHeader);
   }
 }

@@ -267,6 +267,7 @@
     <div class="header-actions">
       <button class="btn outline sm" onclick="abrirEdicao()">＋ Novo convite</button>
       <button class="btn outline sm" onclick="exportarCSV()">⬇ Exportar CSV</button>
+      <button class="btn outline sm" onclick="baixarMensagens()">💌 Baixar mensagens</button>
       <button class="btn outline sm" onclick="window.print()">🖨 Imprimir QR codes</button>
       <button class="btn sm" onclick="carregarDados(true)">↻ Atualizar</button>
     </div>
@@ -607,12 +608,40 @@ function exportarCSV() {
     });
   });
 
+  baixarCSV(linhas, 'rsvp-casamento.csv');
+}
+
+// ── Baixar mensagens ──────────────────────────────────────────────────────────
+async function baixarMensagens() {
+  try {
+    const r = await fetch(`${API_URL}/api/admin/mensagens`, {
+      headers: { 'Authorization': `Bearer ${_token}` },
+    });
+    if (r.status === 401) { sessionStorage.removeItem('admin_token'); location.reload(); return; }
+    if (!r.ok) { alert(`Erro ${r.status} ao buscar as mensagens.`); return; }
+    const mensagens = await r.json();
+    if (mensagens.length === 0) { alert('Nenhuma mensagem recebida ainda.'); return; }
+
+    const linhas = [['Data', 'Nome', 'Mensagem']];
+    mensagens.forEach(m => linhas.push([
+      new Date(m.createdAt).toLocaleString('pt-BR'),
+      m.nome,
+      m.texto,
+    ]));
+    baixarCSV(linhas, 'mensagens-casamento.csv');
+  } catch (e) {
+    alert('Erro ao baixar mensagens: ' + e.message);
+  }
+}
+
+// Gera o arquivo com BOM para o Excel abrir os acentos corretamente
+function baixarCSV(linhas, nomeArquivo) {
   const csv = linhas.map(l => l.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
-  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href     = url;
-  a.download = 'rsvp-casamento.csv';
+  a.download = nomeArquivo;
   a.click();
   URL.revokeObjectURL(url);
 }
