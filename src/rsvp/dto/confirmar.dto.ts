@@ -6,6 +6,7 @@ import {
   ValidateNested,
   MaxLength,
   IsUUID,
+  IsOptional,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 
@@ -15,6 +16,11 @@ class RespostaDto {
 
   @IsBoolean()
   vaiComparecer: boolean;
+
+  // true = vai só à cerimônia, sem a recepção (ignorado quando não vai)
+  @IsOptional()
+  @IsBoolean()
+  apenasCerimonia?: boolean;
 }
 
 export class ConfirmarDto {

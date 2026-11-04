@@ -26,6 +26,10 @@ export class Convidado {
   @Column({ name: 'vai_comparecer', type: 'boolean', nullable: true })
   vaiComparecer: boolean | null;
 
+  // Só faz sentido com vaiComparecer = true: vai à cerimônia, mas não à recepção
+  @Column({ name: 'apenas_cerimonia', type: 'boolean', default: false })
+  apenasCerimonia: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }

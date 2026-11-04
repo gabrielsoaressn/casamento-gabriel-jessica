@@ -289,70 +289,87 @@
     .status-badge.confirmado { background: rgba(110, 117, 65, 0.14); color: var(--olive-deep); border: 1px solid rgba(110, 117, 65, 0.34); }
     .status-badge.pendente   { background: rgba(231, 196, 92, 0.20); color: var(--gold-ink);   border: 1px solid var(--gold-linha); }
 
-    /* ── Checkboxes ── */
+    /* ── Resposta de cada pessoa: três opções em pílula ── */
     .convidados-lista {
       list-style: none;
       margin-bottom: 8px;
     }
     .convidado-item {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 14px 0;
+      padding: 16px 0;
       border-bottom: 1px solid var(--hairline);
-      cursor: pointer;
     }
     .convidado-item:last-child { border-bottom: none; }
-
-    .check-wrap {
-      position: relative;
-      width: 24px;
-      height: 24px;
-      flex-shrink: 0;
+    .convidado-item fieldset { border: none; }
+    .convidado-nome {
+      display: block;
+      font-family: var(--font-body);
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--brown);
+      margin-bottom: 10px;
     }
-    .check-wrap input[type="checkbox"] {
+    .opcoes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .opcao { position: relative; margin: 0; }
+    .opcao input {
       position: absolute;
       opacity: 0;
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
-      z-index: 1;
+      width: 1px;
+      height: 1px;
     }
-    .check-box {
-      width: 24px;
-      height: 24px;
+    .opcao span {
+      display: inline-block;
+      padding: 9px 14px;
+      min-height: 40px;
       border: 1.5px solid var(--gold);
-      border-radius: var(--raio-papel);
-      background: var(--cream);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.18s var(--ease), border-color 0.18s var(--ease);
+      border-radius: var(--raio-pill);
+      background: transparent;
+      font-family: var(--font-label);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: none;
+      color: var(--brown);
+      cursor: pointer;
+      transition: background 0.18s var(--ease), border-color 0.18s var(--ease),
+                  color 0.18s var(--ease);
     }
-    /* Marcado = fúcsia: é o "sim" da confirmação, o acento da peça */
-    .check-wrap input:checked ~ .check-box {
+    .opcao span:hover { background: rgba(201, 162, 74, 0.16); }
+    /* Marcado = fúcsia: o "sim" é o acento da peça; o "não" fica em marrom */
+    .opcao input:checked + span {
       background: var(--fuchsia);
       border-color: var(--fuchsia);
+      color: var(--butter-deep);
     }
-    .check-wrap input:checked ~ .check-box::after {
-      content: '';
-      width: 6px;
-      height: 11px;
-      border-right: 2px solid var(--butter-deep);
-      border-bottom: 2px solid var(--butter-deep);
-      transform: rotate(45deg) translate(-1px, -2px);
+    .opcao input[value="nao"]:checked + span {
+      background: var(--brown-soft);
+      border-color: var(--brown-soft);
     }
-    .check-wrap input:focus-visible ~ .check-box {
+    .opcao input:focus-visible + span {
       outline: 2px solid var(--gold);
       outline-offset: 2px;
     }
-    .convidado-nome {
-      font-family: var(--font-body);
-      font-size: 17px;
-      font-weight: 500;
-      color: var(--brown);
-      flex: 1;
+    .atalhos {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      margin: -6px 0 10px;
+      font-family: var(--font-label);
+      font-size: 11px;
+      color: var(--brown-label);
     }
+    .atalhos button {
+      border: none;
+      background: none;
+      padding: 4px 0;
+      font: inherit;
+      color: var(--gold-ink);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .atalhos button:hover { color: var(--fuchsia); }
 
     /* ── Obrigado: monograma no lugar do emoji, como pede a identidade ── */
     .obrigado-monograma {
@@ -479,9 +496,17 @@
 
       <hr class="divider">
 
-      <p style="margin-bottom: 16px; font-size: 13px;">
-        Marque quem vai comparecer ao casamento:
+      <p style="margin-bottom: 16px; font-size: 15px;">
+        A cerimônia é às 9h30 na Igreja de Nossa Senhora do Carmo, e a recepção
+        ao meio-dia no Bless Eventos. Escolha a resposta de cada pessoa:
       </p>
+
+      <div class="atalhos" id="atalhos">
+        <span>Para todos:</span>
+        <button type="button" onclick="marcarTodos('sim')">vão às duas</button>
+        <button type="button" onclick="marcarTodos('cerimonia')">só cerimônia</button>
+        <button type="button" onclick="marcarTodos('nao')">não vão</button>
+      </div>
 
       <form id="form-confirmacao" onsubmit="confirmarPresenca(event)">
         <ul class="convidados-lista" id="lista-convidados"></ul>
@@ -489,7 +514,7 @@
         <div id="erro-confirmacao" class="error-msg"></div>
 
         <button type="submit" class="btn" id="btn-confirmar">
-          Confirmar presença
+          Enviar resposta
         </button>
         <button type="button" class="btn secondary" onclick="voltarCodigo()">
           Voltar
@@ -500,9 +525,9 @@
     <!-- TELA 3: Obrigado -->
     <div id="tela-obrigado" class="screen">
       <img src="../images/identidade/monograma-gold.png" alt="Monograma de Gabriel e Jéssica" class="obrigado-monograma" width="72" height="72">
-      <div class="obrigado-msg">Presença confirmada</div>
+      <div class="obrigado-msg" id="obrigado-titulo">Presença confirmada</div>
       <div class="ornamento" aria-hidden="true"><span></span></div>
-      <p class="obrigado-sub">
+      <p class="obrigado-sub" id="obrigado-texto">
         Obrigado por responder. Mal podemos esperar para compartilhar esse dia tão especial com você!
       </p>
       <hr class="divider">
@@ -556,7 +581,7 @@ function soltarConfete() {
 // ──────────────────────────────────────────────────────────────────────────────
 // ──────────────────────────────────────────────────────────────────────────────
 let _codigoAtual   = '';
-let _convidadosAtivos = []; // [{id, nome, vaiComparecer}]
+let _convidadosAtivos = []; // [{id, nome, vaiComparecer, apenasCerimonia}]
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Navegação entre telas
@@ -637,7 +662,7 @@ async function verificarCodigo(event) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// Tela 2 — Renderizar convite + checkboxes
+// Tela 2 — Renderizar convite + respostas de cada pessoa
 // ──────────────────────────────────────────────────────────────────────────────
 function renderizarConvite(data) {
   // O título é fixo ("Que bom ter você aqui!") — o campo `grupo` é interno
@@ -655,27 +680,44 @@ function renderizarConvite(data) {
   const lista = document.getElementById('lista-convidados');
   lista.innerHTML = '';
 
+  // Atalho "para todos" só ajuda quando há mais de uma pessoa
+  document.getElementById('atalhos').style.display = data.convidados.length > 1 ? '' : 'none';
+
+  const opcoes = [
+    ['sim',       'Cerimônia e recepção'],
+    ['cerimonia', 'Só a cerimônia'],
+    ['nao',       'Não poderei ir'],
+  ];
+
   data.convidados.forEach(c => {
+    // Convite ainda sem resposta: nada vem marcado, cada um escolhe
+    const atual = c.vaiComparecer === true
+      ? (c.apenasCerimonia ? 'cerimonia' : 'sim')
+      : c.vaiComparecer === false ? 'nao' : '';
+
     const li = document.createElement('li');
     li.className = 'convidado-item';
     li.innerHTML = `
-      <label style="display:flex;align-items:center;gap:16px;width:100%;cursor:pointer;margin:0">
-        <div class="check-wrap">
-          <input type="checkbox" name="presente" value="${c.id}"
-            ${c.vaiComparecer === true ? 'checked' : ''}
-            onchange="sincronizarChecked(this)">
-          <div class="check-box"></div>
+      <fieldset>
+        <legend class="convidado-nome">${escapeHtml(c.nome)}</legend>
+        <div class="opcoes">
+          ${opcoes.map(([valor, texto]) => `
+            <label class="opcao">
+              <input type="radio" name="resp-${c.id}" value="${valor}" ${valor === atual ? 'checked' : ''}>
+              <span>${texto}</span>
+            </label>`).join('')}
         </div>
-        <span class="convidado-nome">${escapeHtml(c.nome)}</span>
-      </label>
+      </fieldset>
     `;
+    li.dataset.id = c.id;
     lista.appendChild(li);
   });
 }
 
-function sincronizarChecked(checkbox) {
-  const c = _convidadosAtivos.find(x => x.id === checkbox.value);
-  if (c) c._checkedTemp = checkbox.checked;
+function marcarTodos(valor) {
+  document.querySelectorAll(`#lista-convidados input[value="${valor}"]`)
+    .forEach(r => { r.checked = true; });
+  esconderErro('erro-confirmacao');
 }
 
 function escapeHtml(str) {
@@ -689,11 +731,22 @@ async function confirmarPresenca(event) {
   event.preventDefault();
   esconderErro('erro-confirmacao');
 
-  const checkboxes = document.querySelectorAll('#lista-convidados input[type="checkbox"]');
-  const respostas = Array.from(checkboxes).map(cb => ({
-    convidadoId:    cb.value,
-    vaiComparecer:  cb.checked,
-  }));
+  const itens = Array.from(document.querySelectorAll('#lista-convidados .convidado-item'));
+  const faltando = itens.filter(li => !li.querySelector('input:checked'));
+  if (faltando.length) {
+    const nomes = faltando.map(li => li.querySelector('.convidado-nome').textContent);
+    mostrarErro('erro-confirmacao', `Falta escolher a resposta de: ${nomes.join(', ')}.`);
+    return;
+  }
+
+  const respostas = itens.map(li => {
+    const valor = li.querySelector('input:checked').value;
+    return {
+      convidadoId:     li.dataset.id,
+      vaiComparecer:   valor !== 'nao',
+      apenasCerimonia: valor === 'cerimonia',
+    };
+  });
 
   const btn = document.getElementById('btn-confirmar');
   btn.disabled = true;
@@ -716,14 +769,21 @@ async function confirmarPresenca(event) {
       return;
     }
 
+    const alguemVai = respostas.some(r => r.vaiComparecer);
+    document.getElementById('obrigado-titulo').textContent =
+      alguemVai ? 'Presença confirmada' : 'Resposta registrada';
+    document.getElementById('obrigado-texto').textContent = alguemVai
+      ? 'Obrigado por responder. Mal podemos esperar para compartilhar esse dia tão especial com você!'
+      : 'Obrigado por nos avisar. Vamos sentir sua falta, e você estará em nossas orações nesse dia!';
+
     mostrarTela('tela-obrigado');
-    soltarConfete();
+    if (alguemVai) soltarConfete();
 
   } catch (e) {
     mostrarErro('erro-confirmacao', 'Erro de conexão. Tente novamente em instantes.');
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Confirmar presença';
+    btn.textContent = 'Enviar resposta';
   }
 }
 

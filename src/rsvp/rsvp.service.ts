@@ -16,10 +16,17 @@ import { SalvarConviteDto } from './dto/salvar-convite.dto';
 // Sem 0/O e 1/I/L: o código vai impresso no convite de papel e é digitado à mão
 const ALFABETO_CODIGO = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 
+export interface ConvidadoResposta {
+  id: string;
+  nome: string;
+  vaiComparecer: boolean | null;
+  apenasCerimonia: boolean;
+}
+
 // `grupo` é controle interno — nunca vai na resposta pública para o convidado
 export interface ConvitePublico {
   confirmadoEm: Date | null;
-  convidados: { id: string; nome: string; vaiComparecer: boolean | null }[];
+  convidados: ConvidadoResposta[];
 }
 
 export interface ConviteAdmin {
@@ -30,7 +37,7 @@ export interface ConviteAdmin {
   confirmadoEm: Date | null;
   link: string;
   qrCode: string | null; // data URL base64, somente para 'papel'
-  convidados: { id: string; nome: string; vaiComparecer: boolean | null }[];
+  convidados: ConvidadoResposta[];
 }
 
 @Injectable()
@@ -74,6 +81,7 @@ export class RsvpService {
         id: c.id,
         nome: c.nome,
         vaiComparecer: c.vaiComparecer,
+        apenasCerimonia: c.apenasCerimonia,
       })),
     };
   }
@@ -84,7 +92,11 @@ export class RsvpService {
    */
   async confirmarPresenca(
     codigo: string,
-    respostas: { convidadoId: string; vaiComparecer: boolean }[],
+    respostas: {
+      convidadoId: string;
+      vaiComparecer: boolean;
+      apenasCerimonia?: boolean;
+    }[],
   ): Promise<void> {
     const normalizado = codigo.trim().toLowerCase();
 
@@ -110,6 +122,7 @@ export class RsvpService {
       }
       await this.convidadoRepo.update(r.convidadoId, {
         vaiComparecer: r.vaiComparecer,
+        apenasCerimonia: r.vaiComparecer && r.apenasCerimonia === true,
       });
     }
 
@@ -154,6 +167,7 @@ export class RsvpService {
             id: p.id,
             nome: p.nome,
             vaiComparecer: p.vaiComparecer,
+            apenasCerimonia: p.apenasCerimonia,
           })),
         };
       }),

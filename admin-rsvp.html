@@ -155,6 +155,7 @@
     .cc-nomes .sim { color: #276749; font-weight: 600; }
     .cc-nomes .nao { color: #c53030; text-decoration: line-through; opacity: 0.7; }
     .cc-nomes .pendente { color: var(--muted); }
+    .cc-nomes .cerimonia { color: #2b6cb0; font-weight: 600; }
 
     .cc-meta {
       display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
@@ -232,9 +233,74 @@
     .btn.perigo { background: transparent; color: #c53030; border: 1.5px solid #c53030; }
     .btn.perigo:hover { background: rgba(197,48,48,0.08); }
 
+    /* ── Abas ── */
+    .abas {
+      display: flex; gap: 4px; padding: 0 32px;
+      background: #fff; border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .aba {
+      padding: 14px 18px; border: none; background: none;
+      border-bottom: 2px solid transparent;
+      font-family: var(--font-label); font-size: 12px; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--muted); cursor: pointer;
+      white-space: nowrap;
+    }
+    .aba.active { color: var(--gold-dk); border-bottom-color: var(--gold); font-weight: 600; }
+    .aba .qtd {
+      display: inline-block; margin-left: 6px; padding: 1px 7px;
+      border-radius: 10px; background: var(--surface); font-size: 10px;
+    }
+    .painel { display: none; }
+    .painel.active { display: block; }
+
+    /* ── Lista de convidados ── */
+    .resumo-lista { padding: 12px 32px 0; font-size: 14px; color: var(--muted); }
+    .tabela-wrap { padding: 12px 32px 32px; overflow-x: auto; }
+    table.pessoas {
+      width: 100%; border-collapse: collapse; background: #fff;
+      border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden;
+      font-size: 15px;
+    }
+    table.pessoas th {
+      text-align: left; padding: 10px 14px; background: var(--surface);
+      font-family: var(--font-label); font-size: 11px; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--muted); font-weight: 500;
+    }
+    table.pessoas td { padding: 10px 14px; border-top: 1px solid var(--border); vertical-align: middle; }
+    table.pessoas td.codigo { font-family: monospace; font-weight: 700; letter-spacing: 1px; color: var(--gold-dk); }
+    table.pessoas td .grupo-link {
+      border: none; background: none; padding: 0; font: inherit;
+      color: var(--text); text-decoration: underline dotted; cursor: pointer;
+    }
+    .badge-sim       { background: #f0fff4; color: #276749; border: 1px solid #c6f6d5; }
+    .badge-cerimonia { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; }
+    .badge-nao       { background: #fff5f5; color: #c53030; border: 1px solid #fed7d7; }
+
+    /* ── Recados ── */
+    .recados { padding: 24px 32px; display: grid; gap: 16px; max-width: 760px; }
+    .recado {
+      background: #fff; border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .recado-topo {
+      display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .recado-nome { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
+    .recado-data { font-family: var(--font-label); font-size: 11px; color: var(--muted); }
+    .recado-texto { font-size: 16px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .vazio { padding: 32px; color: var(--muted); }
+
+    @media (max-width: 600px) {
+      header, .stats, .filtros, .abas, .resumo-lista, .tabela-wrap, .recados, .convites-grid { padding-left: 16px; padding-right: 16px; }
+      .filtros input { min-width: 0; width: 100%; }
+    }
+
     /* ── Print ── */
     @media print {
-      #auth-overlay, header, .filtros, .header-actions, .stats, .cc-acoes, #modal { display: none !important; }
+      #auth-overlay, header, .filtros, .header-actions, .stats, .abas, .cc-acoes, #modal, #aba-convidados, #aba-recados { display: none !important; }
+      #aba-convites { display: block !important; }
       .convites-grid { grid-template-columns: repeat(2, 1fr); padding: 0; gap: 12px; }
       .convite-card { break-inside: avoid; page-break-inside: avoid; }
     }
@@ -275,8 +341,15 @@
 
   <div class="stats" id="stats-bar"></div>
 
+  <nav class="abas" role="tablist">
+    <button class="aba active" data-aba="convites" onclick="abrirAba('convites')">Convites</button>
+    <button class="aba" data-aba="convidados" onclick="abrirAba('convidados')">Convidados</button>
+    <button class="aba" data-aba="recados" onclick="abrirAba('recados')">Recados <span class="qtd" id="qtd-recados">–</span></button>
+  </nav>
+
+  <section id="aba-convites" class="painel active">
   <div class="filtros">
-    <input type="text" id="busca" placeholder="Filtrar por grupo ou código..." oninput="filtrar()">
+    <input type="text" id="busca" placeholder="Filtrar por grupo, código ou nome..." oninput="filtrar()">
     <button class="filtro-btn active" onclick="setFiltro('todos', this)">Todos</button>
     <button class="filtro-btn" onclick="setFiltro('pendente', this)">Pendentes</button>
     <button class="filtro-btn" onclick="setFiltro('confirmado', this)">Confirmados</button>
@@ -285,6 +358,35 @@
   </div>
 
   <div class="convites-grid" id="grid"></div>
+  </section>
+
+  <!-- Uma linha por pessoa: para achar alguém pelo nome e ver a resposta -->
+  <section id="aba-convidados" class="painel">
+    <div class="filtros" id="filtros-pessoas">
+      <input type="search" id="busca-pessoa" placeholder="Buscar convidado pelo nome..." oninput="renderPessoas()">
+      <button class="filtro-btn active" data-filtro="todos"     onclick="setFiltroPessoa('todos')">Todos</button>
+      <button class="filtro-btn" data-filtro="vao"       onclick="setFiltroPessoa('vao')">Confirmados</button>
+      <button class="filtro-btn" data-filtro="cerimonia" onclick="setFiltroPessoa('cerimonia')">Só cerimônia</button>
+      <button class="filtro-btn" data-filtro="nao"       onclick="setFiltroPessoa('nao')">Não vão</button>
+      <button class="filtro-btn" data-filtro="pendente"  onclick="setFiltroPessoa('pendente')">Sem resposta</button>
+      <button class="filtro-btn" onclick="exportarPessoasCSV()">⬇ CSV desta lista</button>
+    </div>
+    <div class="resumo-lista" id="resumo-pessoas"></div>
+    <div class="tabela-wrap">
+      <table class="pessoas">
+        <thead><tr><th>Convidado</th><th>Resposta</th><th>Grupo</th><th>Código</th><th>Respondeu em</th></tr></thead>
+        <tbody id="tbody-pessoas"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="aba-recados" class="painel">
+    <div class="filtros">
+      <input type="search" id="busca-recado" placeholder="Buscar nos recados..." oninput="renderRecados()">
+      <button class="filtro-btn" onclick="carregarRecados()">↻ Atualizar recados</button>
+    </div>
+    <div class="recados" id="lista-recados"></div>
+  </section>
 </div>
 
 <!-- Modal: criar/editar convite -->
@@ -328,6 +430,7 @@
 let _token    = sessionStorage.getItem('admin_token') || '';
 let _todos    = [];
 let _filtroAtivo = 'todos';
+let _recados  = null; // recados do site; null = ainda não carregados
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 async function entrar() {
@@ -371,6 +474,8 @@ async function carregarDados(forcar = false) {
     _todos = await r.json();
     renderStats();
     filtrar();
+    renderPessoas();
+    if (forcar || _recados === null) carregarRecados();
   } catch (e) {
     alert('Erro ao carregar dados: ' + e.message);
   }
@@ -382,15 +487,18 @@ function renderStats() {
   const confirmados = _todos.filter(c => c.confirmadoEm).length;
   const pendentes   = total - confirmados;
   const totalPessoas = _todos.reduce((s, c) => s + c.convidados.length, 0);
-  const confirmouSim = _todos.flatMap(c => c.convidados).filter(p => p.vaiComparecer === true).length;
-  const confirmouNao = _todos.flatMap(c => c.convidados).filter(p => p.vaiComparecer === false).length;
+  const pessoas      = _todos.flatMap(c => c.convidados);
+  const confirmouSim = pessoas.filter(p => p.vaiComparecer === true).length;
+  const soCerimonia  = pessoas.filter(p => statusPessoa(p) === 'cerimonia').length;
+  const confirmouNao = pessoas.filter(p => p.vaiComparecer === false).length;
 
   document.getElementById('stats-bar').innerHTML = `
     <div class="stat"><strong>${total}</strong><span>convites</span></div>
     <div class="stat"><strong style="color:#276749">${confirmados}</strong><span>confirmados</span></div>
     <div class="stat"><strong style="color:#b7791f">${pendentes}</strong><span>pendentes</span></div>
     <div class="stat"><strong>${totalPessoas}</strong><span>pessoas</span></div>
-    <div class="stat"><strong style="color:#276749">${confirmouSim}</strong><span>confirmadas presença</span></div>
+    <div class="stat"><strong style="color:#276749">${confirmouSim}</strong><span>vão ao casamento</span></div>
+    <div class="stat"><strong style="color:#2b6cb0">${soCerimonia}</strong><span>só na cerimônia</span></div>
     <div class="stat"><strong style="color:#c53030">${confirmouNao}</strong><span>não virão</span></div>
   `;
 }
@@ -398,20 +506,21 @@ function renderStats() {
 // ── Filtro ────────────────────────────────────────────────────────────────────
 function setFiltro(f, btn) {
   _filtroAtivo = f;
-  document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#aba-convites .filtro-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   filtrar();
 }
 
 function filtrar() {
-  const q = document.getElementById('busca').value.toLowerCase();
+  const q = normalizar(document.getElementById('busca').value);
   let lista = _todos.filter(c => {
     if (_filtroAtivo === 'confirmado' && !c.confirmadoEm) return false;
     if (_filtroAtivo === 'pendente'   &&  c.confirmadoEm) return false;
     if (_filtroAtivo === 'papel'   && c.entrega !== 'papel')   return false;
     if (_filtroAtivo === 'digital' && c.entrega !== 'digital') return false;
     if (!q) return true;
-    return c.grupo.toLowerCase().includes(q) || c.codigo.toLowerCase().includes(q);
+    return normalizar(c.grupo).includes(q) || normalizar(c.codigo).includes(q)
+      || c.convidados.some(p => normalizar(p.nome).includes(q));
   });
   renderGrid(lista);
 }
@@ -426,9 +535,10 @@ function renderGrid(lista) {
 
   grid.innerHTML = lista.map(c => {
     const nomesHtml = c.convidados.map(p => {
-      const cls = p.vaiComparecer === true ? 'sim' : p.vaiComparecer === false ? 'nao' : 'pendente';
-      const icone = p.vaiComparecer === true ? '✓ ' : p.vaiComparecer === false ? '✗ ' : '• ';
-      return `<span class="${cls}">${icone}${esc(p.nome)}</span>`;
+      const st = statusPessoa(p);
+      const icone = { sim: '✓ ', cerimonia: '⛪ ', nao: '✗ ', pendente: '• ' }[st];
+      const extra = st === 'cerimonia' ? ' <small>(só cerimônia)</small>' : '';
+      return `<span class="${st}">${icone}${esc(p.nome)}${extra}</span>`;
     }).join('<br>');
 
     const status = c.confirmadoEm
@@ -465,6 +575,25 @@ function renderGrid(lista) {
       </div>
     `;
   }).join('');
+}
+
+// 'sim' (cerimônia e recepção) | 'cerimonia' (só cerimônia) | 'nao' | 'pendente'
+function statusPessoa(p) {
+  if (p.vaiComparecer === true) return p.apenasCerimonia ? 'cerimonia' : 'sim';
+  if (p.vaiComparecer === false) return 'nao';
+  return 'pendente';
+}
+
+const ROTULO_STATUS = {
+  sim: 'Vai (cerimônia e recepção)',
+  cerimonia: 'Só cerimônia',
+  nao: 'Não vai',
+  pendente: 'Sem resposta',
+};
+
+// Busca sem diferença de acento e maiúsculas: "joao" acha "João"
+function normalizar(s) {
+  return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 }
 
 function esc(s) {
@@ -509,7 +638,7 @@ function adicionarPessoa(p = {}) {
   const linha = document.createElement('div');
   linha.className = 'pessoa';
   if (p.id) linha.dataset.id = p.id;
-  const resposta = p.vaiComparecer === true ? '✓' : p.vaiComparecer === false ? '✗' : '';
+  const resposta = { sim: '✓', cerimonia: '⛪', nao: '✗', pendente: '' }[statusPessoa(p)];
   linha.innerHTML = `
     <span class="resposta" title="Resposta do RSVP">${resposta}</span>
     <input required maxlength="120" placeholder="Nome" value="${esc(p.nome || '')}">
@@ -602,7 +731,7 @@ function exportarCSV() {
         c.codigo,
         c.entrega,
         p.nome,
-        p.vaiComparecer === true ? 'Sim' : p.vaiComparecer === false ? 'Não' : 'Pendente',
+        ROTULO_STATUS[statusPessoa(p)],
         c.confirmadoEm ? new Date(c.confirmadoEm).toLocaleString('pt-BR') : '',
         c.link,
       ]);
@@ -671,6 +800,108 @@ function baixarCSV(linhas, nomeArquivo) {
   a.download = nomeArquivo;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// ── Abas ──────────────────────────────────────────────────────────────────────
+function abrirAba(nome) {
+  document.querySelectorAll('.aba').forEach(b => b.classList.toggle('active', b.dataset.aba === nome));
+  document.querySelectorAll('.painel').forEach(p => p.classList.toggle('active', p.id === `aba-${nome}`));
+  const busca = { convites: 'busca', convidados: 'busca-pessoa', recados: 'busca-recado' }[nome];
+  document.getElementById(busca).focus();
+}
+
+// ── Convidados (uma linha por pessoa) ─────────────────────────────────────────
+let _filtroPessoa = 'todos';
+
+function setFiltroPessoa(f) {
+  _filtroPessoa = f;
+  document.querySelectorAll('#filtros-pessoas .filtro-btn[data-filtro]')
+    .forEach(b => b.classList.toggle('active', b.dataset.filtro === f));
+  renderPessoas();
+}
+
+function pessoasFiltradas() {
+  const q = normalizar(document.getElementById('busca-pessoa').value);
+  return _todos
+    .flatMap(c => c.convidados.map(p => ({ ...p, convite: c, status: statusPessoa(p) })))
+    .filter(p => {
+      // "Confirmados" = todos que vão, inclusive quem vai só à cerimônia
+      if (_filtroPessoa === 'vao' && !['sim', 'cerimonia'].includes(p.status)) return false;
+      if (['cerimonia', 'nao', 'pendente'].includes(_filtroPessoa) && p.status !== _filtroPessoa) return false;
+      return !q || normalizar(p.nome).includes(q);
+    })
+    .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+}
+
+function renderPessoas() {
+  const lista = pessoasFiltradas();
+  const busca = document.getElementById('busca-pessoa').value.trim();
+  document.getElementById('resumo-pessoas').textContent =
+    `${lista.length} pessoa${lista.length === 1 ? '' : 's'}` + (busca ? ` para "${busca}"` : '');
+
+  const tbody = document.getElementById('tbody-pessoas');
+  if (lista.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="vazio">${busca
+      ? 'Ninguém com esse nome na lista de convidados.'
+      : 'Nenhum convidado neste filtro.'}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = lista.map(p => `
+    <tr>
+      <td>${esc(p.nome)}</td>
+      <td><span class="badge badge-${p.status === 'pendente' ? 'pendente' : p.status}">${ROTULO_STATUS[p.status]}</span></td>
+      <td><button class="grupo-link" title="Editar convite" onclick="abrirEdicao('${p.convite.id}')">${esc(p.convite.grupo)}</button></td>
+      <td class="codigo">${esc(p.convite.codigo)}</td>
+      <td>${p.convite.confirmadoEm ? new Date(p.convite.confirmadoEm).toLocaleDateString('pt-BR') : '—'}</td>
+    </tr>`).join('');
+}
+
+function exportarPessoasCSV() {
+  const linhas = [['Convidado', 'Resposta', 'Grupo', 'Código', 'Respondeu em']];
+  pessoasFiltradas().forEach(p => linhas.push([
+    p.nome,
+    ROTULO_STATUS[p.status],
+    p.convite.grupo,
+    p.convite.codigo,
+    p.convite.confirmadoEm ? new Date(p.convite.confirmadoEm).toLocaleString('pt-BR') : '',
+  ]));
+  baixarCSV(linhas, `convidados-${_filtroPessoa}.csv`);
+}
+
+// ── Recados deixados no site ──────────────────────────────────────────────────
+
+async function carregarRecados() {
+  try {
+    const r = await fetch(`${API_URL}/api/admin/mensagens`, {
+      headers: { 'Authorization': `Bearer ${_token}` },
+    });
+    if (!r.ok) throw new Error(`Erro ${r.status}`);
+    _recados = await r.json();
+    document.getElementById('qtd-recados').textContent = _recados.length;
+    renderRecados();
+  } catch (e) {
+    document.getElementById('lista-recados').innerHTML =
+      `<p class="vazio">Não foi possível carregar os recados (${esc(e.message)}).</p>`;
+  }
+}
+
+function renderRecados() {
+  if (_recados === null) return;
+  const q = normalizar(document.getElementById('busca-recado').value);
+  const lista = _recados.filter(m => !q || normalizar(m.nome).includes(q) || normalizar(m.texto).includes(q));
+  const el = document.getElementById('lista-recados');
+  if (lista.length === 0) {
+    el.innerHTML = `<p class="vazio">${_recados.length ? 'Nenhum recado encontrado.' : 'Ainda não chegou nenhum recado.'}</p>`;
+    return;
+  }
+  el.innerHTML = lista.map(m => `
+    <article class="recado">
+      <div class="recado-topo">
+        <span class="recado-nome">${esc(m.nome)}</span>
+        <span class="recado-data">${new Date(m.createdAt).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}</span>
+      </div>
+      <div class="recado-texto">${esc(m.texto)}</div>
+    </article>`).join('');
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
