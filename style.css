@@ -376,6 +376,57 @@ a:hover {
     color: var(--gold-texto);
 }
 
+/* Botão "Deixe uma Mensagem": pílula com contorno dourado, para se
+   destacar dos links comuns sem competir com o CTA da capa */
+.nav-links a.nav-cta {
+    padding: 8px 18px;
+    border: 1px solid var(--gold);
+    border-radius: 999px;
+    transition: color var(--dur-rapida) var(--ease),
+                background var(--dur-rapida) var(--ease),
+                border-color var(--dur-rapida) var(--ease);
+}
+
+.nav-links a.nav-cta::after {
+    display: none;
+}
+
+.nav-links a.nav-cta:hover,
+.nav-links a.nav-cta:focus-visible {
+    background: var(--gold);
+    color: var(--grafite);
+}
+
+/* Barra clara: contorno no tom de texto, para manter o contraste */
+.navbar.scrolled .nav-links a.nav-cta,
+.navbar.navbar-solid .nav-links a.nav-cta {
+    border-color: var(--gold-texto);
+}
+
+.navbar.scrolled .nav-links a.nav-cta:hover,
+.navbar.navbar-solid .nav-links a.nav-cta:hover {
+    background: var(--gold-texto);
+    border-color: var(--gold-texto);
+    color: var(--branco);
+}
+
+/* Tablet deitado / notebook pequeno: seis itens não cabem com o
+   espaçamento cheio — aperta o vão e o tracking em vez de quebrar linha */
+@media (min-width: 769px) and (max-width: 1000px) {
+    .nav-links {
+        gap: 12px;
+    }
+
+    .nav-links a {
+        letter-spacing: 0.1em;
+        white-space: nowrap;
+    }
+
+    .nav-links a.nav-cta {
+        padding: 7px 12px;
+    }
+}
+
 .nav-links a:focus-visible,
 .logo:focus-visible {
     outline: 2px solid var(--gold);
@@ -2217,6 +2268,12 @@ a:hover {
 
     .nav-links.active {
         display: flex;
+    }
+
+    /* No menu aberto o botão fica do tamanho do texto, não da largura toda */
+    .nav-links a.nav-cta {
+        display: inline-block;
+        margin-top: 4px;
     }
 
     .nav-links a {
