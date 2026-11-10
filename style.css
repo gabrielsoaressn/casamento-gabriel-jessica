@@ -438,7 +438,7 @@ a:hover {
     position: absolute;
     inset: 0;
     z-index: -2;
-    background: url('images/capa-ensaio-larga.jpg') center 45% / cover no-repeat;
+    background: url('images/capa-ensaio-larga.jpg') center 65% / cover no-repeat;
     transform: scale(1.06);
 }
 
@@ -447,7 +447,7 @@ a:hover {
 @media (max-aspect-ratio: 1/1) {
     .hero-foto {
         background-image: url('images/capa-ensaio.jpg');
-        background-position: center 30%;
+        background-position: center 60%;
     }
 }
 
