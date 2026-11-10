@@ -17,8 +17,10 @@
 //         como disponível.
 // nome    Nome completo do produto, com marca, tamanho e quantidade, para
 //         o convidado conseguir achar o mesmo item numa loja.
-// valor   Em reais. É este valor que vai para o Mercado Pago: o backend
-//         ignora o que o navegador mandar. null = valor livre: o convidado
+// valor   Preço de loja, em reais. O convidado paga este valor mais o
+//         ACRESCIMO_TAXA (veja no fim do arquivo); é o valor com acréscimo
+//         que vai para o Mercado Pago: o backend ignora o que o navegador
+//         mandar. null = valor livre: o convidado
 //         escolhe quanto contribuir (mínimo de R$ 10). Hoje nenhum item usa,
 //         mas o checkout e o backend continuam aceitando.
 // imagem  Arquivo em /images/presentes. Sem imagem, o card cai no ícone.
@@ -68,7 +70,7 @@ const CATEGORIAS_PRESENTES = [
     }
 ];
 
-const PRESENTES = [
+const PRESENTES_PRECO_LOJA = [
     // ---------- Cozinha ----------
     {
         id: 'jogo-panelas-inox-7pcs',
@@ -476,6 +478,27 @@ const PRESENTES = [
         categoria: 'escritorio'
     }
 ];
+
+// Acréscimo sobre o preço de loja: o Mercado Pago desconta a taxa dele do
+// que cai na conta, e com os 10% a mais o presente recebido ainda dá para
+// comprar o mesmo item. Mudou a taxa? Mude só este número (0.10 = 10%) e
+// atualize o servidor.
+const ACRESCIMO_TAXA = 0.10;
+
+// Arredonda para centavos. Multiplicar por 100 * (1 + taxa) de uma vez
+// evita o erro de ponto flutuante de 359 * 1.1 = 394.90000000000003.
+function comAcrescimo(valorLoja) {
+    return Math.round(valorLoja * Math.round((1 + ACRESCIMO_TAXA) * 10000) / 100) / 100;
+}
+
+// É esta lista que o site e o backend usam: `valor` já vem com o
+// acréscimo (e as cotas saem dele); o preço de loja fica em `valorLoja`.
+// Valor livre (null) fica como está: quem escolhe o quanto é o convidado.
+const PRESENTES = PRESENTES_PRECO_LOJA.map((presente) =>
+    presente.valor === null || presente.valor === undefined
+        ? presente
+        : { ...presente, valorLoja: presente.valor, valor: comAcrescimo(presente.valor) }
+);
 
 // Para o backend (Node) — no navegador `module` não existe e isto é ignorado.
 if (typeof module !== 'undefined' && module.exports) {
