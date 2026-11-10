@@ -438,8 +438,17 @@ a:hover {
     position: absolute;
     inset: 0;
     z-index: -2;
-    background: url('images/8e6472ce-71ef-4ab0-af18-b8a661d7669d.jpg') center 22% / cover no-repeat;
+    background: url('images/capa-ensaio-larga.jpg') center 45% / cover no-repeat;
     transform: scale(1.06);
+}
+
+/* Tela em pé (celular, tablet vertical): a versão vertical da mesma cena,
+   senão a horizontal seria cortada até sobrar só o meio dos rostos. */
+@media (max-aspect-ratio: 1/1) {
+    .hero-foto {
+        background-image: url('images/capa-ensaio.jpg');
+        background-position: center 30%;
+    }
 }
 
 .hero-foto::after {
